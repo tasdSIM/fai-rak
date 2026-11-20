@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "ไฟรักไม่มอด — เกมการ์ดสำหรับคู่รัก",
+  "short_name": "ไฟรักไม่มอด",
+  "description": "เกมการ์ดสำหรับคู่รัก เล่นบนมือถือและใช้งานออฟไลน์ได้",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#140C0F",
+  "theme_color": "#140C0F",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

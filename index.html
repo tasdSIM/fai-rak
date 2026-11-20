@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140C0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ไฟรักไม่มอด">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>ไฟรักไม่มอด</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&family=Noto+Serif+Thai:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: intimate, calm, low light — a card game played in a dim bedroom
+   IDEA: the physical deck on the table: one cream card under a reading lamp
+   PICTURE: the current card itself, large, with its line-art icon
+   COLOUR and TYPE: night plum ground, cream card, gold accent; level colours on the card band; Noto Serif Thai + IBM Plex Sans Thai
+   LAYOUT: one narrow column, card centred, three big signal buttons under the thumb */
+:root{color-scheme:dark;--bg:#140C0F;--panel:#1E1216;--line:#3A2A2E;--ink:#F6EFE6;--soft:#CBB894;--mute:#A8967A;--gold:#E2BC6E;--goldi:#F3D9A0;--card:#F6EFE6;--cardink:#1F1418;--green:#2F9E44;--amber:#F59F00;--red:#C92A2A}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{padding-bottom:env(safe-area-inset-bottom)}
+body{font:16px/1.55 'IBM Plex Sans Thai',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:460px;padding:24px 18px 28px;display:flex;flex-direction:column;gap:16px;min-height:100vh}
+.scr{display:none;flex-direction:column;gap:18px;flex:1}.scr.on{display:flex}
+h1,h2{font-family:'Noto Serif Thai',serif;margin:0;line-height:1.25;color:var(--goldi);text-wrap:balance}
+h1{font-size:32px}h2{font-size:24px}
+p{margin:0}.soft{color:var(--soft)}.mute{color:var(--mute);font-size:13px}
+label{font-size:14px;font-weight:600}
+input[type=text],input[type=number]{width:100%;height:48px;border-radius:10px;border:1px solid #5A4228;background:var(--panel);color:var(--ink);padding:0 14px;font:16px 'IBM Plex Sans Thai',sans-serif}
+input:focus-visible,button:focus-visible{outline:2px solid var(--goldi);outline-offset:2px}
+.field{display:flex;flex-direction:column;gap:6px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+button{font:inherit;cursor:pointer;border:none;color:inherit}
+.btn{min-height:52px;border-radius:12px;background:var(--gold);color:#1E1216;font-size:17px;font-weight:600;padding:0 18px;width:100%}
+.btn.ghost{background:transparent;border:1px solid #5A4228;color:var(--ink);font-weight:400}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;font-weight:400}
+.check input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--gold);flex:none}
+.err{color:#FFA8A8;font-size:14px;min-height:1.4em}
+.lv{display:flex;align-items:center;gap:12px;min-height:48px;border-radius:10px;border:1px solid var(--line);background:transparent;padding:0 14px;text-align:left;width:100%}
+.lv[aria-pressed=true]{border:2px solid var(--gold);background:#2A1C14}
+.lv .dot{width:14px;height:14px;border-radius:50%;flex:none}
+.lv .note{margin-left:auto;font-size:12px;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;border-radius:999px;border:1px solid #5A4228;background:transparent;padding:0 14px;font-size:14px;display:flex;align-items:center;gap:6px}
+.chip svg{width:16px;height:16px}
+.chip[aria-pressed=true]{border-color:var(--red);background:#3A1418;color:#FFC9C9}
+.box{border-radius:12px;background:var(--panel);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.iconbtn{min-width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;padding:0 12px;font-size:14px}
+.lvchip{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;background:#2A1C14;color:var(--goldi);font-size:14px;font-weight:600}
+.bar{height:4px;border-radius:2px;background:#2A1C1F}.bar i{display:block;height:4px;border-radius:2px;background:var(--gold);transition:width .3s}
+.turn{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card{background:var(--card);color:var(--cardink);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-height:380px;box-shadow:0 18px 40px rgba(0,0,0,.45);animation:deal .35s ease-out}
+@keyframes deal{from{transform:translateY(14px) rotate(-1.5deg);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.bar i{transition:none}}
+.band{height:12px}
+.cbody{flex:1;padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.chead{align-self:stretch;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6B5A4A}
+.ctype{background:#EADCC4;border-radius:999px;padding:4px 12px;font-weight:600;color:#4A3110}
+.cicon{width:108px;height:108px;border-radius:50%;background:#EFE3CF;display:flex;align-items:center;justify-content:center}
+.cicon svg{width:60px;height:60px}
+.ctext{flex:1;display:flex;align-items:center;font-family:'Noto Serif Thai',serif;font-weight:700;font-size:clamp(19px,5.4vw,23px);line-height:1.5;text-wrap:balance}
+.ctime{display:flex;align-items:center;gap:6px}
+.ctime span{border:1px solid #B3122E;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:600;color:#6E0C1C;white-space:nowrap}
+.adj{width:36px;height:36px;border-radius:50%;border:1px solid #C9A25A;background:transparent;color:#6B4A12;font-size:18px}
+.fav{width:44px;height:44px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}
+.sig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sig button{min-height:58px;border-radius:14px;font-size:16px;font-weight:600}
+.g{background:var(--green);color:#fff}.y{background:var(--amber);color:#1F1418}.r{background:var(--red);color:#fff}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.clock{font-size:42px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--goldi);white-space:nowrap}
+.overlay{position:fixed;inset:0;background:rgba(20,12,15,.97);display:none;align-items:center;justify-content:center;padding:24px;z-index:5}
+.overlay.on{display:flex}
+.ov{max-width:420px;width:100%;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center}
+.safe{border:1px dashed #F76707;border-radius:10px;padding:8px 14px;color:#FFC078}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;gap:12px;align-items:center;border-radius:12px;background:var(--panel);padding:12px 14px;font-size:14px;line-height:1.5}
+.li b{width:6px;align-self:stretch;border-radius:3px;flex:none}
+.foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.logo{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding-top:28px}
+</style>
+</head>
+<body>
+<main class="app">
+
+<section class="scr" id="gate" aria-labelledby="g-t">
+<div class="logo">
+<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#E2BC6E" stroke-width="1.1" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c1 4 6 6 6 11a6 6 0 0 1-12 0c0-2.5 1.2-4.2 2.5-5.3 0 2.2 1 3.3 2.2 3.3C10.7 8 10 5.5 12 2z"/><path d="M12 13c.6 1.6 2.2 2.4 2.2 4.2a2.2 2.2 0 0 1-4.4 0c0-1.3.9-2 2.2-4.2z"/></svg>
+<h1 id="g-t">ไฟรักไม่มอด</h1>
+<p class="soft">เกมการ์ดสำหรับคู่รัก มีเนื้อหาสำหรับผู้ใหญ่</p>
+</div>
+<form id="gform" class="box" novalidate>
+<div class="field"><label for="by">ปีเกิดของคนที่อายุน้อยกว่า (พ.ศ.)</label><input type="number" id="by" inputmode="numeric" placeholder="เช่น 2535"></div>
+<label class="check"><input type="checkbox" id="agree">ทั้งสองคนอายุ 18 ปีขึ้นไป และยินยอมเล่นด้วยความสมัครใจ</label>
+<p class="err" id="gerr" role="alert"></p>
+<button class="btn" type="submit">เข้าสู่เกม</button>
+</form>
+<p class="mute" style="text-align:center">แอปไม่ส่งข้อมูลไปไหน ชื่อและการ์ดที่ชอบเก็บไว้ในเครื่องนี้เท่านั้น</p>
+</section>
+
+<section class="scr" id="setup" aria-labelledby="s-t">
+<div><h2 id="s-t">ตั้งค่าคืนนี้</h2><p class="soft">ตั้งด้วยกันทั้งสองคน ใช้เวลา 1 นาที</p></div>
+<div class="row2">
+<div class="field"><label for="n0">ผู้เล่น 1</label><input type="text" id="n0" maxlength="16" placeholder="ชื่อเล่น"></div>
+<div class="field"><label for="n1">ผู้เล่น 2</label><input type="text" id="n1" maxlength="16" placeholder="ชื่อเล่น"></div>
+</div>
+<div class="field"><span style="font-size:14px;font-weight:600">เริ่มที่ระดับ</span><div id="levels" class="list"></div></div>
+<div class="box" id="x5" hidden>
+<p style="font-weight:600;color:#FFC078">ปลดล็อกระดับ 5 เอ็กซ์ตรีม</p>
+<p class="mute">ทั้งสองคนต้องยินยอม และตั้งคำหยุดร่วมกัน พูดคำนี้เมื่อไหร่ ทุกอย่างหยุดทันที</p>
+<div class="field"><label for="safe">คำหยุด</label><input type="text" id="safe" maxlength="20" placeholder="เช่น สับปะรด"></div>
+<label class="check"><input type="checkbox" id="ok0"><span id="ok0t">ผู้เล่น 1 ยินยอม</span></label>
+<label class="check"><input type="checkbox" id="ok1"><span id="ok1t">ผู้เล่น 2 ยินยอม</span></label>
+</div>
+<div class="field"><span style="font-size:14px;font-weight:600">คืนนี้ไม่เอาแน่นอน</span><span class="mute">การ์ดในหมวดที่เลือกจะไม่ถูกสุ่มขึ้นมา</span><div class="chips" id="ex"></div></div>
+<label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
+<p class="err" id="serr" role="alert"></p>
+<div class="foot"><button class="btn" id="start">เริ่มเล่น</button></div>
+</section>
+
+<section class="scr" id="play" aria-label="หน้าเล่นการ์ด">
+<div class="top">
+<button class="iconbtn" id="toSetup" aria-label="กลับไปตั้งค่า"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+<button class="lvchip" id="lvchip"><span class="dot" id="lvdot" style="width:10px;height:10px;border-radius:50%"></span><span id="lvname"></span></button>
+<button class="iconbtn" id="toEnd">จบเกม</button>
+</div>
+<div class="bar" aria-hidden="true"><i id="prog" style="width:0"></i></div>
+<div class="turn"><span style="font-size:17px;font-weight:600" id="who"></span><span class="mute" id="whoto"></span></div>
+<article class="card" id="card" aria-live="polite"></article>
+<div id="ctl"></div>
+<p class="mute" style="text-align:center" id="passes"></p>
+</section>
+
+<section class="scr" id="end" aria-labelledby="e-t">
+<div class="logo" style="padding-top:8px">
+<div class="clock" id="hug">5:00</div>
+<h2 id="e-t">หลังเกม</h2>
+<p class="soft">วางมือถือ นอนกอดกัน แล้วบอกการ์ดที่ชอบที่สุดคนละ 1 ใบ</p>
+<button class="btn ghost" id="hugbtn" style="max-width:240px">เริ่มจับเวลา 5 นาที</button>
+</div>
+<p class="mute" id="sum" style="text-align:center"></p>
+<div class="field"><span style="font-size:14px;font-weight:600">การ์ดที่ชอบ (เก็บไว้ในเครื่องนี้)</span><div class="list" id="favs"></div></div>
+<div class="foot"><button class="btn" id="again">เล่นอีกรอบ</button></div>
+</section>
+
+<div class="overlay" id="ov" role="dialog" aria-modal="true" aria-labelledby="ov-t"><div class="ov" id="ovbody"></div></div>
+</main>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem('frm-'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('frm-'+k,JSON.stringify(v))}catch(e){}}};
+const LV={1:{n:'ประกาย',band:'#E2BC6E',dot:'#E2BC6E'},2:{n:'อุ่น',band:'#A8384D',dot:'#C9566A'},3:{n:'ร้อน',band:'#B3122E',dot:'#E03A50'},4:{n:'ลุกโชน',band:'#1E1216',dot:'#F3D9A0'},5:{n:'เอ็กซ์ตรีม',band:'#E8590C',dot:'#F76707'},0:{n:'การ์ดพิเศษ',band:'#A8843F',dot:'#A8967A'}};
+const I={
+'คุย':'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+'ทำ':'<path d="M13 3 5 14h6l-1 7 8-11h-6z"/>',
+'เลือก':'<path d="M12 21v-8"/><path d="M12 13 6 5"/><path d="M12 13l6-8"/><path d="M6 9V5h4"/><path d="M18 9V5h-4"/>',
+'พิเศษ':'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5l-5.3 2.9 1.2-6-4.5-4.1 6-.7z"/>',
+'กระซิบ':'<path d="M15 4c3 0 5 2.5 5 5.5 0 2.5-2 3.5-2 6 0 2-1.5 3.5-3.5 3.5"/><path d="M9 9.5a3.5 3.5 0 0 1 0 5"/><path d="M5.5 7a7 7 0 0 1 0 10"/>',
+'จูบ':'<path d="M3 12c3-4 6-5 9-3 3-2 6-1 9 3-3 4-6 6-9 6s-6-2-9-6z"/><path d="M3 12h18"/>',
+'ปิดตา':'<circle cx="12" cy="13" r="8"/><path d="M3 10.5c4-2 14-2 18 0V14c-4-2-14-2-18 0z"/>',
+'น้ำแข็ง':'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/>',
+'เทียน':'<path d="M9 11h6v10H9z"/><path d="M12 3c1.5 2 2 3 2 4a2 2 0 0 1-4 0c0-1 .5-2 2-4z"/>',
+'เวลา':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M10 2h4"/>',
+'ผูก':'<path d="M12 11c-3-4-8-4-8 0s5 4 8 0z"/><path d="M12 11c3-4 8-4 8 0s-5 4-8 0z"/><path d="M12 11l-3 9"/><path d="M12 11l3 9"/>',
+'เพลง':'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+'สัมผัส':'<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12"/><path d="M11 11.5v-8a1.5 1.5 0 0 1 3 0V12"/><path d="M14 11.5V5a1.5 1.5 0 0 1 3 0v7"/><path d="M17 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-2c-2.5 0-4-1-5.3-2.3l-3-3.2a1.5 1.5 0 0 1 2.2-2L8 15.5"/>',
+'หัวใจ':'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+'มอง':'<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+'เสื้อผ้า':'<path d="M8 3 3 6l2 4 2-1v12h10V9l2 1 2-4-5-3c0 1.7-1.8 3-4 3S8 4.7 8 3z"/>',
+'สถานที่':'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+'กระจก':'<path d="M12 2.5c3.6 0 6 3.4 6 7.8s-2.4 7.7-6 7.7-6-3.3-6-7.7 2.4-7.8 6-7.8z"/><path d="M12 18v3"/><path d="M9 21h6"/>'
+};
+const svg=(n,c,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="${w||1.4}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]||I['ทำ']}</svg>`;
+const HEART='<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>';
+const EXCL=['กระซิบ','จูบ','สัมผัส','มอง','ปิดตา','ผูก','น้ำแข็ง','เสื้อผ้า','สถานที่','กระจก','เทียน','เพลง'];
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+const tlabel=s=>s>=60&&s%60===0?(s/60)+' นาที':s+' วินาที';
+
+let ALL=[],S={},timer=null;
+const cfg={names:store.get('names',['','']),level:1,ex:[],sp:true,x5:false,safe:''};
+
+function show(id){for(const s of document.querySelectorAll('.scr'))s.classList.toggle('on',s.id===id);window.scrollTo(0,0)}
+
+/* gate */
+$('gform').addEventListener('submit',e=>{e.preventDefault();
+const by=parseInt($('by').value,10),now=new Date().getFullYear()+543;
+if(!by||by<2400||by>now){$('gerr').textContent='กรอกปีเกิดเป็น พ.ศ. 4 หลัก';return}
+if(now-by<18){$('gerr').textContent='เกมนี้สำหรับผู้มีอายุ 18 ปีขึ้นไปเท่านั้น';return}
+if(!$('agree').checked){$('gerr').textContent='ติ๊กยืนยันว่าทั้งสองคนยินยอมก่อน';return}
+store.set('age',1);openSetup()});
+
+/* setup */
+function renderLevels(){
+$('levels').innerHTML=[1,2,3,4,5].map(l=>`<button type="button" class="lv" data-l="${l}" aria-pressed="${cfg.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span><span class="note">${l===1?'แนะนำ':l===4?'ต้องไฟเขียวทั้งคู่':l===5?'18+ ต้องปลดล็อก':''}</span></button>`).join('');
+$('x5').hidden=cfg.level!==5;
+}
+$('levels').addEventListener('click',e=>{const b=e.target.closest('.lv');if(!b)return;cfg.level=+b.dataset.l;renderLevels()});
+function renderEx(){$('ex').innerHTML=EXCL.map(n=>`<button type="button" class="chip" data-n="${n}" aria-pressed="${cfg.ex.includes(n)}">${svg(n,'currentColor',1.8)}${n}</button>`).join('')}
+$('ex').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const n=b.dataset.n;cfg.ex=cfg.ex.includes(n)?cfg.ex.filter(x=>x!==n):cfg.ex.concat(n);renderEx()});
+const nameSync=()=>{$('ok0t').textContent=($('n0').value.trim()||'ผู้เล่น 1')+' ยินยอม';$('ok1t').textContent=($('n1').value.trim()||'ผู้เล่น 2')+' ยินยอม'};
+$('n0').addEventListener('input',nameSync);$('n1').addEventListener('input',nameSync);
+function openSetup(){$('n0').value=cfg.names[0]||'';$('n1').value=cfg.names[1]||'';nameSync();renderLevels();renderEx();$('serr').textContent='';show('setup')}
+
+$('start').addEventListener('click',()=>{
+const n0=$('n0').value.trim(),n1=$('n1').value.trim();
+if(!n0||!n1){$('serr').textContent='ใส่ชื่อเล่นทั้งสองคนก่อน';return}
+if(!ALL.length){$('serr').textContent='โหลดการ์ดไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง';return}
+cfg.names=[n0,n1];store.set('names',cfg.names);cfg.sp=$('sp').checked;
+if(cfg.level===5){const sw=$('safe').value.trim();
+if(!sw||!$('ok0').checked||!$('ok1').checked){$('serr').textContent='ระดับ 5 ต้องตั้งคำหยุด และติ๊กยินยอมทั้งสองคน';return}
+cfg.x5=true;cfg.safe=sw}
+startGame()});
+
+/* game */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function deckFor(l){return shuffle(ALL.filter(c=>c.l===l&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)))}
+function startGame(){
+S={turn:0,level:cfg.level,deck:deckFor(cfg.level),inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>['SP-05','SP-06','SP-07','SP-08','SP-09'].includes(c.code))),maxLevel:cfg.level,card:null};
+if(S.level===5)S.card=ALL.find(c=>c.code==='X-01');
+draw(!!S.card);show('play')}
+function draw(keep){
+stopTimer();
+if(!keep){
+if(cfg.sp&&S.specials.length&&S.inLevel>2&&Math.random()<0.12)S.card=S.specials.pop();
+else{if(!S.deck.length)S.deck=deckFor(S.level);S.card=S.deck.pop()||null;S.inLevel++}}
+S.mode=S.card&&(S.card.l===0||S.card.code==='X-01')?'special':'signal';
+const base=S.card?S.card.secs:0;S.left=S.dbl&&S.card&&S.card.l!==0?base*2:base;if(S.card&&S.card.l!==0)S.dbl=false;
+render();
+if(S.inLevel===9&&S.level<4&&!S.asked[S.level]){S.asked[S.level]=1;levelUp(S.level+1)}
+else if(S.inLevel===9&&S.level===4&&cfg.x5&&!S.asked[4]){S.asked[4]=1;levelUp(5)}
+}
+function next(){if(S.card)S.played.push(S.card);S.turn=1-S.turn;draw()}
+const reader=()=>cfg.names[S.turn],listener=()=>cfg.names[1-S.turn];
+
+function render(){
+const c=S.card,lv=LV[S.level];
+$('lvdot').style.background=lv.dot;$('lvname').textContent='ระดับ '+S.level+' '+lv.n;
+$('prog').style.width=Math.min(100,S.inLevel/9*100)+'%';
+$('who').textContent='ตาของ'+reader();$('whoto').textContent='อ่านออกเสียงให้'+listener()+'ฟัง';
+$('passes').textContent='บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ';
+if(!c){$('card').innerHTML='<div class="cbody"><p class="ctext">การ์ดหมวดนี้หมดแล้ว ลองเปลี่ยนระดับ หรือเอาหมวดที่ซ่อนไว้ออก</p></div>';$('ctl').innerHTML='';return}
+const L=LV[c.l],fav=store.get('favs',[]).includes(c.code);
+const ink=c.l===3||c.l===2?'#8A1024':'#6B4A12';
+$('card').style.animation='none';void $('card').offsetWidth;$('card').style.animation='';
+$('card').innerHTML=`<div class="band" style="background:${L.band}"></div><div class="cbody">
+<div class="chead"><span class="ctype">${esc(c.type)}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
+<button class="fav" id="fav" aria-pressed="${fav}" aria-label="เก็บการ์ดนี้ไว้ในที่ชอบ"><svg width="22" height="22" viewBox="0 0 24 24" fill="${fav?'#B3122E':'none'}" stroke="${fav?'#B3122E':'#A8967A'}" stroke-width="1.8" aria-hidden="true">${HEART}</svg></button></div>
+<div class="cicon">${svg(c.icon,ink,1.3)}</div>
+<p class="ctext">${esc(c.text)}</p>
+${S.left?`<div class="ctime">${S.mode==='signal'?'<button class="adj" id="minus" aria-label="ลดเวลา 15 วินาที">−</button>':''}<span>${tlabel(S.left)}</span>${S.mode==='signal'?'<button class="adj" id="plus" aria-label="เพิ่มเวลา 15 วินาที">+</button>':''}</div>`:''}
+${c.code==='X-01'?`<p class="safe">คำหยุดคืนนี้: <b>${esc(cfg.safe)}</b></p>`:''}
+</div>`;
+renderCtl()}
+
+function renderCtl(){
+const m=S.mode,lp=S.passes[1-S.turn];let h='';
+if(m==='signal')h=`<p class="mute" style="text-align:center;margin-bottom:8px">${esc(listener())} ชูไฟให้การ์ดใบนี้</p><div class="sig"><button class="g" data-a="green">ไฟเขียว</button><button class="y" data-a="yellow">ไฟเหลือง</button><button class="r" data-a="red">ไฟแดง</button></div>`;
+else if(m==='yellow')h=`<p style="text-align:center;color:#FFD8A8;margin-bottom:8px">ไฟเหลือง: ทำให้เบาลง หรือข้ามใบนี้</p><div class="two"><button class="btn ghost" data-a="green">ทำแบบเบาลง</button><button class="btn" data-a="pass" ${lp?'':'disabled'}>ใช้บัตรผ่าน (${lp})</button></div><button class="btn ghost" data-a="back" style="margin-top:10px;min-height:44px">กลับไปเลือกไฟใหม่</button>`;
+else if(m==='doing')h=S.left?`<div style="display:flex;align-items:center;gap:14px"><span class="clock" id="clock">${fmt(S.left)}</span><button class="btn ghost" data-a="next">${S.left?'เสร็จแล้ว ใบต่อไป':'หมดเวลา ใบต่อไป'}</button></div>`:`<button class="btn" data-a="next">เสร็จแล้ว ใบต่อไป</button>`;
+else if(m==='special')h=`<div class="two">${S.left?'<button class="btn ghost" data-a="time">เริ่มจับเวลา</button>':''}<button class="btn" data-a="sp" style="${S.left?'':'grid-column:1/-1'}">รับทราบ ใบต่อไป</button></div>`;
+$('ctl').innerHTML=h}
+
+function startTimer(){stopTimer();if(!S.left)return;timer=setInterval(()=>{S.left--;const el=$('clock');if(S.left<=0){S.left=0;stopTimer();renderCtl();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}return}if(el)el.textContent=fmt(S.left)},1000)}
+function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+
+$('ctl').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a;
+if(a==='green'){S.mode='doing';render();startTimer()}
+else if(a==='yellow'){S.mode='yellow';renderCtl()}
+else if(a==='back'){S.mode='signal';renderCtl()}
+else if(a==='red'){stopTimer();redStop()}
+else if(a==='pass'){const k=1-S.turn;if(S.passes[k]>0){S.passes[k]--;S.turn=1-S.turn;draw()}}
+else if(a==='next')next();
+else if(a==='time'){S.mode='doing';render();startTimer()}
+else if(a==='sp'){if(S.card.code==='SP-07')S.dbl=true;S.turn=1-S.turn;draw()}});
+
+$('card').addEventListener('click',e=>{
+if(e.target.closest('#plus')){S.left=Math.min(900,S.left+15);render()}
+else if(e.target.closest('#minus')){S.left=Math.max(5,S.left-15);render()}
+else if(e.target.closest('#fav')){const f=store.get('favs',[]),c=S.card.code;store.set('favs',f.includes(c)?f.filter(x=>x!==c):f.concat(c));render()}});
+
+function overlay(html){$('ovbody').innerHTML=html;$('ov').classList.add('on');const b=$('ovbody').querySelector('button');if(b)b.focus()}
+function closeOv(){$('ov').classList.remove('on')}
+function redStop(){S.ovh=null;overlay(`<span style="width:72px;height:72px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true">${HEART}</svg></span>
+<h2 id="ov-t">หยุดก่อน</h2><p class="soft">กอดกันสักครู่ แล้วถาม${esc(listener())}ว่าโอเคไหม ไม่ต้องอธิบายเหตุผล</p>
+${cfg.x5?`<p class="safe">คำหยุด: <b>${esc(cfg.safe)}</b></p>`:''}
+<button class="btn" data-o="cont">เล่นต่อด้วยการ์ดใบใหม่</button><button class="btn ghost" data-o="down">ลดระดับลง 1 ขั้น</button><button class="btn ghost" data-o="end">พอแค่นี้ ไปหลังเกม</button>`)}
+function levelUp(to){const ready=[false,false];
+const paint=()=>overlay(`<h2 id="ov-t">ไปต่อระดับ ${to} ${LV[to].n}?</h2><p class="soft">${to>=4?'ระดับนี้ต้องกดพร้อมทั้งสองคน':'กดพร้อมทั้งสองคน แล้วแอปจะเปิดระดับถัดไป'}</p>
+<div class="two" style="width:100%">${[0,1].map(i=>`<button class="btn ${ready[i]?'':'ghost'}" data-o="r${i}" aria-pressed="${ready[i]}" style="${ready[i]?'background:var(--green);color:#fff':''}">${esc(cfg.names[i])} ${ready[i]?'พร้อม':'กดถ้าพร้อม'}</button>`).join('')}</div>
+<button class="btn" data-o="go" ${ready[0]&&ready[1]?'':'disabled'}>ไปต่อ</button><button class="btn ghost" data-o="stay">อยู่ระดับ ${S.level} ต่อ</button>`);
+S.ovh=o=>{if(o==='r0'||o==='r1'){ready[+o[1]]=!ready[+o[1]];paint();return true}
+if(o==='go'){S.level=to;S.maxLevel=Math.max(S.maxLevel,to);S.inLevel=0;S.deck=deckFor(to);closeOv();if(to===5){S.card=ALL.find(c=>c.code==='X-01');draw(true)}else draw();return true}
+if(o==='stay'){closeOv();return true}return false};paint()}
+function levelMenu(){const opts=[1,2,3,4].concat(cfg.x5?[5]:[]);
+overlay(`<h2 id="ov-t">เปลี่ยนระดับ</h2><p class="soft">ลดระดับได้ทุกเมื่อ ขึ้นระดับต้องพร้อมทั้งสองคน</p>${opts.map(l=>`<button class="lv" data-o="L${l}" aria-pressed="${S.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span></button>`).join('')}<button class="btn ghost" data-o="stay">ปิด</button>`);
+S.ovh=o=>{if(o[0]!=='L')return false;const l=+o.slice(1);if(l>S.level){levelUp(l);return true}S.level=l;S.inLevel=0;S.deck=deckFor(l);closeOv();draw();return true}}
+$('ovbody').addEventListener('click',e=>{const b=e.target.closest('button[data-o]');if(!b)return;const o=b.dataset.o;
+if(S.ovh&&S.ovh(o))return;
+if(o==='cont'){closeOv();S.turn=1-S.turn;draw()}
+else if(o==='down'){closeOv();if(S.level>1){S.level--;S.inLevel=0;S.deck=deckFor(S.level)}draw()}
+else if(o==='end'){closeOv();toEnd()}
+else if(o==='stay')closeOv()});
+$('lvchip').addEventListener('click',()=>{S.ovh=null;levelMenu()});
+$('toSetup').addEventListener('click',()=>{stopTimer();openSetup()});
+$('toEnd').addEventListener('click',()=>{stopTimer();toEnd()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('ov').classList.contains('on')&&!$('ovbody').querySelector('[data-o="cont"]'))closeOv()});
+
+/* end */
+let hugT=null,hugLeft=300;
+function toEnd(){if(S.card&&S.mode==='doing')S.played.push(S.card);
+const favs=store.get('favs',[]);
+$('sum').textContent='คืนนี้เล่นไป '+S.played.length+' ใบ ไปถึงระดับ '+S.maxLevel+' '+LV[S.maxLevel].n;
+const list=ALL.filter(c=>favs.includes(c.code));
+$('favs').innerHTML=list.length?list.map(c=>`<div class="li"><b style="background:${LV[c.l].band}"></b><span style="flex:1">${esc(c.text)}</span><span class="mute">${c.code}</span></div>`).join(''):'<p class="mute">ยังไม่มี แตะหัวใจบนการ์ดระหว่างเล่นเพื่อเก็บไว้</p>';
+hugLeft=300;$('hug').textContent=fmt(hugLeft);$('hugbtn').textContent='เริ่มจับเวลา 5 นาที';show('end')}
+$('hugbtn').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null;$('hugbtn').textContent='จับเวลาต่อ';return}
+$('hugbtn').textContent='หยุดชั่วคราว';hugT=setInterval(()=>{hugLeft--;$('hug').textContent=fmt(Math.max(0,hugLeft));if(hugLeft<=0){clearInterval(hugT);hugT=null;$('hugbtn').textContent='ครบ 5 นาทีแล้ว'}},1000)});
+$('again').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}openSetup()});
+
+/* load cards */
+fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}))}).catch(()=>{ALL=[]});
+if(store.get('age',0))openSetup();else show('gate');
+}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
+
+
