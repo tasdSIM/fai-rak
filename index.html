@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="ไฟรักไม่มอด">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-180.png">
 <title>ไฟรักไม่มอด</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&family=Noto+Serif+Thai:wght@500;700&display=swap" rel="stylesheet">
@@ -83,6 +83,12 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 .li b{width:6px;align-self:stretch;border-radius:3px;flex:none}
 .foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
 .logo{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding-top:28px}
+.inst{display:flex;align-items:center;justify-content:center;gap:10px}
+.inst img{width:28px;height:28px;border-radius:7px;flex:none}
+.steps{text-align:left;display:flex;flex-direction:column;gap:10px;width:100%;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:flex;gap:12px;align-items:center;background:var(--panel);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5;counter-increment:s}
+.steps li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--gold);color:#1E1216;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+.steps svg{width:20px;height:20px;vertical-align:-4px}
 </style>
 </head>
 <body>
@@ -100,6 +106,7 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 <p class="err" id="gerr" role="alert"></p>
 <button class="btn" type="submit">เข้าสู่เกม</button>
 </form>
+<button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button>
 <p class="mute" style="text-align:center">แอปไม่ส่งข้อมูลไปไหน ชื่อและการ์ดที่ชอบเก็บไว้ในเครื่องนี้เท่านั้น</p>
 </section>
 
@@ -120,7 +127,7 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 <div class="field"><span style="font-size:14px;font-weight:600">คืนนี้ไม่เอาแน่นอน</span><span class="mute">การ์ดในหมวดที่เลือกจะไม่ถูกสุ่มขึ้นมา</span><div class="chips" id="ex"></div></div>
 <label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
 <p class="err" id="serr" role="alert"></p>
-<div class="foot"><button class="btn" id="start">เริ่มเล่น</button></div>
+<div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
 </section>
 
 <section class="scr" id="play" aria-label="หน้าเล่นการ์ด">
@@ -327,6 +334,38 @@ $('again').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}
 /* load cards */
 fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}))}).catch(()=>{ALL=[]});
 if(store.get('age',0))openSetup();else show('gate');
+
+/* add to home screen */
+{
+const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const ua=navigator.userAgent;
+const isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const iosOther=isIOS&&/CriOS|FxiOS|EdgiOS|Line\/|FBAN|FBAV|Instagram/.test(ua);
+const inApp=/Line\/|FBAN|FBAV|Instagram|; wv\)/.test(ua);
+const btns=[...document.querySelectorAll('[data-install]')];
+let deferred=null;
+const sync=()=>{const hide=standalone();btns.forEach(b=>b.hidden=hide)};
+sync();
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;sync()});
+window.addEventListener('appinstalled',()=>{deferred=null;btns.forEach(b=>b.hidden=true);overlay(`<h2 id="ov-t">เพิ่มไอคอนแล้ว</h2><p class="soft">ครั้งหน้ากดไอคอน ไฟรักไม่มอด ที่หน้าจอโฮมได้เลย</p><button class="btn" data-close>ตกลง</button>`)});
+const SHARE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/></svg>';
+const PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+const head=t=>`<img src="icon-192.png" alt="" width="72" height="72" style="border-radius:18px"><h2 id="ov-t">${t}</h2>`;
+const ok='<button class="btn" data-close>เข้าใจแล้ว</button>';
+const copyBtn='<button class="btn ghost" data-copy>คัดลอกลิงก์</button>';
+function guide(){
+if(inApp&&!isIOS||iosOther)return overlay(head('เปิดในเบราว์เซอร์ก่อน')+`<p class="soft">แอปนี้เพิ่มไอคอนไม่ได้ เปิดลิงก์ใน ${isIOS?'Safari':'Chrome'} แล้วกดปุ่มนี้อีกครั้ง</p>`+copyBtn+ok);
+if(isIOS)return overlay(head('เพิ่มไอคอนบน iPhone / iPad')+`<ol class="steps"><li><span>กดปุ่ม แชร์ ${SHARE} ${/iPad/.test(ua)?'ด้านบนขวา':'ด้านล่างของ Safari'}</span></li><li><span>เลื่อนลงแล้วเลือก เพิ่มไปยังหน้าจอโฮม ${PLUS}</span></li><li><span>กด เพิ่ม ที่มุมขวาบน</span></li></ol>`+ok);
+overlay(head('เพิ่มไอคอนที่หน้าจอโฮม')+`<ol class="steps"><li><span>กดเมนู ⋮ ของเบราว์เซอร์ (มุมขวาบน)</span></li><li><span>เลือก ติดตั้งแอป หรือ เพิ่มไปยังหน้าจอหลัก</span></li><li><span>กด ติดตั้ง หรือ เพิ่ม เพื่อยืนยัน</span></li></ol>`+ok);
+}
+btns.forEach(b=>b.addEventListener('click',async()=>{
+if(deferred){const e=deferred;deferred=null;e.prompt();try{await e.userChoice}catch(_){}return}
+guide()}));
+$('ovbody').addEventListener('click',e=>{
+if(e.target.closest('[data-close]'))closeOv();
+const c=e.target.closest('[data-copy]');if(c){const u=location.href.split('#')[0];
+(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>c.textContent='คัดลอกแล้ว',()=>{c.textContent=u})}});
+}
 }
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
 </script>
