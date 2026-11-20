@@ -89,6 +89,40 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 .steps li{display:flex;gap:12px;align-items:center;background:var(--panel);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5;counter-increment:s}
 .steps li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--gold);color:#1E1216;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
 .steps svg{width:20px;height:20px;vertical-align:-4px}
+.bonusbtn{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;border-radius:14px;border:1px solid #6E1A26;background:linear-gradient(135deg,#3A0D16,#1E1216);padding:10px 14px;color:var(--ink);font-size:15px}
+.bb-ic{width:40px;height:40px;border-radius:12px;background:#B3122E;color:#FFE8A3;display:flex;align-items:center;justify-content:center;flex:none}.bb-ic svg{width:24px;height:24px}
+.pill{border-radius:999px;background:#3A0D16;border:1px solid #7A1A2A;color:#FF8A9A;font-size:13px;font-weight:600;padding:4px 14px}
+.tile{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;border-radius:16px;border-top:3px solid #B3122E;background:var(--panel);padding:16px;color:var(--ink)}
+.tile .ti{width:52px;height:52px;border-radius:14px;background:radial-gradient(circle at 50% 40%,#C2152F,#5A0614);display:flex;align-items:center;justify-content:center;flex:none}.tile .ti svg{width:28px;height:28px}
+.tile b{display:block;font-family:'Noto Serif Thai',serif;font-size:19px;color:var(--goldi)}
+.tile .ts{display:block;color:#FF8A9A;font-size:13px;font-weight:600;margin-bottom:4px}
+.tile .td{display:block;color:var(--soft);font-size:14px;line-height:1.5}
+.bxc{display:flex;flex-direction:column;gap:14px}
+.lbl{font-size:14px;font-weight:600}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.box ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--soft)}
+.box h3{margin:0;font-size:15px;color:var(--goldi)}
+.stepcard{background:var(--card);color:var(--cardink);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.45);animation:deal .35s ease-out}
+.stepcard .area{background:#F3D3D8;color:#8A1024;border-radius:999px;padding:3px 12px;font-size:13px;font-weight:600}
+.stepcard h3{margin:0;font-family:'Noto Serif Thai',serif;font-size:24px}
+.stepcard p{font-size:17px;line-height:1.6}
+.stepcard .clock{color:#8A1024}
+.night{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;border-radius:12px;border:1px solid var(--line);background:var(--panel);padding:10px 14px;text-align:left;color:var(--ink)}
+.night .no{width:36px;height:36px;border-radius:50%;border:2px solid #7A1A2A;display:flex;align-items:center;justify-content:center;font-weight:600;flex:none;color:#FF8A9A}
+.night.done .no{background:#B3122E;border-color:#B3122E;color:#fff}
+.night:disabled{opacity:.45}
+.task{display:flex;gap:12px;align-items:flex-start;border-radius:12px;background:var(--panel);padding:14px;font-size:15px;line-height:1.55;width:100%;text-align:left;color:var(--ink);border:1px solid transparent}
+.task .ck{width:26px;height:26px;border-radius:8px;border:2px solid #7A6A50;flex:none;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.task[aria-pressed=true]{border-color:#2F9E44}.task[aria-pressed=true] .ck{background:#2F9E44;border-color:#2F9E44}
+.paper{background:#F1E6D0;color:#2A1E14;border-radius:6px;padding:18px;font-size:16px;line-height:1.7;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative}
+.paper .stamp{position:absolute;top:10px;right:12px;border:2px solid #A11;color:#A11;font-size:11px;font-weight:700;padding:2px 8px;transform:rotate(6deg);letter-spacing:1px}
+.paper h3{margin:0 0 6px;font-family:'Noto Serif Thai',serif;font-size:15px;color:#7A1A10}
+.susp{display:flex;gap:12px;align-items:flex-start;border-radius:12px;background:var(--panel);padding:12px 14px}
+.susp .av{width:40px;height:40px;border-radius:50%;background:#3A2A2E;color:var(--goldi);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;font-family:'Noto Serif Thai',serif}
+.pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pick button{min-height:46px;border-radius:10px;border:1px solid #5A4228;background:transparent;font-size:15px}
+.pick button[aria-pressed=true]{background:var(--gold);color:#1E1216;border-color:var(--gold);font-weight:600}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;color:var(--soft)}.dl dt{color:var(--goldi);font-weight:600}.dl dd{margin:0}
 </style>
 </head>
 <body>
@@ -127,6 +161,7 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 <div class="field"><span style="font-size:14px;font-weight:600">คืนนี้ไม่เอาแน่นอน</span><span class="mute">การ์ดในหมวดที่เลือกจะไม่ถูกสุ่มขึ้นมา</span><div class="chips" id="ex"></div></div>
 <label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
 <p class="err" id="serr" role="alert"></p>
+<button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · ไขคดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
 </section>
 
@@ -152,7 +187,19 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 </div>
 <p class="mute" id="sum" style="text-align:center"></p>
 <div class="field"><span style="font-size:14px;font-weight:600">การ์ดที่ชอบ (เก็บไว้ในเครื่องนี้)</span><div class="list" id="favs"></div></div>
-<div class="foot"><button class="btn" id="again">เล่นอีกรอบ</button></div>
+<div class="foot"><button class="btn ghost" id="endMassage">ต่อด้วยนวดผ่อนคลาย (มือที่รู้ใจ)</button><button class="btn" id="again">เล่นอีกรอบ</button></div>
+</section>
+
+<section class="scr" id="bonus" aria-labelledby="b-t">
+<div class="top"><button class="iconbtn" id="bonusBack" aria-label="กลับไปตั้งค่า"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill">โบนัส</span><span style="width:44px"></span></div>
+<div><h2 id="b-t">เกมเสริม</h2><p class="soft">เล่นแยกจากเกมการ์ด หรือเล่นต่อกันในคืนเดียวก็ได้</p></div>
+<div class="list" id="hub"></div>
+</section>
+
+<section class="scr" id="bx" aria-labelledby="bxt">
+<div class="top"><button class="iconbtn" id="bxBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill" id="bxtag">โบนัส</span><span style="width:44px"></span></div>
+<h2 id="bxt"></h2>
+<div id="bxc" class="bxc"></div>
 </section>
 
 <div class="overlay" id="ov" role="dialog" aria-modal="true" aria-labelledby="ov-t"><div class="ov" id="ovbody"></div></div>
@@ -330,6 +377,116 @@ hugLeft=300;$('hug').textContent=fmt(hugLeft);$('hugbtn').textContent='เริ
 $('hugbtn').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null;$('hugbtn').textContent='จับเวลาต่อ';return}
 $('hugbtn').textContent='หยุดชั่วคราว';hugT=setInterval(()=>{hugLeft--;$('hug').textContent=fmt(Math.max(0,hugLeft));if(hugLeft<=0){clearInterval(hugT);hugT=null;$('hugbtn').textContent='ครบ 5 นาทีแล้ว'}},1000)});
 $('again').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}openSetup()});
+
+/* bonus games */
+let B=null,bxT=null,bxH=null,bxBackFn=null,wl=null;
+const nm=i=>cfg.names[i]||$('n'+i).value.trim()||('ผู้เล่น '+(i+1));
+const loadB=()=>B?Promise.resolve(B):fetch('bonus.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>(B=d));
+const hubT=id=>B.hub.find(h=>h.id===id);
+const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+function wake(on){try{if(on&&navigator.wakeLock&&!wl)navigator.wakeLock.request('screen').then(l=>{wl=l}).catch(()=>{});else if(!on&&wl){wl.release();wl=null}}catch(e){}}
+function bxStop(){if(bxT){clearInterval(bxT);bxT=null}wake(false)}
+function bxSet(html){$('bxc').innerHTML=html}
+function bx(tag,title,html,back){bxStop();$('bxtag').textContent=tag;$('bxt').textContent=title;bxSet(html);bxBackFn=back||openBonus;show('bx')}
+function openBonus(){bxStop();bxH=null;loadB().then(()=>{
+$('hub').innerHTML=B.hub.map(h=>`<button type="button" class="tile" data-h="${h.id}"><span class="ti">${svg(h.icon,'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">โบนัส ${h.n} · ${esc(h.sub)}</span><b>${esc(h.title)}</b><span class="td">${esc(h.desc)}</span></span></button>`).join('');
+show('bonus')}).catch(()=>{$('serr').textContent='โหลดเกมเสริมไม่สำเร็จ ต่อเน็ตแล้วลองอีกครั้ง';show('setup')})}
+$('toBonus').addEventListener('click',openBonus);
+$('bonusBack').addEventListener('click',openSetup);
+$('bxBack').addEventListener('click',()=>{bxStop();(bxBackFn||openBonus)()});
+$('hub').addEventListener('click',e=>{const t=e.target.closest('[data-h]');if(t)({massage:mSetup,nights:nList,cases:cList,dates:dList})[t.dataset.h]()});
+$('bxc').addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(b&&!b.disabled&&bxH)bxH(b.dataset.b)});
+$('endMassage').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}loadB().then(mSetup).catch(()=>{})});
+
+/* 1 massage */
+function mSetup(){const M=B.massage,H=hubT('massage');let g=0,len='20';
+const mins=l=>+l;
+const html=()=>`<p class="soft">${esc(M.intro)}</p>
+<div class="field"><span class="lbl">ใครนวดก่อน</span><div class="two">${[0,1].map(i=>`<button class="btn ${g===i?'':'ghost'}" data-b="g${i}" aria-pressed="${g===i}">${esc(nm(i))}</button>`).join('')}</div></div>
+<div class="field"><span class="lbl">ความยาว</span><div class="pick">${['10','20','30'].map(l=>`<button data-b="l${l}" aria-pressed="${len===l}">${mins(l)} นาที</button>`).join('')}</div><span class="mute">${M.routines[len].length} ขั้น: ${M.routines[len].map(id=>esc(M.steps[id].a)).join(' · ')}</span></div>
+<div class="box"><h3>เตรียมก่อนเริ่ม</h3>${ul(M.prep)}</div>
+<div class="box"><h3>ความปลอดภัย</h3>${ul(M.safety)}</div>
+<button class="btn" data-b="go">เริ่มนวด</button>`;
+bx('โบนัส 1',H.title,html());
+bxH=b=>{if(b==='go')mRun(g,len);else if(b[0]==='g'){g=+b[1];bxSet(html())}else if(b[0]==='l'){len=b.slice(1);bxSet(html())}}}
+function mRun(g,len){const M=B.massage,ids=M.routines[len];
+// Stretch each step so the whole routine lasts the chosen 10, 20 or 30 minutes.
+const k=len*60/ids.reduce((s,id)=>s+M.steps[id].s,0),secs=ids.map(id=>Math.max(30,Math.round(M.steps[id].s*k/15)*15));
+let i=0,left=secs[0],paused=false;
+const html=()=>{const s=M.steps[ids[i]];return `<p class="mute" style="text-align:center">${esc(nm(g))} นวดให้ ${esc(nm(1-g))} · ขั้น ${i+1}/${ids.length}</p>
+<div class="bar"><i style="width:${i/ids.length*100}%"></i></div>
+<div class="stepcard"><span class="area">${esc(s.a)}</span><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><span class="clock" id="mclock">${fmt(left)}</span></div>
+<div class="two"><button class="btn ghost" data-b="pause">${paused?'นวดต่อ':'พักแป๊บ'}</button><button class="btn" data-b="next">${i<ids.length-1?'ขั้นต่อไป':'เสร็จแล้ว'}</button></div>
+<p class="mute" style="text-align:center">หมดเวลาแล้วแอปจะสั่นและไปขั้นต่อไปเอง</p>`};
+const finish=()=>{bxStop();bxSet(`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>นวดครบแล้ว</h2><p class="soft">ถาม${esc(nm(1-g))}ว่าชอบขั้นไหนที่สุด แล้วสลับกันนวด</p></div>
+<button class="btn" data-b="swap">สลับให้ ${esc(nm(1-g))} นวด</button><button class="btn ghost" data-b="menu">กลับเมนูเกมเสริม</button>`);
+bxH=b=>{if(b==='swap')mRun(1-g,len);else if(b==='menu')openBonus()}};
+const go=()=>{i++;if(i>=ids.length){finish();return}left=secs[i];paused=false;bxSet(html());window.scrollTo(0,0)};
+bx('โบนัส 1',hubT('massage').title,html(),mSetup);wake(true);
+bxT=setInterval(()=>{if(paused)return;left--;const el=$('mclock');if(el)el.textContent=fmt(Math.max(0,left));if(left<=0){try{navigator.vibrate&&navigator.vibrate([150,80,150])}catch(e){}go()}},1000);
+bxH=b=>{if(b==='pause'){paused=!paused;bxSet(html())}else if(b==='next')go()}}
+
+/* 2 seven nights */
+function nList(){const N=B.nights,done=store.get('nights',[]);
+bx('โบนัส 2',hubT('nights').title,`<p class="soft">ทำคืนละหนึ่งภารกิจตามลำดับ จะเว้นวันก็ได้ คืนถัดไปจะเปิดเมื่อทำคืนก่อนหน้าเสร็จ</p>
+<div class="bar"><i style="width:${done.length/N.length*100}%"></i></div><p class="mute">ทำแล้ว ${done.length}/${N.length} คืน</p>
+<div class="list">${N.map((n,k)=>{const d=done.includes(k),open=d||k===0||done.includes(k-1);return `<button class="night ${d?'done':''}" data-b="n${k}" ${open?'':'disabled'}><span class="no">${d?'✓':k+1}</span><span style="flex:1"><b>คืนที่ ${k+1}: ${esc(n.t)}</b><span class="mute" style="display:block">${d?'ทำแล้ว แตะเพื่อเล่นซ้ำ':open?'พร้อมเล่นคืนนี้':'ล็อกอยู่'}</span></span></button>`}).join('')}</div>
+${done.length?'<button class="btn ghost" data-b="reset">เริ่ม 7 คืนใหม่ตั้งแต่คืนแรก</button>':''}`);
+bxH=b=>{if(b[0]==='n')nNight(+b.slice(1));else if(b==='reset'&&confirm('ล้างความคืบหน้าทั้ง 7 คืน?')){store.set('nights',[]);nList()}}}
+function nNight(k){const n=B.nights[k],ck=n.tasks.map(()=>false);
+const html=()=>`<p class="soft">${esc(n.i)}</p>
+<div class="list">${n.tasks.map((t,j)=>`<button class="task" data-b="t${j}" aria-pressed="${ck[j]}"><span class="ck">${ck[j]?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span>${esc(t)}</span></button>`).join('')}</div>
+<div class="box"><h3>คำถามก่อนนอน</h3><p class="soft">${esc(n.q)}</p></div>
+${k===B.nights.length-1?'<button class="btn ghost" data-b="cards">เปิดเกมการ์ดหลัก</button>':''}
+<button class="btn" data-b="done" ${ck.every(Boolean)?'':'disabled'}>คืนนี้ทำครบแล้ว</button>
+<p class="mute" style="text-align:center">ข้อไหนไม่สบายใจ ข้ามได้เสมอ แตะข้อนั้นให้ติ๊กแล้วบอกกันว่าข้าม</p>`;
+bx('โบนัส 2','คืนที่ '+(k+1)+': '+n.t,html(),nList);
+bxH=b=>{if(b[0]==='t'){const j=+b.slice(1);ck[j]=!ck[j];bxSet(html())}
+else if(b==='cards')openSetup();
+else if(b==='done'){const d=store.get('nights',[]);if(!d.includes(k))store.set('nights',d.concat(k));
+bxSet(`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>จบคืนที่ ${k+1} แล้ว</h2><p class="soft">${k<B.nights.length-1?'คืนที่ '+(k+2)+' เปิดแล้ว เล่นคืนไหนก็ได้ที่ทั้งคู่พร้อม':'ครบ 7 คืนแล้ว เลือกคืนที่ชอบมาเล่นซ้ำได้ตลอด'}</p></div><button class="btn" data-b="list">กลับไปดู 7 คืน</button>`);
+bxH=x=>{if(x==='list')nList()}}}}
+
+/* 3 detective cases */
+function cList(){const C=B.cases,sol=store.get('cases',{});
+bx('โบนัส 3',hubT('cases').title,`<div class="box"><h3>วิธีเล่น</h3><ol class="steps"><li><span>อ่านเรื่องย่อและผู้ต้องสงสัยด้วยกัน</span></li><li><span>ผลัดกันอ่านเบาะแสออกเสียงทีละข้อ</span></li><li><span>คุยกันได้ แต่ตอนทายต่างคนต่างกด ห้ามแอบดู</span></li><li><span>เปิดเฉลยพร้อมกัน คนที่ทายถูกได้รางวัล</span></li></ol></div>
+<div class="list">${C.map((c,k)=>`<button class="night ${sol[c.id]?'done':''}" data-b="c${k}"><span class="no">${sol[c.id]?'✓':k+1}</span><span style="flex:1"><b>คดีที่ ${k+1}: ${esc(c.t)}</b><span class="mute" style="display:block">${esc(c.tag)}${sol[c.id]?' · ปิดคดีแล้ว':''}</span></span></button>`).join('')}</div>`);
+bxH=b=>{if(b[0]==='c')cPlay(+b.slice(1))}}
+function cPlay(k){const c=B.cases[k];let shown=0,reveal=false;const pick=[-1,-1],lock=[false,false];
+const total=c.clues.length,reader=j=>nm(j%2);
+const html=()=>{let h=`<div class="paper"><span class="stamp">ลับ</span><h3>แฟ้มคดี ${k+1}</h3>${esc(c.story)}</div>
+<div class="field"><span class="lbl">ผู้ต้องสงสัย</span>${c.suspects.map(s=>`<div class="susp"><span class="av">${esc(s.n.replace(/^[เแโใไ]/,'')[0])}</span><span><b>${esc(s.n)}</b> <span class="mute">${esc(s.r)}</span><br><span class="soft" style="font-size:14px">${esc(s.m)}</span></span></div>`).join('')}</div>
+<div class="field"><span class="lbl">เบาะแส ${shown}/${total}</span>${c.clues.slice(0,shown).map((x,j)=>`<div class="paper" id="clue${j}" style="padding:14px 16px;font-size:15px"><h3>เบาะแส ${j+1} · ${esc(reader(j))} อ่าน</h3>${esc(x)}</div>`).join('')}</div>`;
+if(shown<total)h+=`<button class="btn" data-b="clue">เปิดเบาะแสข้อ ${shown+1} ให้ ${esc(reader(shown))} อ่าน</button>`;
+else if(!reveal)h+=`<div class="box"><h3>ใครคือคนร้าย?</h3><p class="mute">ส่งมือถือให้กันทีละคน กดแล้วคำตอบจะถูกซ่อน</p>${[0,1].map(p=>lock[p]?`<div class="two" style="align-items:center"><span>✓ ${esc(nm(p))} เลือกแล้ว</span><button class="btn ghost" data-b="u${p}" style="min-height:40px">เลือกใหม่</button></div>`:`<span class="lbl">${esc(nm(p))} คิดว่า</span><div class="pick">${c.suspects.map((s,i)=>`<button data-b="p${p}${i}">${esc(s.n)}</button>`).join('')}</div>`).join('')}
+<button class="btn" data-b="reveal" ${lock[0]&&lock[1]?'':'disabled'}>เปิดเฉลย</button></div>`;
+else{const ok=[0,1].map(p=>pick[p]===c.answer),rw=B.caseReward;
+h+=`<div class="paper"><span class="stamp">ปิดคดี</span><h3>เฉลย: ${esc(c.suspects[c.answer].n)}</h3>${esc(c.solution)}</div>
+<div class="box">${[0,1].map(p=>`<p>${ok[p]?'✓':'✗'} ${esc(nm(p))} ทาย ${esc(c.suspects[pick[p]].n)} · <b style="color:${ok[p]?'#8CE99A':'#FFA8A8'}">${ok[p]?'ถูก':'ผิด'}</b></p>`).join('')}
+<h3>รางวัล</h3><p class="soft">${esc(ok[0]&&ok[1]?rw[1]:!ok[0]&&!ok[1]?rw[2]:rw[0].replace('คนที่ทายถูก',nm(ok[0]?0:1)))}</p></div>
+<button class="btn" data-b="list">กลับไปเลือกคดี</button>`}
+return h};
+bx('โบนัส 3','คดีที่ '+(k+1)+': '+c.t,html(),cList);
+bxH=b=>{if(b==='clue'){shown++;bxSet(html());const el=$('clue'+(shown-1));if(el)el.scrollIntoView({behavior:'smooth',block:'center'})}
+else if(b[0]==='p'){const p=+b[1];pick[p]=+b[2];lock[p]=true;bxSet(html())}
+else if(b[0]==='u'){lock[+b[1]]=false;bxSet(html())}
+else if(b==='reveal'){reveal=true;const s=store.get('cases',{});s[c.id]=1;store.set('cases',s);bxSet(html());window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
+else if(b==='list')cList()}}
+
+/* 4 date themes */
+function dList(){const D=B.dates;
+bx('โบนัส 4',hubT('dates').title,`<p class="soft">เลือกธีมคืนนี้ เตรียมตามรายการ แล้วกดเริ่มเกมการ์ดในระดับที่เข้ากับธีม</p>
+<div class="list">${D.map((t,k)=>`<button class="tile" data-b="d${k}" style="border-top-color:${LV[t.level].dot}"><span class="ti">${svg(['เทียน','สถานที่','หัวใจ','เพลง','น้ำแข็ง','เลือก'][k%6],'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">ธีม ${k+1} · การ์ดระดับ ${t.level} ${LV[t.level].n}</span><b>${esc(t.t)}</b><span class="td">${esc(t.v)}</span></span></button>`).join('')}</div>`);
+bxH=b=>{if(b[0]==='d')dTheme(+b.slice(1))}}
+function dTheme(k){const t=B.dates[k];
+bx('โบนัส 4',t.t,`<p class="soft">${esc(t.v)}</p>
+<div class="box"><h3>เตรียมห้องและตัว</h3>${ul(t.setup)}</div>
+<div class="box"><h3>เมนูคืนนี้</h3><dl class="dl"><dt>เพลง</dt><dd>${esc(t.music)}</dd><dt>อาหาร</dt><dd>${t.food.map(esc).join('<br>')}</dd><dt>เครื่องดื่ม</dt><dd>${esc(t.drink.a)}</dd><dt>ไม่มีแอลกอฮอล์</dt><dd>${esc(t.drink.m)}</dd></dl></div>
+<div class="box"><h3>ลำดับคืนนี้</h3><ol class="steps">${t.flow.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol></div>
+<button class="btn" data-b="play">เริ่มเกมการ์ดตามธีมนี้ (ระดับ ${t.level})</button>
+${/มือที่รู้ใจ/.test(t.flow.join(''))?'<button class="btn ghost" data-b="massage">เปิดโหมดนวด มือที่รู้ใจ</button>':''}
+<p class="mute" style="text-align:center">ดื่มแต่พอดี ทั้งสองคนต้องมีสติพอจะยินยอมตลอดเกม</p>`,dList);
+bxH=b=>{if(b==='play'){cfg.level=t.level;openSetup()}else if(b==='massage')mSetup()}}
 
 /* load cards */
 fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}))}).catch(()=>{ALL=[]});

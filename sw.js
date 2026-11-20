@@ -1,5 +1,5 @@
-const CACHE = 'fire-love-pwa-v4';
-const FILES = ['./', './index.html', './cards.json', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
+const CACHE = 'fire-love-pwa-v5';
+const FILES = ['./', './index.html', './cards.json', './bonus.json', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)));
   self.skipWaiting();
