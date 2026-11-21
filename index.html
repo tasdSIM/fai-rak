@@ -115,8 +115,9 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 /* music */
 body.hasbar .app{padding-bottom:88px}
 .mbar{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:460px;display:flex;align-items:center;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(30,18,22,.97);border-top:1px solid #4A1A24;z-index:4}
-.mbar .mt{flex:1;min-width:0;height:44px;background:transparent;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:0}
-.mbar .mt b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.mbar .mt{flex:1 1 0;width:0;min-width:0;overflow:hidden;height:44px;background:transparent;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:0}
+.mbar .mt b,.mbar .mt span{display:block;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbar .mt b{font-size:13px;font-weight:600}
 .mbar .mt span{font-size:11px;color:var(--mute)}
 .mbar .rb{width:42px;height:42px;border-radius:50%;background:transparent;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
 .mbar .rb.pl{background:#B3122E;border-color:#B3122E}
@@ -151,6 +152,32 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .pick button{min-height:46px;border-radius:10px;border:1px solid #5A4228;background:transparent;font-size:15px}
 .pick button[aria-pressed=true]{background:var(--gold);color:#1E1216;border-color:var(--gold);font-weight:600}
 .dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;color:var(--soft)}.dl dt{color:var(--goldi);font-weight:600}.dl dd{margin:0}
+/* wider screens: column wrappers vanish on phones, become real columns on computers, iPads and landscape */
+.col{display:contents}
+@media (min-width:700px){
+.app{max-width:760px;padding:28px 32px 36px}
+.mbar{max-width:760px}.msheet{max-width:640px}
+#hub,#bxc .list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.poses{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{min-height:440px}.ctext{font-size:25px}
+#gate.on,#end.on{width:100%;max-width:600px;margin:0 auto}
+}
+@media (min-width:1000px),(orientation:landscape) and (min-width:700px){
+.app{max-width:1180px;padding:32px 40px 40px}
+.mbar{max-width:1180px}.msheet{max-width:760px}
+.col{display:flex;flex-direction:column;gap:18px}
+#setup.on{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 44px;align-content:start}
+#setup>div:first-child{grid-column:1/-1}
+#play.on{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px 44px;align-content:start}
+#play>.top,#play>.bar{grid-column:1/-1}
+#play .pr{align-self:center}
+#play .sig button{min-height:72px;font-size:18px}
+#bonus.on,#bx.on{width:100%;max-width:980px;margin:0 auto}
+}
+/* landscape phones are short: let the card shrink */
+@media (orientation:landscape) and (max-height:560px){
+.card{min-height:0}.cicon{width:72px;height:72px}.cicon svg{width:40px;height:40px}.logo{padding-top:8px}.ctext{font-size:21px}
+}
 </style>
 </head>
 <body>
@@ -174,6 +201,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 
 <section class="scr" id="setup" aria-labelledby="s-t">
 <div><h2 id="s-t">ตั้งค่าคืนนี้</h2><p class="soft">ตั้งด้วยกันทั้งสองคน ใช้เวลา 1 นาที</p></div>
+<div class="col">
 <div class="row2">
 <div class="field"><label for="n0">ผู้เล่น 1</label><input type="text" id="n0" maxlength="16" placeholder="ชื่อเล่น"></div>
 <div class="field"><label for="n1">ผู้เล่น 2</label><input type="text" id="n1" maxlength="16" placeholder="ชื่อเล่น"></div>
@@ -186,12 +214,15 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <label class="check"><input type="checkbox" id="ok0"><span id="ok0t">ผู้เล่น 1 ยินยอม</span></label>
 <label class="check"><input type="checkbox" id="ok1"><span id="ok1t">ผู้เล่น 2 ยินยอม</span></label>
 </div>
+</div>
+<div class="col">
 <div class="field"><span style="font-size:14px;font-weight:600">คืนนี้ไม่เอาแน่นอน</span><span class="mute">การ์ดในหมวดที่เลือกจะไม่ถูกสุ่มขึ้นมา</span><div class="chips" id="ex"></div></div>
 <label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
 <p class="err" id="serr" role="alert"></p>
 <button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · ไขคดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button type="button" class="btn ghost" id="toMusic" style="min-height:48px;font-size:15px">เพลงประกอบ: เปลี่ยนเพลง หรือเพิ่มเพลย์ลิสต์เอง</button>
 <div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
+</div>
 </section>
 
 <section class="scr" id="play" aria-label="หน้าเล่นการ์ด">
@@ -201,10 +232,14 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <button class="iconbtn" id="toEnd">จบเกม</button>
 </div>
 <div class="bar" aria-hidden="true"><i id="prog" style="width:0"></i></div>
+<div class="col pl">
 <div class="turn"><span style="font-size:17px;font-weight:600" id="who"></span><span class="mute" id="whoto"></span></div>
 <article class="card" id="card" aria-live="polite"></article>
+</div>
+<div class="col pr">
 <div id="ctl"></div>
 <p class="mute" style="text-align:center" id="passes"></p>
+</div>
 </section>
 
 <section class="scr" id="end" aria-labelledby="e-t">
