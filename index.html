@@ -22,6 +22,7 @@
    LAYOUT: one narrow column, card centred, three big signal buttons under the thumb */
 :root{color-scheme:dark;--bg:#140C0F;--panel:#1E1216;--line:#3A2A2E;--ink:#F6EFE6;--soft:#CBB894;--mute:#A8967A;--gold:#E2BC6E;--goldi:#F3D9A0;--card:#F6EFE6;--cardink:#1F1418;--green:#2F9E44;--amber:#F59F00;--red:#C92A2A}
 *{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{padding-bottom:env(safe-area-inset-bottom)}
 body{font:16px/1.55 'IBM Plex Sans Thai',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center}
@@ -152,6 +153,14 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .pick button{min-height:46px;border-radius:10px;border:1px solid #5A4228;background:transparent;font-size:15px}
 .pick button[aria-pressed=true]{background:var(--gold);color:#1E1216;border-color:var(--gold);font-weight:600}
 .dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;color:var(--soft)}.dl dt{color:var(--goldi);font-weight:600}.dl dd{margin:0}
+/* two devices */
+.rban{display:flex;align-items:center;gap:10px;border-radius:999px;border:1px solid #2F5E3A;background:#13201A;padding:4px 4px 4px 14px;font-size:13px;color:#C3FAE8}
+.rban .d{width:8px;height:8px;border-radius:50%;background:#51CF66;flex:none}
+.rban.wait{border-color:#5A4228;background:#221A12;color:#FFE8A3}.rban.wait .d{background:#FCC419}
+.rban .chip{min-height:34px}
+.rcode{font-size:44px;font-weight:700;letter-spacing:6px;color:var(--goldi);font-variant-numeric:tabular-nums;line-height:1.2}
+.qr svg{display:block;border-radius:12px;width:200px;height:200px}
+.rstat{text-align:center;color:#FFD8A8;font-weight:600}.rstat.ok{color:#8CE99A}
 /* wider screens: column wrappers vanish on phones, become real columns on computers, iPads and landscape */
 .col{display:contents}
 @media (min-width:700px){
@@ -182,6 +191,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 </head>
 <body>
 <main class="app">
+<div class="rban" id="rban" hidden><span class="d" aria-hidden="true"></span><span id="rbanT" style="flex:1"></span><button type="button" class="chip" id="rbanB">ห้อง</button></div>
 
 <section class="scr" id="gate" aria-labelledby="g-t">
 <div class="logo">
@@ -220,6 +230,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
 <p class="err" id="serr" role="alert"></p>
 <button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · ไขคดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+<button type="button" class="bonusbtn" id="toRoom"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="8" height="15" rx="2"/><rect x="13.5" y="5" width="8" height="15" rx="2"/><path d="M5.5 16h2M16.5 17h2"/></svg></span><span style="flex:1;text-align:left"><b>เล่น 2 เครื่อง</b><span class="mute" style="display:block">ต่างคนต่างถือมือถือ เห็นการ์ดใบเดียวกันพร้อมกัน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button type="button" class="btn ghost" id="toMusic" style="min-height:48px;font-size:15px">เพลงประกอบ: เปลี่ยนเพลง หรือเพิ่มเพลย์ลิสต์เอง</button>
 <div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
 </div>
@@ -264,6 +275,12 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <div class="top"><button class="iconbtn" id="bxBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill" id="bxtag">โบนัส</span><span style="width:44px"></span></div>
 <h2 id="bxt"></h2>
 <div id="bxc" class="bxc"></div>
+</section>
+
+<section class="scr" id="room" aria-labelledby="r-t">
+<div class="top"><button class="iconbtn" id="roomBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill">2 เครื่อง</span><span style="width:44px"></span></div>
+<div><h2 id="r-t">เล่น 2 เครื่อง</h2><p class="soft">ต่างคนต่างถือมือถือ เห็นการ์ดใบเดียวกันพร้อมกัน ใครกดปุ่มก็ได้ ทั้งสองเครื่องต้องต่อเน็ต</p></div>
+<div id="roomc" class="bxc"></div>
 </section>
 
 <div class="overlay" id="ov" role="dialog" aria-modal="true" aria-labelledby="ov-t"><div class="ov" id="ovbody"></div></div>
@@ -324,11 +341,14 @@ const EXCL=['กระซิบ','จูบ','สัมผัส','มอง','�
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 const tlabel=s=>s>=60&&s%60===0?(s/60)+' นาที':s+' วินาที';
 
-let ALL=[],S={},timer=null;
+let ALL=[],S={},timer=null,lastCard=null;
+/* two-device room state (see "two devices" below) */
+const R={ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:'',retry:0,rt:0,q:0,last:null,hostScr:null,ovKey:null,gameOv:false,ret:null,pend:null};
 const cfg={names:store.get('names',['','']),level:1,ex:[],sp:true,x5:false,safe:''};
 
 function show(id){for(const s of document.querySelectorAll('.scr'))s.classList.toggle('on',s.id===id);window.scrollTo(0,0);
-const bar=id!=='gate';$('mbar').hidden=!bar;document.body.classList.toggle('hasbar',bar);if(bar&&window.musPrep)window.musPrep()}
+const bar=id!=='gate';$('mbar').hidden=!bar;document.body.classList.toggle('hasbar',bar);if(bar&&window.musPrep)window.musPrep();
+rban();rsync()}
 
 /* gate */
 $('gform').addEventListener('submit',e=>{e.preventDefault();
@@ -348,7 +368,10 @@ function renderEx(){$('ex').innerHTML=EXCL.map(n=>`<button type="button" class="
 $('ex').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const n=b.dataset.n;cfg.ex=cfg.ex.includes(n)?cfg.ex.filter(x=>x!==n):cfg.ex.concat(n);renderEx()});
 const nameSync=()=>{$('ok0t').textContent=($('n0').value.trim()||'ผู้เล่น 1')+' ยินยอม';$('ok1t').textContent=($('n1').value.trim()||'ผู้เล่น 2')+' ยินยอม'};
 $('n0').addEventListener('input',nameSync);$('n1').addEventListener('input',nameSync);
-function openSetup(){$('n0').value=cfg.names[0]||'';$('n1').value=cfg.names[1]||'';nameSync();renderLevels();renderEx();$('serr').textContent='';show('setup')}
+function openSetup(){
+if(R.pend){const c=R.pend;R.pend=null;roomOpen();rJoin(c);return}
+if(R.role==='guest'){roomOpen();return}
+$('n0').value=cfg.names[0]||'';$('n1').value=cfg.names[1]||'';nameSync();renderLevels();renderEx();$('serr').textContent='';show('setup')}
 
 $('start').addEventListener('click',()=>{
 const n0=$('n0').value.trim(),n1=$('n1').value.trim();
@@ -387,10 +410,10 @@ $('lvdot').style.background=lv.dot;$('lvname').textContent='ระดับ '+S.
 $('prog').style.width=Math.min(100,S.inLevel/9*100)+'%';
 $('who').textContent='ตาของ'+reader();$('whoto').textContent='อ่านออกเสียงให้'+listener()+'ฟัง';
 $('passes').textContent='บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ';
-if(!c){$('card').innerHTML='<div class="cbody"><p class="ctext">การ์ดหมวดนี้หมดแล้ว ลองเปลี่ยนระดับ หรือเอาหมวดที่ซ่อนไว้ออก</p></div>';$('ctl').innerHTML='';return}
+if(!c){$('card').innerHTML='<div class="cbody"><p class="ctext">การ์ดหมวดนี้หมดแล้ว ลองเปลี่ยนระดับ หรือเอาหมวดที่ซ่อนไว้ออก</p></div>';$('ctl').innerHTML='';rsync();return}
 const L=LV[c.l],fav=store.get('favs',[]).includes(c.code);
 const ink=c.l===3||c.l===2?'#8A1024':'#6B4A12';
-$('card').style.animation='none';void $('card').offsetWidth;$('card').style.animation='';
+if(c.code!==lastCard){lastCard=c.code;$('card').style.animation='none';void $('card').offsetWidth;$('card').style.animation=''}
 $('card').innerHTML=`<div class="band" style="background:${L.band}"></div><div class="cbody">
 <div class="chead"><span class="ctype">${esc(c.type)}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
 <button class="fav" id="fav" aria-pressed="${fav}" aria-label="เก็บการ์ดนี้ไว้ในที่ชอบ"><svg width="22" height="22" viewBox="0 0 24 24" fill="${fav?'#B3122E':'none'}" stroke="${fav?'#B3122E':'#A8967A'}" stroke-width="1.8" aria-hidden="true">${HEART}</svg></button></div>
@@ -407,9 +430,9 @@ if(m==='signal')h=`<p class="mute" style="text-align:center;margin-bottom:8px">$
 else if(m==='yellow')h=`<p style="text-align:center;color:#FFD8A8;margin-bottom:8px">ไฟเหลือง: ทำให้เบาลง หรือข้ามใบนี้</p><div class="two"><button class="btn ghost" data-a="green">ทำแบบเบาลง</button><button class="btn" data-a="pass" ${lp?'':'disabled'}>ใช้บัตรผ่าน (${lp})</button></div><button class="btn ghost" data-a="back" style="margin-top:10px;min-height:44px">กลับไปเลือกไฟใหม่</button>`;
 else if(m==='doing')h=S.left?`<div style="display:flex;align-items:center;gap:14px"><span class="clock" id="clock">${fmt(S.left)}</span><button class="btn ghost" data-a="next">${S.left?'เสร็จแล้ว ใบต่อไป':'หมดเวลา ใบต่อไป'}</button></div>`:`<button class="btn" data-a="next">เสร็จแล้ว ใบต่อไป</button>`;
 else if(m==='special')h=`<div class="two">${S.left?'<button class="btn ghost" data-a="time">เริ่มจับเวลา</button>':''}<button class="btn" data-a="sp" style="${S.left?'':'grid-column:1/-1'}">รับทราบ ใบต่อไป</button></div>`;
-$('ctl').innerHTML=h}
+$('ctl').innerHTML=h;rsync()}
 
-function startTimer(){stopTimer();if(!S.left)return;timer=setInterval(()=>{S.left--;const el=$('clock');if(S.left<=0){S.left=0;stopTimer();renderCtl();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}return}if(el)el.textContent=fmt(S.left)},1000)}
+function startTimer(){stopTimer();if(!S.left)return;timer=setInterval(()=>{S.left--;const el=$('clock');if(S.left<=0){S.left=0;stopTimer();renderCtl();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}return}if(el)el.textContent=fmt(S.left);if(R.role==='host'&&R.peer)rsend({k:'tick',left:S.left})},1000)}
 function stopTimer(){if(timer){clearInterval(timer);timer=null}}
 
 $('ctl').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a;
@@ -427,20 +450,20 @@ if(e.target.closest('#plus')){S.left=Math.min(900,S.left+15);render()}
 else if(e.target.closest('#minus')){S.left=Math.max(5,S.left-15);render()}
 else if(e.target.closest('#fav')){const f=store.get('favs',[]),c=S.card.code;store.set('favs',f.includes(c)?f.filter(x=>x!==c):f.concat(c));render()}});
 
-function overlay(html){$('ovbody').innerHTML=html;$('ov').classList.add('on');const b=$('ovbody').querySelector('button');if(b)b.focus()}
-function closeOv(){$('ov').classList.remove('on')}
-function redStop(){S.ovh=null;overlay(`<span style="width:72px;height:72px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true">${HEART}</svg></span>
+function overlay(html){$('ovbody').innerHTML=html;$('ov').classList.add('on');const b=$('ovbody').querySelector('button');if(b)b.focus();rsync()}
+function closeOv(){$('ov').classList.remove('on');S.ov=null;R.ovKey=null;R.gameOv=false;rsync()}
+function redStop(){S.ovh=null;S.ov={k:'red'};overlay(`<span style="width:72px;height:72px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true">${HEART}</svg></span>
 <h2 id="ov-t">หยุดก่อน</h2><p class="soft">กอดกันสักครู่ แล้วถาม${esc(listener())}ว่าโอเคไหม ไม่ต้องอธิบายเหตุผล</p>
 ${cfg.x5?`<p class="safe">คำหยุด: <b>${esc(cfg.safe)}</b></p>`:''}
 <button class="btn" data-o="cont">เล่นต่อด้วยการ์ดใบใหม่</button><button class="btn ghost" data-o="down">ลดระดับลง 1 ขั้น</button><button class="btn ghost" data-o="end">พอแค่นี้ ไปหลังเกม</button>`)}
-function levelUp(to){const ready=[false,false];
+function levelUp(to,keep){if(!keep||!Array.isArray(S.ready))S.ready=[false,false];const ready=S.ready;S.ov={k:'up',to};
 const paint=()=>overlay(`<h2 id="ov-t">ไปต่อระดับ ${to} ${LV[to].n}?</h2><p class="soft">${to>=4?'ระดับนี้ต้องกดพร้อมทั้งสองคน':'กดพร้อมทั้งสองคน แล้วแอปจะเปิดระดับถัดไป'}</p>
 <div class="two" style="width:100%">${[0,1].map(i=>`<button class="btn ${ready[i]?'':'ghost'}" data-o="r${i}" aria-pressed="${ready[i]}" style="${ready[i]?'background:var(--green);color:#fff':''}">${esc(cfg.names[i])} ${ready[i]?'พร้อม':'กดถ้าพร้อม'}</button>`).join('')}</div>
 <button class="btn" data-o="go" ${ready[0]&&ready[1]?'':'disabled'}>ไปต่อ</button><button class="btn ghost" data-o="stay">อยู่ระดับ ${S.level} ต่อ</button>`);
 S.ovh=o=>{if(o==='r0'||o==='r1'){ready[+o[1]]=!ready[+o[1]];paint();return true}
 if(o==='go'){S.level=to;S.maxLevel=Math.max(S.maxLevel,to);S.inLevel=0;S.deck=deckFor(to);closeOv();if(to===5){S.card=ALL.find(c=>c.code==='X-01');draw(true)}else draw();return true}
 if(o==='stay'){closeOv();return true}return false};paint()}
-function levelMenu(){const opts=[1,2,3,4].concat(cfg.x5?[5]:[]);
+function levelMenu(){const opts=[1,2,3,4].concat(cfg.x5?[5]:[]);S.ov={k:'menu'};
 overlay(`<h2 id="ov-t">เปลี่ยนระดับ</h2><p class="soft">ลดระดับได้ทุกเมื่อ ขึ้นระดับต้องพร้อมทั้งสองคน</p>${opts.map(l=>`<button class="lv" data-o="L${l}" aria-pressed="${S.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span></button>`).join('')}<button class="btn ghost" data-o="stay">ปิด</button>`);
 S.ovh=o=>{if(o[0]!=='L')return false;const l=+o.slice(1);if(l>S.level){levelUp(l);return true}S.level=l;S.inLevel=0;S.deck=deckFor(l);closeOv();draw();return true}}
 $('ovbody').addEventListener('click',e=>{const b=e.target.closest('button[data-o]');if(!b)return;const o=b.dataset.o;
@@ -456,7 +479,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('ov').classList.c
 
 /* end */
 let hugT=null,hugLeft=300;
-function toEnd(){if(S.card&&S.mode==='doing')S.played.push(S.card);
+function toEnd(){if(S.card&&S.mode==='doing')S.played.push(S.card);endView()}
+function endView(){
 const favs=store.get('favs',[]);
 $('sum').textContent='คืนนี้เล่นไป '+S.played.length+' ใบ ไปถึงระดับ '+S.maxLevel+' '+LV[S.maxLevel].n;
 const list=ALL.filter(c=>favs.includes(c.code));
@@ -670,8 +694,140 @@ ${/มือที่รู้ใจ/.test(t.flow.join(''))?'<button class="btn 
 <p class="mute" style="text-align:center">ดื่มแต่พอดี ทั้งสองคนต้องมีสติพอจะยินยอมตลอดเกม</p>`,dList);
 bxH=b=>{if(b==='play'){cfg.level=t.level;openSetup()}else if(b==='massage')mSetup()}}
 
+/* two devices: the device that creates the room runs the game; after every change it sends a
+   small snapshot (card code, level, turn, overlay) through the relay and the other device draws
+   the same screen from its own cards.json. Buttons pressed on the other device are sent back
+   and pressed on the host, so both always show the same thing. */
+if(/^(127.0.0.1|localhost)$/.test(location.hostname))window.__R=R;   // local test hook only
+const curScr=()=>(document.querySelector('.scr.on')||{}).id;
+const wsUrl=()=>/^(127\.0\.0\.1|localhost)$/.test(location.hostname)?'ws://127.0.0.1:8799/ws':(location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws';
+const inviteUrl=()=>location.origin+location.pathname+'#join='+R.code;
+const ssSave=()=>{try{R.code&&R.tok?sessionStorage.setItem('frm-room',JSON.stringify({code:R.code,tok:R.tok,role:R.role})):sessionStorage.removeItem('frm-room')}catch(e){}};
+function rsend(d){if(R.ws&&R.ws.readyState===1)R.ws.send(JSON.stringify({t:'msg',d}))}
+function snap(){const scr=curScr(),on=scr==='play'||scr==='end';
+return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,g:on?{turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
+function rsync(){if(R.role!=='host'||!R.peer||R.q)return;R.q=1;setTimeout(()=>{R.q=0;rsend({k:'snap',s:snap()})},0)}
+function rOpen(first){
+if(R.ws){const o=R.ws;R.ws=null;o.onclose=null;try{o.close()}catch(e){}}
+let ws;try{ws=new WebSocket(wsUrl())}catch(e){R.st='idle';R.err='เชื่อมต่อไม่ได้ ลองอีกครั้ง';rui();return}
+R.ws=ws;
+ws.onopen=()=>{R.retry=0;ws.send(JSON.stringify(first))};
+ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}rMsg(m)};
+ws.onclose=()=>{if(R.ws!==ws)return;R.ws=null;
+if(R.code&&R.tok){R.st='re';rui();clearTimeout(R.rt);R.rt=setTimeout(()=>{if(R.code&&!R.ws)rOpen({t:'resume',code:R.code,tok:R.tok})},Math.min(15000,800*2**R.retry++))}
+else{if(R.st==='conn')R.err='เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ เช็กเน็ตแล้วลองอีกครั้ง';R.st='idle';rui()}}}
+function rCreate(){R.err='';R.st='conn';rui();rOpen({t:'create'})}
+function rJoin(code){code=String(code||'').replace(/\D/g,'');if(code.length!==6){R.err='รหัสห้องต้องเป็นตัวเลข 6 หลัก';rui();return}R.err='';R.st='conn';rui();rOpen({t:'join',code})}
+function rClear(err){const ws=R.ws,wasGuest=R.role==='guest';clearTimeout(R.rt);
+Object.assign(R,{ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:err||'',last:null,hostScr:null,ovKey:null});ssSave();
+if(ws){ws.onclose=null;try{ws.close()}catch(e){}}
+if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}
+if(wasGuest&&curScr()!=='room'){S={};roomOpen();return}rui()}
+function rLeave(){if(R.ws&&R.ws.readyState===1)R.ws.send('{"t":"leave"}');rClear('')}
+const RERR={nf:'ไม่พบห้องนี้ เช็กรหัสอีกครั้ง',full:'ห้องนี้มีครบ 2 เครื่องแล้ว',gone:'ห้องหมดอายุแล้ว สร้างห้องใหม่ได้เลย',rate:'ลองบ่อยเกินไป รอสักครู่แล้วลองใหม่',busy:'เซิร์ฟเวอร์ไม่ว่าง ลองใหม่อีกครั้ง'};
+function rMsg(m){
+if(m.t==='room'){Object.assign(R,{code:m.code,tok:m.tok,role:m.role,peer:!!m.peer,st:'ok',err:''});ssSave();
+if(R.role==='guest'){if(playing)musPause();musStarted=true}
+if(R.role==='host')rsync();rui()}
+else if(m.t==='peer'){R.peer=!!m.on;
+if(m.left&&R.role==='guest'){rClear('เครื่องหลักปิดห้องแล้ว');return}
+if(R.peer&&R.role==='host')rsync();rui()}
+else if(m.t==='err')rClear(RERR[m.e]||'เกิดข้อผิดพลาด ลองอีกครั้ง');
+else if(m.t==='msg'&&m.d&&typeof m.d==='object'){const d=m.d;
+if(R.role==='host'&&d.k==='act')rAct(d);
+else if(R.role==='guest'){if(d.k==='snap'&&d.s)rApply(d.s);
+else if(d.k==='tick'){S.left=Math.max(0,+d.left|0);const el=$('clock');if(el)el.textContent=fmt(S.left)}}}}
+/* host: press the same button the other device pressed */
+function rAct(d){const scr=curScr();if(scr!=='play'&&scr!=='end')return;const v=String(d.v||'');if(!/^[A-Za-z0-9]{1,12}$/.test(v))return;
+const sel=d.w==='a'?`#ctl button[data-a="${v}"]`:d.w==='o'?`#ovbody button[data-o="${v}"]`:d.w==='id'&&['plus','minus','lvchip','toEnd','again'].includes(v)?'#'+v:null;
+const el=sel&&document.querySelector(sel);if(el&&!el.disabled)el.click()}
+/* guest: draw the host's screen. Every value is checked, since it came over the network. */
+const num=(x,lo,hi)=>{x=Math.round(+x);return Number.isFinite(x)?Math.min(hi,Math.max(lo,x)):lo};
+function rApply(s){R.last=s;if(!ALL.length)return;
+const g=s.g,scr=s.scr,cur=curScr(),moved=R.hostScr!==scr;R.hostScr=scr;
+cfg.names=(Array.isArray(s.names)?s.names:[]).slice(0,2).map(x=>String(x||'').slice(0,16));while(cfg.names.length<2)cfg.names.push('');
+cfg.x5=!!s.x5;cfg.safe=String(s.safe||'').slice(0,20);
+if((scr==='play'||scr==='end')&&g&&typeof g==='object'){
+const ov=g.ov&&typeof g.ov==='object'&&['red','up','menu'].includes(g.ov.k)?{k:g.ov.k,to:num(g.ov.to,1,5)}:null;
+Object.assign(S,{turn:num(g.turn,0,1),level:num(g.level,1,5),inLevel:num(g.inLevel,0,999),passes:[0,1].map(i=>num((g.passes||[])[i],0,9)),
+mode:['signal','yellow','doing','special'].includes(g.mode)?g.mode:'signal',left:num(g.left,0,3600),maxLevel:num(g.maxLevel,1,5),
+played:new Array(num(g.played,0,999)),ready:[0,1].map(i=>!!(g.ready||[])[i]),ov});
+S.card=ALL.find(c=>c.code===g.card)||null;
+if(!moved&&cur!=='play'&&cur!=='end'){rui();return}   // stepped away on purpose: stay there
+if(scr==='play'){if(cur!=='play')show('play');render();rOv()}
+else{rOvClose();if(cur!=='end')endView()}}
+else{rOvClose();if(cur==='play'||cur==='end')roomOpen();else rui()}}
+function rOvClose(){if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}R.ovKey=null}
+function rOv(){const key=JSON.stringify([S.ov,S.ready]);if(key===R.ovKey)return;
+if(!S.ov){rOvClose();return}
+R.ovKey=key;R.gameOv=true;
+if(S.ov.k==='red')redStop();else if(S.ov.k==='up')levelUp(S.ov.to,true);else levelMenu()}
+/* guest taps go to the host instead of acting locally */
+document.addEventListener('click',e=>{if(R.role!=='guest')return;const scr=curScr();if(scr!=='play'&&scr!=='end')return;
+let b,m=null;
+if(b=e.target.closest('#ctl button[data-a]'))m={w:'a',v:b.dataset.a};
+else if(R.gameOv&&(b=e.target.closest('#ovbody button[data-o]')))m={w:'o',v:b.dataset.o};
+else if(b=e.target.closest('#plus,#minus,#lvchip,#toEnd,#again'))m={w:'id',v:b.id};
+else if(b=e.target.closest('#toSetup')){e.preventDefault();e.stopPropagation();roomOpen();return}
+if(!m)return;e.preventDefault();e.stopPropagation();
+if(b.disabled)return;
+if(!R.ws||R.ws.readyState!==1||!R.peer){rui();return}
+rsend({k:'act',...m})},true);
+/* banner and room screen */
+function rban(){const on=!!R.code&&curScr()!=='gate'&&curScr()!=='room';$('rban').hidden=!on;if(!on)return;
+const ok=R.st==='ok'&&R.peer;$('rban').classList.toggle('wait',!ok);
+$('rbanT').textContent=R.st==='re'?'กำลังต่อใหม่… ห้อง '+R.code:R.role==='host'?(R.peer?'ห้อง '+R.code+' · อีกเครื่องเชื่อมต่อแล้ว':'ห้อง '+R.code+' · รออีกเครื่องเข้าห้อง'):(R.peer?'เชื่อมกับห้อง '+R.code:'ห้อง '+R.code+' · เครื่องหลักหลุดการเชื่อมต่อ')}
+function rui(){rban();if(curScr()==='room')roomView()}
+function roomOpen(){const c=curScr();if(c!=='room')R.ret=c;show('room');roomView()}
+const gameOn=()=>R.role==='guest'?(R.hostScr==='play'||R.hostScr==='end'):!!(S&&S.deck&&(R.ret==='play'||R.ret==='end'));
+function roomView(){let h='';const tag=R.code?R.code.slice(0,3)+' '+R.code.slice(3):'';
+$('roomBack').hidden=R.role==='guest'&&!gameOn();
+if(!R.code){const busy=R.st==='conn';
+h=`${R.err?`<p class="err" role="alert">${esc(R.err)}</p>`:''}
+<div class="box"><h3>สร้างห้องใหม่</h3><p class="soft" style="font-size:14px">เครื่องนี้เป็นเครื่องหลัก ใช้ตั้งค่าเกมและสุ่มการ์ด แล้วให้อีกคนสแกน QR หรือพิมพ์รหัสห้อง</p><button class="btn" data-r="create" ${busy?'disabled':''}>${busy?'กำลังเชื่อมต่อ…':'สร้างห้อง'}</button></div>
+<div class="box"><h3>เข้าห้องของอีกคน</h3><div class="field"><label for="rcode">รหัสห้อง 6 หลัก</label><input type="text" id="rcode" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="เช่น 482913"></div><button class="btn ghost" data-r="join" ${busy?'disabled':''}>เข้าห้อง</button></div>
+<p class="mute">ระบบส่งแค่รหัสการ์ดกับปุ่มที่กดระหว่างสองเครื่อง ไม่เก็บข้อมูลใดไว้ และห้องจะหายไปเองเมื่อเลิกเล่น</p>`}
+else if(R.role==='host'){
+h=`<div class="box" style="align-items:center;text-align:center"><span class="lbl">รหัสห้อง</span><span class="rcode">${tag}</span><div class="qr" id="rqr"></div><p class="mute">ให้อีกคนสแกน QR ด้วยกล้องมือถือ หรือเปิดเกมแล้วกด เล่น 2 เครื่อง แล้วใส่รหัสนี้</p><button class="btn ghost" data-r="share">ส่งลิงก์เชิญ</button></div>
+<p class="rstat ${R.peer&&R.st==='ok'?'ok':''}">${R.st==='re'?'กำลังต่อใหม่…':R.peer?'อีกเครื่องเชื่อมต่อแล้ว':'รออีกเครื่องเข้าห้อง…'}</p>
+${gameOn()?'<button class="btn" data-r="back">กลับไปที่เกม</button>':R.peer?'<button class="btn" data-r="setup">ไปตั้งค่าเกม แล้วกดเริ่มเล่น</button>':''}
+<button class="btn ghost" data-r="leave">ปิดห้อง</button>`}
+else{
+h=`<div class="box" style="align-items:center;text-align:center"><span class="lbl">ห้อง</span><span class="rcode">${tag}</span>
+<p class="rstat ${R.peer&&R.st==='ok'?'ok':''}">${R.st==='re'?'กำลังต่อใหม่…':R.peer?'เชื่อมต่อแล้ว':'เครื่องหลักหลุดการเชื่อมต่อ รอสักครู่'}</p>
+<p class="soft">${gameOn()?'เกมกำลังเล่นอยู่':'รอเครื่องหลักตั้งค่าและกดเริ่มเล่น การ์ดจะขึ้นที่เครื่องนี้เอง'}</p></div>
+${gameOn()?'<button class="btn" data-r="back">กลับไปที่เกม</button>':''}
+<p class="mute">เพลงเปิดจากเครื่องหลักเครื่องเดียว จะได้ไม่ดังซ้อนกัน</p>
+<button class="btn ghost" data-r="leave">ออกจากห้อง</button>`}
+$('roomc').innerHTML=h;
+if(R.role==='host')drawQR()}
+let qrP=null;
+const loadQR=()=>window.qrcode?Promise.resolve():qrP||(qrP=new Promise((ok,no)=>{const s=document.createElement('script');s.src='qrcode.js';s.onload=ok;s.onerror=()=>{qrP=null;no()};document.head.appendChild(s)}));
+function drawQR(){const el=$('rqr');if(!el)return;loadQR().then(()=>{if(!$('rqr'))return;const q=qrcode(0,'M');q.addData(inviteUrl());q.make();const n=q.getModuleCount();let p='';
+for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))p+=`M${c} ${r}h1v1h-1z`;
+$('rqr').innerHTML=`<svg viewBox="-3 -3 ${n+6} ${n+6}" shape-rendering="crispEdges" role="img" aria-label="QR สำหรับเข้าห้อง"><rect x="-3" y="-3" width="${n+6}" height="${n+6}" fill="#fff"/><path d="${p}" fill="#140C0F"/></svg>`}).catch(()=>{const e=$('rqr');if(e)e.hidden=true})}
+function roomBack(){const r=R.ret;
+if((r==='play'||r==='end')&&gameOn()){if(R.role==='guest'&&R.last){R.hostScr=null;rApply(R.last)}else{show(r);if(r==='play')render()}return}
+openSetup()}
+$('roomc').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b||b.disabled)return;const a=b.dataset.r;
+if(a==='create')rCreate();
+else if(a==='join')rJoin($('rcode').value);
+else if(a==='leave'){if(confirm(R.role==='host'?'ปิดห้องนี้? อีกเครื่องจะหลุดออกจากเกม':'ออกจากห้องนี้?')){rLeave();roomView()}}
+else if(a==='setup')openSetup();
+else if(a==='back')roomBack();
+else if(a==='share'){const url=inviteUrl(),text='มาเล่นไฟรักไม่มอดด้วยกัน ห้อง '+R.code;
+if(navigator.share)navigator.share({title:'ไฟรักไม่มอด',text,url}).catch(()=>{});
+else(navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>{b.textContent='คัดลอกลิงก์แล้ว'},()=>{b.textContent=url})}});
+$('roomc').addEventListener('keydown',e=>{if(e.target.id==='rcode'&&e.key==='Enter'){e.preventDefault();rJoin(e.target.value)}});
+$('roomBack').addEventListener('click',roomBack);
+$('toRoom').addEventListener('click',roomOpen);
+$('rbanB').addEventListener('click',roomOpen);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&R.code&&R.tok&&!R.ws){clearTimeout(R.rt);R.retry=0;rOpen({t:'resume',code:R.code,tok:R.tok})}});
+{const m=location.hash.match(/join=(\d{6})/);if(m){R.pend=m[1];history.replaceState(null,'',location.pathname+location.search)}
+else{try{const s=JSON.parse(sessionStorage.getItem('frm-room')||'null');if(s&&s.code&&s.tok){Object.assign(R,{code:s.code,tok:s.tok,role:s.role,st:'re'});rOpen({t:'resume',code:s.code,tok:s.tok})}}catch(e){}}}
+
 /* load cards */
-fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}))}).catch(()=>{ALL=[]});
+fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}));if(R.role==='guest'&&R.last)rApply(R.last)}).catch(()=>{ALL=[]});
 if(store.get('age',0))openSetup();else show('gate');
 
 /* add to home screen */

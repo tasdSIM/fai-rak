@@ -31,7 +31,7 @@ echo "== Deploying $REV: $(git log -1 --format=%s)"
 TARBALL=$(mktemp)
 trap 'rm -f "$TARBALL"' EXIT
 # The site files go in site/, the compose file and nginx.conf next to it.
-git archive --format=tar --prefix=site/ HEAD -- index.html cards.json bonus.json sw.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png icon-maskable-512.png > "$TARBALL"
+git archive --format=tar --prefix=site/ HEAD -- index.html cards.json bonus.json sw.js qrcode.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png icon-maskable-512.png > "$TARBALL"
 
 echo "== Checking the VM"
 vm true || { echo "Cannot reach $VM_HOST. If the key needs its passphrase, run: ssh-add ~/.ssh/id_ed25519" >&2; exit 1; }
@@ -51,10 +51,11 @@ echo "== Copying $REV"
 vm "mkdir -p $APP_DIR/site && find $APP_DIR/site -mindepth 1 -delete && tar xf - -C $APP_DIR/site --strip-components=1 && chmod -R a+rX $APP_DIR/site" < "$TARBALL"
 vm "cat > $APP_DIR/docker-compose.vm.yml" < deploy/vm/docker-compose.vm.yml
 vm "cat > $APP_DIR/nginx.conf" < deploy/vm/nginx.conf
+git show HEAD:relay/relay.js | vm "cat > $APP_DIR/relay.js && chmod a+r $APP_DIR/relay.js"
 vm "echo $REV > $APP_DIR/REVISION"
 
 echo "== Starting"
-vm "cd $APP_DIR && $COMPOSE up -d --remove-orphans 2>&1 | tail -4 && sudo docker exec fai-rak-web nginx -s reload >/dev/null 2>&1 || true"
+vm "cd $APP_DIR && $COMPOSE up -d --remove-orphans 2>&1 | tail -4 && sudo docker restart fai-rak-relay >/dev/null && sudo docker exec fai-rak-web nginx -s reload >/dev/null 2>&1 || true"
 
 echo "== Checking"
 vm "for i in \$(seq 1 20); do curl -fs -o /dev/null http://127.0.0.1:8093/manifest.webmanifest && echo '   VM 200' && exit 0; sleep 1; done; echo '   VM FAILED'; sudo docker logs --tail 30 fai-rak-web; exit 1"
