@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#140C0F">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ไฟรักไม่มอด">
@@ -107,6 +108,33 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 .stepcard h3{margin:0;font-family:'Noto Serif Thai',serif;font-size:24px}
 .stepcard p{font-size:17px;line-height:1.6}
 .stepcard .clock{color:#8A1024}
+.stepcard .posecap{font-size:13px;color:#6B5A4A;margin-top:-6px}
+.poses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.poses figure{margin:0;background:var(--card);border-radius:12px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.poses figcaption{font-size:12px;color:#4A3110;text-align:center;line-height:1.4}
+/* music */
+body.hasbar .app{padding-bottom:88px}
+.mbar{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:460px;display:flex;align-items:center;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(30,18,22,.97);border-top:1px solid #4A1A24;z-index:4}
+.mbar .mt{flex:1;min-width:0;height:44px;background:transparent;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:0}
+.mbar .mt b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.mbar .mt span{font-size:11px;color:var(--mute)}
+.mbar .rb{width:42px;height:42px;border-radius:50%;background:transparent;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.mbar .rb.pl{background:#B3122E;border-color:#B3122E}
+.eq{display:flex;align-items:flex-end;gap:2px;width:18px;height:16px;flex:none}.eq i{flex:1;background:#FF6B6B;height:30%;border-radius:1px}
+.eq.on i{animation:eq 1s ease-in-out infinite}.eq.on i:nth-child(2){animation-delay:-.4s}.eq.on i:nth-child(3){animation-delay:-.7s}
+@keyframes eq{0%,100%{height:25%}50%{height:100%}}
+@media (prefers-reduced-motion:reduce){.eq.on i{animation:none;height:70%}}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:6;display:none}.scrim.on{display:block}
+.msheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:460px;max-height:90vh;overflow-y:auto;background:#1E1216;border-radius:20px 20px 0 0;border-top:2px solid #B3122E;padding:16px 16px calc(20px + env(safe-area-inset-bottom));z-index:7;transform:translateY(110%);transition:transform .25s ease;display:flex;flex-direction:column;gap:14px}
+.msheet.on{transform:none}
+.msheet>*{flex:none}
+.ytbox{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+.ytbox iframe,.ytbox>div{position:absolute;inset:0;width:100%;height:100%;border:0}
+.trk{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;border-radius:10px;border:1px solid var(--line);background:transparent;padding:6px 6px 6px 12px;text-align:left;color:var(--ink);font-size:14px}
+.trk[aria-current=true]{border-color:#B3122E;background:#2A1218}
+.trk .tn{flex:1;min-width:0}.trk .tn b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trk .tn span{font-size:12px;color:var(--mute)}
+.trk .x{width:36px;height:36px;border-radius:50%;background:transparent;color:var(--mute);flex:none}
+input[type=range]{width:100%;accent-color:#B3122E}
 .night{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;border-radius:12px;border:1px solid var(--line);background:var(--panel);padding:10px 14px;text-align:left;color:var(--ink)}
 .night .no{width:36px;height:36px;border-radius:50%;border:2px solid #7A1A2A;display:flex;align-items:center;justify-content:center;font-weight:600;flex:none;color:#FF8A9A}
 .night.done .no{background:#B3122E;border-color:#B3122E;color:#fff}
@@ -162,6 +190,7 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 <label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
 <p class="err" id="serr" role="alert"></p>
 <button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · ไขคดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+<button type="button" class="btn ghost" id="toMusic" style="min-height:48px;font-size:15px">เพลงประกอบ: เปลี่ยนเพลง หรือเพิ่มเพลย์ลิสต์เอง</button>
 <div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
 </section>
 
@@ -205,6 +234,29 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 <div class="overlay" id="ov" role="dialog" aria-modal="true" aria-labelledby="ov-t"><div class="ov" id="ovbody"></div></div>
 </main>
 
+<div class="mbar" id="mbar" hidden>
+<span class="eq" id="mEq" aria-hidden="true"><i></i><i></i><i></i></span>
+<button class="mt" id="mOpen" aria-label="เปิดหน้าตั้งค่าเพลง"><b id="mTitle">เพลงประกอบ</b><span id="mSub">แตะเพื่อเลือกเพลง</span></button>
+<button class="rb pl" id="mPlay2" aria-label="เล่นเพลง"></button>
+<button class="rb" id="mNext2" aria-label="เพลงถัดไป"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5l9 7-9 7zM16 5h2v14h-2z"/></svg></button>
+</div>
+<div class="scrim" id="mScrim"></div>
+<section class="msheet" id="msheet" role="dialog" aria-modal="true" aria-labelledby="m-t" aria-hidden="true">
+<div class="top"><h2 id="m-t" style="font-size:22px">เพลงประกอบ</h2><button class="iconbtn" id="mClose">ปิด</button></div>
+<div class="ytbox"><div id="ytp"></div></div>
+<p class="mute" id="mHint">เพลงมาจาก YouTube ต้องต่อเน็ต</p>
+<div class="three"><button class="btn ghost" id="mPrev" aria-label="เพลงก่อนหน้า"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 5l-9 7 9 7zM6 5h2v14H6z"/></svg></button><button class="btn" id="mPlay">เล่น</button><button class="btn ghost" id="mNext" aria-label="เพลงถัดไป"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5l9 7-9 7zM16 5h2v14h-2z"/></svg></button></div>
+<div class="field"><label class="lbl" for="mVol">ความดัง</label><input type="range" id="mVol" min="0" max="100" step="5"></div>
+<label class="check"><input type="checkbox" id="mAuto">เปิดเพลงเองเมื่อเข้าเกม (เริ่มเมื่อแตะหน้าจอครั้งแรก)</label>
+<label class="check"><input type="checkbox" id="mShuf">สุ่มลำดับเพลง</label>
+<div class="field"><label class="lbl" for="mUrl">เพิ่มเพลงจาก YouTube</label>
+<div style="display:flex;gap:8px"><input type="text" id="mUrl" inputmode="url" autocomplete="off" placeholder="วางลิงก์วิดีโอหรือเพลย์ลิสต์"><button class="btn" id="mAdd" style="width:auto;flex:none">เพิ่ม</button></div>
+<span class="mute">ใช้ได้ทั้งลิงก์ youtu.be, youtube.com/watch และลิงก์เพลย์ลิสต์ (list=...)</span>
+<p class="err" id="mErr" role="alert"></p></div>
+<div class="field"><span class="lbl">รายการเพลง</span><div class="list" id="mList"></div></div>
+<button class="btn ghost" id="mReset">คืนค่ารายการเพลงเริ่มต้น</button>
+</section>
+
 <script>
 {
 const $=id=>document.getElementById(id);
@@ -240,7 +292,8 @@ const tlabel=s=>s>=60&&s%60===0?(s/60)+' นาที':s+' วินาที';
 let ALL=[],S={},timer=null;
 const cfg={names:store.get('names',['','']),level:1,ex:[],sp:true,x5:false,safe:''};
 
-function show(id){for(const s of document.querySelectorAll('.scr'))s.classList.toggle('on',s.id===id);window.scrollTo(0,0)}
+function show(id){for(const s of document.querySelectorAll('.scr'))s.classList.toggle('on',s.id===id);window.scrollTo(0,0);
+const bar=id!=='gate';$('mbar').hidden=!bar;document.body.classList.toggle('hasbar',bar);if(bar&&window.musPrep)window.musPrep()}
 
 /* gate */
 $('gform').addEventListener('submit',e=>{e.preventDefault();
@@ -248,7 +301,7 @@ const by=parseInt($('by').value,10),now=new Date().getFullYear()+543;
 if(!by||by<2400||by>now){$('gerr').textContent='กรอกปีเกิดเป็น พ.ศ. 4 หลัก';return}
 if(now-by<18){$('gerr').textContent='เกมนี้สำหรับผู้มีอายุ 18 ปีขึ้นไปเท่านั้น';return}
 if(!$('agree').checked){$('gerr').textContent='ติ๊กยืนยันว่าทั้งสองคนยินยอมก่อน';return}
-store.set('age',1);openSetup()});
+store.set('age',1);openSetup();if(mus.on&&!musStarted)musPlay()});
 
 /* setup */
 function renderLevels(){
@@ -378,6 +431,81 @@ $('hugbtn').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null
 $('hugbtn').textContent='หยุดชั่วคราว';hugT=setInterval(()=>{hugLeft--;$('hug').textContent=fmt(Math.max(0,hugLeft));if(hugLeft<=0){clearInterval(hugT);hugT=null;$('hugbtn').textContent='ครบ 5 นาทีแล้ว'}},1000)});
 $('again').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}openSetup()});
 
+/* background music (YouTube IFrame API) */
+const DEF_MUSIC=[
+{id:'bQP1v8sT0nM',t:'Sweet Night R&B · Romantic Bedroom Vibes',g:'R&B ห้องนอน · MOONROOM'},
+{id:'UNStHJMHRMY',t:'R&B After Midnight · Dark Bedroom Vibes',g:'R&B ห้องนอน · MOONROOM'},
+{id:'DvlhilOQ-sw',t:'Bedroom R&B After Hours · Obsessive Love',g:'R&B ห้องนอน · CRVVE MOON'},
+{id:'hwkq1qlVbqc',t:'2:00am Soul R&B Bedroom Playlist',g:'R&B ห้องนอน · Hello Vee'},
+{id:'AKAE9Qwl9jY',t:'Volumes of Love · 3 Hour Bedroom R&B',g:'R&B ห้องนอน · Hello Vee'},
+{id:'_qbO0AGYa5g',t:'R&B Bedroom Mix · Soul Playlist',g:'R&B ห้องนอน'},
+{id:'-hodj-MLrco',t:'Bedroom Playlist · R&B Slow Jams',g:'Slow jams'},
+{id:'fIn2UczoKzk',t:'R&B Love Songs · Smooth Slow Jams',g:'Slow jams คลาสสิก'},
+{id:'Wjum8kjG_ww',t:'Sensual Saxophone Jazz · Romantic Nights',g:'แซกโซโฟน ไม่มีเนื้อร้อง'},
+{id:'jy7ov6kvXQ0',t:'2 Hours Romantic Saxophone Instrumental',g:'แซกโซโฟน ไม่มีเนื้อร้อง'},
+{id:'k-YAR37vL-M',t:'Seductive Deep House · Late Night Intimate',g:'Deep house'},
+{id:'u00s99PJU5k',t:'Sensual Deep House · Chill Vocal Mix',g:'Deep house'}];
+const musDef=()=>({on:true,vol:60,shuf:false,idx:0,list:DEF_MUSIC.map(x=>({...x}))});
+let mus=Object.assign(musDef(),store.get('music',{}));if(!Array.isArray(mus.list)||!mus.list.length)mus.list=musDef().list;
+if(mus.idx>=mus.list.length)mus.idx=0;
+const musSave=()=>store.set('music',mus);
+let yt=null,ytReady=false,ytLoading=false,playing=false,wantPlay=false,errRun=0,nowT='',musStarted=false;
+const PLAY_I='<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg>',PAUSE_I='<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+function musUI(msg){const it=mus.list[mus.idx]||{};
+$('mTitle').textContent=nowT||it.t||(it.p?'เพลย์ลิสต์ที่เพิ่มเอง':'เพลงที่เพิ่มเอง');
+$('mSub').textContent=msg||(playing?'กำลังเล่น · '+(it.g||'เพลงของคุณ'):'หยุดอยู่ · แตะเพื่อเปลี่ยนเพลง');
+$('mEq').classList.toggle('on',playing);
+$('mPlay2').innerHTML=playing?PAUSE_I:PLAY_I;$('mPlay2').setAttribute('aria-label',playing?'หยุดเพลง':'เล่นเพลง');
+$('mPlay').textContent=playing?'หยุด':'เล่น';
+$('mHint').textContent=msg||(playing?'กำลังเล่นจาก YouTube · ปิดหน้านี้แล้วเพลงยังเล่นต่อ':'เพลงมาจาก YouTube ต้องต่อเน็ต');
+$('mList').innerHTML=mus.list.map((x,i)=>`<div class="trk" aria-current="${i===mus.idx}"><button class="tn" data-m="p${i}" style="background:none;text-align:left;color:inherit;padding:0"><b>${i===mus.idx&&playing?'♪ ':''}${esc(x.t||(x.p?'เพลย์ลิสต์ที่เพิ่มเอง':'เพลงที่เพิ่มเอง'))}</b><span>${esc(x.g||(x.p?'เพลย์ลิสต์ YouTube':'YouTube'))}${x.bad?' · เล่นไม่ได้':''}</span></button><button class="x" data-m="x${i}" aria-label="ลบเพลงนี้">✕</button></div>`).join('')}
+function ytLoad(){if(ytLoading)return;ytLoading=true;
+window.onYouTubeIframeAPIReady=()=>{yt=new YT.Player('ytp',{width:'100%',height:'100%',playerVars:{playsinline:1,rel:0,modestbranding:1,origin:location.origin},
+events:{onReady:()=>{ytReady=true;yt.setVolume(mus.vol);cueCur(wantPlay)},
+onStateChange:e=>{playing=e.data===1;
+if(e.data===1){errRun=0;const d=yt.getVideoData&&yt.getVideoData(),it=mus.list[mus.idx];if(d&&d.title){nowT=d.title;if(it&&it.custom&&!it.p&&it.t!==d.title){it.t=d.title;musSave()}}if(it&&it.bad){delete it.bad;musSave()}}
+if(e.data===0){const it=mus.list[mus.idx];const pl=it&&it.p&&yt.getPlaylist&&yt.getPlaylist();if(!(pl&&yt.getPlaylistIndex()<pl.length-1))musGo(musNextIdx())}
+musUI()},
+onError:()=>{const it=mus.list[mus.idx];if(it){it.bad=1;musSave()}errRun++;playing=false;if(errRun<mus.list.length)musGo(musNextIdx());else musUI('เล่นเพลงในรายการไม่ได้เลย ลองเพิ่มลิงก์อื่น')}}})};
+const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{ytLoading=false;musUI('โหลดเพลงไม่ได้ ต้องต่อเน็ต')};document.head.appendChild(s)}
+function cueCur(play){const it=mus.list[mus.idx];if(!it||!ytReady)return;nowT='';
+if(it.p)(play?yt.loadPlaylist:yt.cuePlaylist).call(yt,{list:it.id,listType:'playlist'});else(play?yt.loadVideoById:yt.cueVideoById).call(yt,it.id);musUI()}
+function musNextIdx(){if(mus.list.length<2)return mus.idx;if(mus.shuf){let j;do j=Math.floor(Math.random()*mus.list.length);while(j===mus.idx);return j}return(mus.idx+1)%mus.list.length}
+function musPlay(){wantPlay=true;musStarted=true;if(!ytReady){ytLoad();return}yt.playVideo();
+setTimeout(()=>{if(wantPlay&&!playing)musUI('ถ้าเพลงยังไม่ขึ้น แตะปุ่มเล่นบนวิดีโอในหน้าเพลงประกอบหนึ่งครั้ง')},3000)}
+function musPause(){wantPlay=false;if(ytReady)yt.pauseVideo();playing=false;musUI()}
+function musGo(i){if(!mus.list.length)return;mus.idx=(i+mus.list.length)%mus.list.length;musSave();wantPlay=true;musStarted=true;if(ytReady)cueCur(true);else ytLoad();musUI()}
+function musToggle(){playing?musPause():musPlay()}
+window.musPrep=()=>{musUI();ytLoad()};
+function parseYT(u){u=u.trim();if(!u)return null;
+const list=(u.match(/[?&]list=([A-Za-z0-9_-]{12,})/)||[])[1];
+const v=(u.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([A-Za-z0-9_-]{11})/)||[])[1]||(/^[A-Za-z0-9_-]{11}$/.test(u)?u:null);
+if(list&&!/^RD/.test(list))return{id:list,p:1,custom:1,t:'',g:'เพลย์ลิสต์ที่เพิ่มเอง'};
+if(v)return{id:v,custom:1,t:'',g:'เพลงที่เพิ่มเอง'};return null}
+function musOpen(){$('mVol').value=mus.vol;$('mAuto').checked=mus.on;$('mShuf').checked=mus.shuf;$('mErr').textContent='';musUI();ytLoad();
+$('msheet').classList.add('on');$('msheet').setAttribute('aria-hidden','false');$('mScrim').classList.add('on');$('mClose').focus()}
+function musClose(){$('msheet').classList.remove('on');$('msheet').setAttribute('aria-hidden','true');$('mScrim').classList.remove('on')}
+$('mOpen').addEventListener('click',musOpen);$('toMusic').addEventListener('click',musOpen);
+$('mClose').addEventListener('click',musClose);$('mScrim').addEventListener('click',musClose);
+$('mPlay2').addEventListener('click',musToggle);$('mPlay').addEventListener('click',musToggle);
+$('mNext2').addEventListener('click',()=>musGo(musNextIdx()));$('mNext').addEventListener('click',()=>musGo(musNextIdx()));
+$('mPrev').addEventListener('click',()=>musGo(mus.idx-1));
+$('mVol').addEventListener('input',e=>{mus.vol=+e.target.value;if(ytReady)yt.setVolume(mus.vol);musSave()});
+$('mAuto').addEventListener('change',e=>{mus.on=e.target.checked;musSave()});
+$('mShuf').addEventListener('change',e=>{mus.shuf=e.target.checked;musSave()});
+$('mAdd').addEventListener('click',()=>{const it=parseYT($('mUrl').value);
+if(!it){$('mErr').textContent='ลิงก์นี้ไม่ใช่ลิงก์ YouTube ที่ใช้ได้';return}
+if(mus.list.some(x=>x.id===it.id)){$('mErr').textContent='มีเพลงนี้ในรายการแล้ว';return}
+mus.list.push(it);$('mUrl').value='';$('mErr').textContent='';musGo(mus.list.length-1)});
+$('mUrl').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('mAdd').click()}});
+$('mList').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const i=+b.dataset.m.slice(1);
+if(b.dataset.m[0]==='p')musGo(i);
+else{if(mus.list.length<=1){$('mErr').textContent='ต้องมีเพลงอย่างน้อย 1 รายการ';return}const cur=i===mus.idx;mus.list.splice(i,1);if(i<mus.idx)mus.idx--;else if(mus.idx>=mus.list.length)mus.idx=0;musSave();if(cur&&ytReady)cueCur(playing);musUI()}});
+$('mReset').addEventListener('click',()=>{if(!confirm('คืนค่ารายการเพลงเริ่มต้น? เพลงที่เพิ่มเองจะหายไป'))return;const v=mus.vol,on=mus.on;mus=musDef();mus.vol=v;mus.on=on;musSave();if(ytReady)cueCur(playing);musUI()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('msheet').classList.contains('on'))musClose()});
+// Browsers only allow sound after a tap, so start on the first tap once the game is open.
+document.addEventListener('click',e=>{if(musStarted||!mus.on||$('gate').classList.contains('on')||e.target.closest('#mbar,#msheet'))return;musPlay()});
+
 /* bonus games */
 let B=null,bxT=null,bxH=null,bxBackFn=null,wl=null;
 const nm=i=>cfg.names[i]||$('n'+i).value.trim()||('ผู้เล่น '+(i+1));
@@ -399,28 +527,47 @@ $('bxc').addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(b&
 $('endMassage').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}loadB().then(mSetup).catch(()=>{})});
 
 /* 1 massage */
-function mSetup(){const M=B.massage,H=hubT('massage');let g=0,len='20';
-const mins=l=>+l;
-const html=()=>`<p class="soft">${esc(M.intro)}</p>
+/* pose drawings: giver in red, receiver in tan, side view on a bed */
+const POSE=(()=>{const R='#C9A27A',G='#B3122E';
+const l=(c,p,w)=>`<polyline points="${p}" fill="none" stroke="${c}" stroke-width="${w||13}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const h=(c,x,y)=>`<circle cx="${x}" cy="${y}" r="10" fill="${c}"/>`;
+const bed='<rect x="4" y="102" width="232" height="12" rx="6" fill="#E4D3B8"/>';
+const prone=h(R,36,88)+l(R,'50,92 128,92 206,95');
+const P={
+side:bed+l(G,'150,98 188,100')+prone+l(G,'150,98 148,66 128,38')+l(G,'128,40 106,62 98,84',9)+h(G,121,25),
+straddle:bed+l(G,'150,99 188,100')+prone+l(G,'150,99 138,74 114,44')+l(G,'114,46 96,66 86,86',9)+h(G,106,31),
+head:bed+h(R,76,88)+l(R,'90,92 160,92 228,95')+l(G,'8,99 34,99 36,70 58,42')+l(G,'58,44 82,62 104,84',9)+h(G,66,30),
+behind:bed+l(G,'92,96 176,98')+l(R,'132,96 210,98')+l(G,'92,96 104,56')+h(G,114,42)+l(R,'132,96 126,54')+h(R,130,39)+l(G,'104,60 124,68 142,74',9),
+faceup:bed+l(G,'150,98 188,100')+h(R,36,88)+l(R,'50,92 128,92 162,76 200,96')+l(R,'66,92 88,82 108,88',8)+l(G,'150,98 148,66 128,38')+l(G,'128,40 106,62 98,84',9)+h(G,121,25),
+feet:bed+h(R,30,88)+l(R,'44,92 120,92 180,95')+l(G,'218,99 190,100')+l(G,'218,99 210,60')+h(G,206,46)+l(G,'210,64 194,80 184,92',9),
+glide:bed+prone+h(G,50,68)+l(G,'64,74 136,76 206,80',12)+l(G,'66,76 46,86',8),
+spoon:bed+h(G,44,80)+l(G,'58,84 130,86 168,94')+h(R,62,92)+l(R,'76,96 146,96 196,99')+l(G,'70,86 96,94 114,92',8)};
+return k=>`<svg viewBox="0 0 240 118" width="100%" style="max-width:280px" aria-hidden="true">${P[k]||P.side}</svg>`})();
+
+function mSetup(){const M=B.massage,H=hubT('massage');let g=0,len='20',hot=false;
+const mins=l=>+l,R=()=>hot?M.hotRoutines:M.routines;
+const html=()=>`<p class="soft">${esc(hot?M.hotIntro:M.intro)}</p>
+<div class="field"><span class="lbl">โหมด</span><div class="two"><button class="btn ${hot?'ghost':''}" data-b="mrelax" aria-pressed="${!hot}">ผ่อนคลาย</button><button class="btn ${hot?'':'ghost'}" data-b="mhot" aria-pressed="${hot}" style="${hot?'background:#B3122E;color:#fff':''}">เร่าร้อน 18+</button></div></div>
 <div class="field"><span class="lbl">ใครนวดก่อน</span><div class="two">${[0,1].map(i=>`<button class="btn ${g===i?'':'ghost'}" data-b="g${i}" aria-pressed="${g===i}">${esc(nm(i))}</button>`).join('')}</div></div>
-<div class="field"><span class="lbl">ความยาว</span><div class="pick">${['10','20','30'].map(l=>`<button data-b="l${l}" aria-pressed="${len===l}">${mins(l)} นาที</button>`).join('')}</div><span class="mute">${M.routines[len].length} ขั้น: ${M.routines[len].map(id=>esc(M.steps[id].a)).join(' · ')}</span></div>
-<div class="box"><h3>เตรียมก่อนเริ่ม</h3>${ul(M.prep)}</div>
-<div class="box"><h3>ความปลอดภัย</h3>${ul(M.safety)}</div>
-<button class="btn" data-b="go">เริ่มนวด</button>`;
+<div class="field"><span class="lbl">ความยาว</span><div class="pick">${['10','20','30'].map(l=>`<button data-b="l${l}" aria-pressed="${len===l}">${mins(l)} นาที</button>`).join('')}</div><span class="mute">${R()[len].length} ขั้น: ${R()[len].map(id=>esc(M.steps[id].t)).join(' · ')}</span></div>
+<div class="box"><h3>ท่าที่ใช้</h3><div class="poses">${[...new Set(R()[len].map(id=>M.steps[id].p))].map(p=>`<figure>${POSE(p)}<figcaption>${esc(M.poses[p])}</figcaption></figure>`).join('')}</div></div>
+<div class="box"><h3>เตรียมก่อนเริ่ม</h3>${ul(hot?M.hotPrep:M.prep)}</div>
+<div class="box"><h3>${hot?'ข้อตกลงก่อนเริ่ม':'ความปลอดภัย'}</h3>${ul(hot?M.hotRules.concat(M.safety.slice(0,1)):M.safety)}</div>
+<button class="btn" data-b="go" style="${hot?'background:#B3122E;color:#fff':''}">${hot?'ตกลงกันแล้ว เริ่มเลย':'เริ่มนวด'}</button>`;
 bx('โบนัส 1',H.title,html());
-bxH=b=>{if(b==='go')mRun(g,len);else if(b[0]==='g'){g=+b[1];bxSet(html())}else if(b[0]==='l'){len=b.slice(1);bxSet(html())}}}
-function mRun(g,len){const M=B.massage,ids=M.routines[len];
+bxH=b=>{if(b==='go')mRun(g,len,hot);else if(b==='mhot'||b==='mrelax'){hot=b==='mhot';bxSet(html())}else if(b[0]==='g'){g=+b[1];bxSet(html())}else if(b[0]==='l'){len=b.slice(1);bxSet(html())}}}
+function mRun(g,len,hot){const M=B.massage,ids=(hot?M.hotRoutines:M.routines)[len];
 // Stretch each step so the whole routine lasts the chosen 10, 20 or 30 minutes.
 const k=len*60/ids.reduce((s,id)=>s+M.steps[id].s,0),secs=ids.map(id=>Math.max(30,Math.round(M.steps[id].s*k/15)*15));
 let i=0,left=secs[0],paused=false;
 const html=()=>{const s=M.steps[ids[i]];return `<p class="mute" style="text-align:center">${esc(nm(g))} นวดให้ ${esc(nm(1-g))} · ขั้น ${i+1}/${ids.length}</p>
 <div class="bar"><i style="width:${i/ids.length*100}%"></i></div>
-<div class="stepcard"><span class="area">${esc(s.a)}</span><h3>${esc(s.t)}</h3><p>${esc(s.d)}</p><span class="clock" id="mclock">${fmt(left)}</span></div>
+<div class="stepcard"><span class="area">${esc(s.a)}</span><h3>${esc(s.t)}</h3>${POSE(s.p)}<span class="posecap">ท่า: ${esc(M.poses[s.p]||'')}</span><p>${esc(s.d)}</p><span class="clock" id="mclock">${fmt(left)}</span></div>
 <div class="two"><button class="btn ghost" data-b="pause">${paused?'นวดต่อ':'พักแป๊บ'}</button><button class="btn" data-b="next">${i<ids.length-1?'ขั้นต่อไป':'เสร็จแล้ว'}</button></div>
 <p class="mute" style="text-align:center">หมดเวลาแล้วแอปจะสั่นและไปขั้นต่อไปเอง</p>`};
 const finish=()=>{bxStop();bxSet(`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>นวดครบแล้ว</h2><p class="soft">ถาม${esc(nm(1-g))}ว่าชอบขั้นไหนที่สุด แล้วสลับกันนวด</p></div>
 <button class="btn" data-b="swap">สลับให้ ${esc(nm(1-g))} นวด</button><button class="btn ghost" data-b="menu">กลับเมนูเกมเสริม</button>`);
-bxH=b=>{if(b==='swap')mRun(1-g,len);else if(b==='menu')openBonus()}};
+bxH=b=>{if(b==='swap')mRun(1-g,len,hot);else if(b==='menu')openBonus()}};
 const go=()=>{i++;if(i>=ids.length){finish();return}left=secs[i];paused=false;bxSet(html());window.scrollTo(0,0)};
 bx('โบนัส 1',hubT('massage').title,html(),mSetup);wake(true);
 bxT=setInterval(()=>{if(paused)return;left--;const el=$('mclock');if(el)el.textContent=fmt(Math.max(0,left));if(left<=0){try{navigator.vibrate&&navigator.vibrate([150,80,150])}catch(e){}go()}},1000);
