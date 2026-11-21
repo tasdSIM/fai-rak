@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Puts ไฟรักไม่มอด on the VM (ssh alias cpxsim) at https://fairak.cpxsim.online, the same way
+# Puts ไฟรักไม่มอด on the VM (ssh alias cpxsim) at https://fairuk.cpxsim.online, the same way
 # staff.cpxsim.online and schedule.cpxsim.online are put there, but as a stack of its own.
 #
 #   bash deploy/deploy-vm.sh
@@ -8,7 +8,7 @@
 # Wholly apart from CPX prod, ARMY-INTEL, Coding Adventure and exec-scheduler: own folder
 # (/opt/fai-rak), project (fai-rak-prod), containers (fai-rak-web, fai-rak-tunnel), loopback
 # port 8093 and its own Cloudflare tunnel "fai-rak". That tunnel's route
-# fairak.cpxsim.online -> http://fai-rak:80 is set in the Cloudflare dashboard; its token lives
+# fairuk.cpxsim.online -> http://fai-rak:80 is set in the Cloudflare dashboard; its token lives
 # only on the VM in /opt/fai-rak/tunnel.env (kept between deploys).
 #
 # Only committed files are sent, so commit first.
@@ -16,7 +16,7 @@ set -euo pipefail
 
 VM_HOST="${VM_HOST:-cpxsim}"
 APP_DIR=/opt/fai-rak
-PUBLIC_URL="${PUBLIC_URL:-https://fairak.cpxsim.online}"
+PUBLIC_URL="${PUBLIC_URL:-https://fairuk.cpxsim.online}"
 COMPOSE="sudo docker compose -f docker-compose.vm.yml"
 
 SSH=ssh

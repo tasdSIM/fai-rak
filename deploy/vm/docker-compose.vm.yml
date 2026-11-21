@@ -2,7 +2,7 @@
 #
 # Wholly apart from every other stack on the VM: its own project (fai-rak-prod), network,
 # containers, loopback port, and its own Cloudflare tunnel "fai-rak", whose route
-# fairak.cpxsim.online -> http://fai-rak:80 is set in the Cloudflare dashboard.
+# fairuk.cpxsim.online -> http://fai-rak:80 is set in the Cloudflare dashboard.
 # The tunnel token is in /opt/fai-rak/tunnel.env on the VM (never in this folder).
 name: fai-rak-prod
 
