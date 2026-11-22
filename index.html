@@ -166,6 +166,18 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .rcode{font-size:44px;font-weight:700;letter-spacing:6px;color:var(--goldi);font-variant-numeric:tabular-nums;line-height:1.2}
 .qr svg{display:block;border-radius:12px;width:200px;height:200px}
 .rstat{text-align:center;color:#FFD8A8;font-weight:600}.rstat.ok{color:#8CE99A}
+/* สืบซ่อนรัก */
+.secret{border:1px dashed #B3122E;background:#1F1014}
+.ev{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.6;color:var(--ink)}
+.env{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;border-radius:12px;border:1px solid #6E1A26;background:repeating-linear-gradient(135deg,#2A1218 0 10px,#24101A 10px 20px);padding:10px 14px;color:var(--ink);font-size:15px}
+.env .seal{width:44px;height:44px;border-radius:50%;background:#B3122E;color:#FFE8A3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none;box-shadow:0 0 0 3px #5A0614}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{width:100%;min-height:46px;border-radius:10px;border:1px solid #5A4228;background:transparent;padding:8px 14px;text-align:left;font-size:15px;line-height:1.5;color:var(--ink)}
+.opt[aria-pressed=true]{background:var(--gold);color:#1E1216;border-color:var(--gold);font-weight:600}
+.opt:disabled{cursor:default}
+.opt.right{border:2px solid #2F9E44;background:#12301B;color:#C3FAE8}.opt.right[aria-pressed=true]{background:#2F9E44;color:#fff}
+.opt.wrong{border:2px solid #C92A2A;background:#3A1418;color:#FFC9C9}
+@media (min-width:1000px),(orientation:landscape) and (min-width:700px){.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* wider screens: column wrappers vanish on phones, become real columns on computers, iPads and landscape */
 .col{display:contents}
 @media (min-width:700px){
@@ -237,7 +249,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <div class="field"><span style="font-size:14px;font-weight:600">คืนนี้ไม่เอาแน่นอน</span><span class="mute">การ์ดในหมวดที่เลือกจะไม่ถูกสุ่มขึ้นมา</span><div class="chips" id="ex"></div></div>
 <label class="check"><input type="checkbox" id="sp" checked>สุ่มการ์ดพิเศษแทรกระหว่างเล่น (สลับบท พักหายใจ เพิ่มเวลา)</label>
 <p class="err" id="serr" role="alert"></p>
-<button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · ไขคดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+<button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · สืบซ่อนรัก 20 คดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button type="button" class="bonusbtn" id="toRoom"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="8" height="15" rx="2"/><rect x="13.5" y="5" width="8" height="15" rx="2"/><path d="M5.5 16h2M16.5 17h2"/></svg></span><span style="flex:1;text-align:left"><b>เล่น 2 เครื่อง</b><span class="mute" style="display:block">ต่างคนต่างถือมือถือ เห็นการ์ดใบเดียวกันพร้อมกัน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button type="button" class="btn ghost" id="toMusic" style="min-height:48px;font-size:15px">เพลงประกอบ: เปลี่ยนเพลง หรือเพิ่มเพลย์ลิสต์เอง</button>
 <div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
@@ -349,7 +361,7 @@ const EXCL=['กระซิบ','จูบ','สัมผัส','มอง','�
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 const tlabel=s=>s>=60&&s%60===0?(s/60)+' นาที':s+' วินาที';
 
-let ALL=[],S={},timer=null,lastCard=null;
+let ALL=[],S={},timer=null,lastCard=null,CS=null;
 /* two-device room state (see "two devices" below) */
 const R={ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:'',retry:0,rt:0,q:0,last:null,hostScr:null,ovKey:null,gameOv:false,ret:null,pend:null};
 const cfg={names:store.get('names',['','']),level:1,ex:[],sp:true,x5:false,safe:'',mode:'prog',lvls:[1,2,3]};
@@ -615,7 +627,7 @@ const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
 function wake(on){try{if(on&&navigator.wakeLock&&!wl)navigator.wakeLock.request('screen').then(l=>{wl=l}).catch(()=>{});else if(!on&&wl){wl.release();wl=null}}catch(e){}}
 function bxStop(){if(bxT){clearInterval(bxT);bxT=null}wake(false)}
 function bxSet(html){$('bxc').innerHTML=html}
-function bx(tag,title,html,back){bxStop();$('bxtag').textContent=tag;$('bxt').textContent=title;bxSet(html);bxBackFn=back||openBonus;show('bx')}
+function bx(tag,title,html,back){bxStop();CS=null;R.caseView=false;$('bxtag').textContent=tag;$('bxt').textContent=title;bxSet(html);bxBackFn=back||openBonus;show('bx')}
 function openBonus(){bxStop();bxH=null;loadB().then(()=>{
 $('hub').innerHTML=B.hub.map(h=>`<button type="button" class="tile" data-h="${h.id}"><span class="ti">${svg(h.icon,'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">โบนัส ${h.n} · ${esc(h.sub)}</span><b>${esc(h.title)}</b><span class="td">${esc(h.desc)}</span></span></button>`).join('');
 show('bonus')}).catch(()=>{$('serr').textContent='โหลดเกมเสริมไม่สำเร็จ ต่อเน็ตแล้วลองอีกครั้ง';show('setup')})}
@@ -695,30 +707,65 @@ bxSet(`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="widt
 bxH=x=>{if(x==='list')nList()}}}}
 
 /* 3 detective cases */
-function cList(){const C=B.cases,sol=store.get('cases',{});
-bx('โบนัส 3',hubT('cases').title,`<div class="box"><h3>วิธีเล่น</h3><ol class="steps"><li><span>อ่านเรื่องย่อและผู้ต้องสงสัยด้วยกัน</span></li><li><span>ผลัดกันอ่านเบาะแสออกเสียงทีละข้อ</span></li><li><span>คุยกันได้ แต่ตอนทายต่างคนต่างกด ห้ามแอบดู</span></li><li><span>เปิดเฉลยพร้อมกัน คนที่ทายถูกได้รางวัล</span></li></ol></div>
-<div class="list">${C.map((c,k)=>`<button class="night ${sol[c.id]?'done':''}" data-b="c${k}"><span class="no">${sol[c.id]?'✓':k+1}</span><span style="flex:1"><b>คดีที่ ${k+1}: ${esc(c.t)}</b><span class="mute" style="display:block">${esc(c.tag)}${sol[c.id]?' · ปิดคดีแล้ว':''}</span></span></button>`).join('')}</div>`);
+/* สืบซ่อนรัก: co-op cases. Each player holds private evidence (a / b); the answer is shared
+   and needs both to confirm. On two devices the host runs CS and the guest mirrors it; on one
+   device the private evidence sits in two sealed envelopes. */
+const STAR=n=>['','ง่าย','กลาง','ยาก'][n]||'';
+const cDuo=()=>R.role==='guest'?!!R.caseView:R.role==='host'&&R.peer;
+const cMe=()=>R.role==='guest'?1:0;
+function cList(){const C=B.cases,sol=store.get('cases2',{});CS=null;
+bx('โบนัส 3',hubT('cases').title,`<div class="box"><h3>วิธีเล่น</h3><ol class="steps"><li><span>อ่านเรื่องย่อและผู้ต้องสงสัยด้วยกัน</span></li><li><span>แต่ละคนเปิดหลักฐานลับของตัวเอง ห้ามยื่นจอให้อีกคนดู ต้องเล่าด้วยคำพูดเท่านั้น</span></li><li><span>เปิดหลักฐานกลางทีละชิ้น แล้วช่วยกันต่อภาพ ไม่มีใครไขคดีได้คนเดียว</span></li><li><span>ตอบร่วมกัน 3 ข้อ: ใครทำ ทำอย่างไร และทำไม ทั้งคู่ต้องกดยืนยันก่อนเปิดเฉลย</span></li></ol>
+<p class="mute">${R.role==='host'&&R.peer?'เชื่อมกับอีกเครื่องอยู่: หลักฐานลับจะขึ้นเฉพาะในเครื่องของแต่ละคน':'เล่น 2 เครื่องได้: สร้างห้องจากปุ่ม เล่น 2 เครื่อง ในหน้าตั้งค่า แล้วเลือกคดีจากเครื่องหลัก'}</p></div>
+<div class="list">${C.map((c,k)=>{const sc=sol[c.id];return `<button class="night ${sc!=null?'done':''}" data-b="c${k}"><span class="no">${sc!=null?sc:k+1}</span><span style="flex:1"><b>คดีที่ ${k+1}: ${esc(c.t)}</b><span class="mute" style="display:block">${esc(c.tag)} · ${STAR(c.lv)}${sc!=null?' · ปิดคดีแล้ว '+sc+'/3':''}</span></span></button>`}).join('')}</div>`);
 bxH=b=>{if(b[0]==='c')cPlay(+b.slice(1))}}
-function cPlay(k){const c=B.cases[k];let shown=0,reveal=false;const pick=[-1,-1],lock=[false,false];
-const total=c.clues.length,reader=j=>nm(j%2);
-const html=()=>{let h=`<div class="paper"><span class="stamp">ลับ</span><h3>แฟ้มคดี ${k+1}</h3>${esc(c.story)}</div>
-<div class="field"><span class="lbl">ผู้ต้องสงสัย</span>${c.suspects.map(s=>`<div class="susp"><span class="av">${esc(s.n.replace(/^[เแโใไ]/,'')[0])}</span><span><b>${esc(s.n)}</b> <span class="mute">${esc(s.r)}</span><br><span class="soft" style="font-size:14px">${esc(s.m)}</span></span></div>`).join('')}</div>
-<div class="field"><span class="lbl">เบาะแส ${shown}/${total}</span>${c.clues.slice(0,shown).map((x,j)=>`<div class="paper" id="clue${j}" style="padding:14px 16px;font-size:15px"><h3>เบาะแส ${j+1} · ${esc(reader(j))} อ่าน</h3>${esc(x)}</div>`).join('')}</div>`;
-if(shown<total)h+=`<button class="btn" data-b="clue">เปิดเบาะแสข้อ ${shown+1} ให้ ${esc(reader(shown))} อ่าน</button>`;
-else if(!reveal)h+=`<div class="box"><h3>ใครคือคนร้าย?</h3><p class="mute">ส่งมือถือให้กันทีละคน กดแล้วคำตอบจะถูกซ่อน</p>${[0,1].map(p=>lock[p]?`<div class="two" style="align-items:center"><span>✓ ${esc(nm(p))} เลือกแล้ว</span><button class="btn ghost" data-b="u${p}" style="min-height:40px">เลือกใหม่</button></div>`:`<span class="lbl">${esc(nm(p))} คิดว่า</span><div class="pick">${c.suspects.map((s,i)=>`<button data-b="p${p}${i}">${esc(s.n)}</button>`).join('')}</div>`).join('')}
-<button class="btn" data-b="reveal" ${lock[0]&&lock[1]?'':'disabled'}>เปิดเฉลย</button></div>`;
-else{const ok=[0,1].map(p=>pick[p]===c.answer),rw=B.caseReward;
-h+=`<div class="paper"><span class="stamp">ปิดคดี</span><h3>เฉลย: ${esc(c.suspects[c.answer].n)}</h3>${esc(c.solution)}</div>
-<div class="box">${[0,1].map(p=>`<p>${ok[p]?'✓':'✗'} ${esc(nm(p))} ทาย ${esc(c.suspects[pick[p]].n)} · <b style="color:${ok[p]?'#8CE99A':'#FFA8A8'}">${ok[p]?'ถูก':'ผิด'}</b></p>`).join('')}
-<h3>รางวัล</h3><p class="soft">${esc(ok[0]&&ok[1]?rw[1]:!ok[0]&&!ok[1]?rw[2]:rw[0].replace('คนที่ทายถูก',nm(ok[0]?0:1)))}</p></div>
-<button class="btn" data-b="list">กลับไปเลือกคดี</button>`}
-return h};
-bx('โบนัส 3','คดีที่ '+(k+1)+': '+c.t,html(),cList);
-bxH=b=>{if(b==='clue'){shown++;bxSet(html());const el=$('clue'+(shown-1));if(el)el.scrollIntoView({behavior:'smooth',block:'center'})}
-else if(b[0]==='p'){const p=+b[1];pick[p]=+b[2];lock[p]=true;bxSet(html())}
-else if(b[0]==='u'){lock[+b[1]]=false;bxSet(html())}
-else if(b==='reveal'){reveal=true;const s=store.get('cases',{});s[c.id]=1;store.set('cases',s);bxSet(html());window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
-else if(b==='list')cList()}}
+function cPlay(k){const c=B.cases[k];
+bx('โบนัส 3','คดีที่ '+(k+1)+': '+c.t,'',cList);
+CS={k,ph:'brief',pub:0,w:-1,h:-1,y:-1,ok:[false,false]};R.sv=[false,false];
+bxH=v=>{if(/^sv[01]$/.test(v)){const p=+v[2];R.sv=[false,false].map((_,i)=>i===p?!(R.sv||[])[p]:false);cRender();return}caseAct(v,cMe())};
+cRender();window.scrollTo(0,0)}
+const cReady=()=>CS.w>=0&&CS.h>=0&&CS.y>=0;
+const cScore=c=>(CS.w===c.who)+(CS.h===c.how.a)+(CS.y===c.why.a);
+function caseAct(v,who){if(!CS)return;const c=B.cases[CS.k];let scroll=null;
+if(v==='go'&&CS.ph==='brief')CS.ph='intel';
+else if(v==='clue'&&CS.ph==='intel'&&CS.pub<c.pub.length){CS.pub++;scroll='pub'+(CS.pub-1)}
+else if(v==='ask'&&CS.ph==='intel'&&CS.pub>=c.pub.length){CS.ph='ans';scroll='ans'}
+else if(v==='back'&&CS.ph==='ans')CS.ph='intel';
+else if(/^[why][0-3]$/.test(v)&&CS.ph==='ans'){CS[v[0]]=+v[1];CS.ok=[false,false]}
+else if(v==='ok'&&CS.ph==='ans'&&cReady())CS.ok[who]=!CS.ok[who];
+else if(/^ok[01]$/.test(v)&&CS.ph==='ans'&&cReady())CS.ok[+v[2]]=!CS.ok[+v[2]];
+else if(v==='reveal'&&CS.ph==='ans'&&cReady()&&CS.ok[0]&&CS.ok[1]){CS.ph='done';scroll='done'}
+else if(v==='list'){cList();return}
+else if(v==='next'){cPlay((CS.k+1)%B.cases.length);return}
+else if(v==='again'){cPlay(CS.k);return}
+else return;
+cRender();if(scroll){const el=$(scroll);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}}
+function cRender(){if(!CS||!B)return;bxSet(caseHTML());
+if(CS.ph==='done'){const c=B.cases[CS.k],s=store.get('cases2',{}),sc=cScore(c);if(s[c.id]==null||sc>s[c.id]){s[c.id]=sc;store.set('cases2',s)}}
+rsync()}
+function caseHTML(){const k=CS.k,c=B.cases[k],duo=cDuo(),me=cMe(),done=CS.ph==='done';
+const clueList=(arr,tag)=>`<ol class="ev">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
+let h=`<div class="paper"><span class="stamp">ลับ</span><h3>แฟ้มคดี ${k+1} · ${esc(c.tag)} · ${STAR(c.lv)}</h3>${esc(c.story)}</div>
+<div class="field"><span class="lbl">ผู้ต้องสงสัย</span>${c.sus.map(s=>`<div class="susp"><span class="av">${esc(s.n.replace(/^[เแโใไ]/,'')[0])}</span><span><b>${esc(s.n)}</b> <span class="mute">${esc(s.r)}</span><br><span class="soft" style="font-size:14px">${esc(s.m)}</span></span></div>`).join('')}</div>`;
+if(CS.ph==='brief')return h+`<div class="box"><h3>ก่อนเปิดแฟ้ม</h3><ul><li>${duo?'หลักฐานลับจะขึ้นเฉพาะในเครื่องของแต่ละคน':'หลักฐานลับอยู่ในซองของแต่ละคน เปิดดูทีละคน แล้วกดซ่อนก่อนส่งเครื่อง'}</li><li>ห้ามยื่นจอให้อีกคนดู เล่าด้วยคำพูดเท่านั้น จะเล่าทั้งหมดหรือเลือกเล่าก็ได้</li><li>หลักฐานลับของแต่ละคนช่วยได้ครึ่งเดียว ต้องเอามาต่อกันถึงจะปิดคดีได้</li></ul></div>
+<button class="btn" data-b="go">เปิดแฟ้มหลักฐาน</button>`;
+// private evidence
+if(done)h+=`<div class="box secret"><h3>หลักฐานลับของ ${esc(nm(0))}</h3>${clueList(c.a)}<h3>หลักฐานลับของ ${esc(nm(1))}</h3>${clueList(c.b)}</div>`;
+else if(duo)h+=`<div class="box secret"><h3>หลักฐานลับของ ${esc(nm(me))}</h3><p class="mute">ขึ้นเฉพาะเครื่องนี้ ห้ามยื่นจอให้ ${esc(nm(1-me))} ดู เล่าด้วยคำพูดเท่านั้น</p>${clueList(me?c.b:c.a)}</div>`;
+else h+=[0,1].map(p=>(R.sv||[])[p]?`<div class="box secret"><h3>หลักฐานลับของ ${esc(nm(p))}</h3><p class="mute">${esc(nm(1-p))} อย่าแอบดู</p>${clueList(p?c.b:c.a)}<button class="btn ghost" data-b="sv${p}">อ่านแล้ว ซ่อนซอง</button></div>`:`<button class="env" data-b="sv${p}"><span class="seal">ลับ</span><span style="flex:1;text-align:left"><b>ซองหลักฐานของ ${esc(nm(p))}</b><span class="mute" style="display:block">ให้ ${esc(nm(p))} เปิดดูคนเดียว</span></span></button>`).join('');
+// shared evidence
+h+=`<div class="field"><span class="lbl">หลักฐานกลาง ${CS.pub}/${c.pub.length}</span>${c.pub.slice(0,CS.pub).map((x,j)=>`<div class="paper" id="pub${j}" style="padding:14px 16px;font-size:15px"><h3>หลักฐานกลาง ${j+1}</h3>${esc(x)}</div>`).join('')}</div>`;
+if(CS.ph==='intel')return h+(CS.pub<c.pub.length?`<button class="btn" data-b="clue">เปิดหลักฐานกลางชิ้นที่ ${CS.pub+1}</button>`:`<button class="btn" data-b="ask">คุยกันครบแล้ว ไปสรุปคดี</button>`);
+const grp=(key,title,opts,ans)=>`<div class="field"><span class="lbl">${title}</span><div class="opts">${opts.map((o,i)=>{const sel=CS[key]===i,cls=done?(i===ans?' right':sel?' wrong':''):'';return `<button class="opt${cls}" data-b="${key}${i}" aria-pressed="${sel}" ${done?'disabled':''}>${esc(o)}</button>`}).join('')}</div></div>`;
+h+=`<div class="box" id="ans"><h3>${done?'คำตอบของทีม':'สรุปคดีร่วมกัน'}</h3>${done?'':'<p class="mute">เลือกด้วยกันข้อละหนึ่งคำตอบ ถ้าเปลี่ยนคำตอบ ทั้งคู่ต้องกดยืนยันใหม่</p>'}
+${grp('w','1. ใครคือคนร้าย',c.sus.map(s=>s.n),c.who)}${grp('h','2. ทำอย่างไร',c.how.o,c.how.a)}${grp('y','3. ทำไม',c.why.o,c.why.a)}</div>`;
+if(!done){const rd=cReady();
+h+=duo?`<button class="btn ${CS.ok[me]?'':'ghost'}" data-b="ok" ${rd?'':'disabled'} style="${CS.ok[me]?'background:var(--green);color:#fff':''}">${CS.ok[me]?'✓ '+esc(nm(me))+' ยืนยันแล้ว':esc(nm(me))+' กดยืนยันคำตอบนี้'}</button><p class="mute" style="text-align:center">${CS.ok[1-me]?esc(nm(1-me))+' ยืนยันแล้ว':'รอ '+esc(nm(1-me))+' ยืนยัน'}</p>`
+:`<div class="two">${[0,1].map(p=>`<button class="btn ${CS.ok[p]?'':'ghost'}" data-b="ok${p}" ${rd?'':'disabled'} style="${CS.ok[p]?'background:var(--green);color:#fff':''}">${CS.ok[p]?'✓ ':''}${esc(nm(p))} ${CS.ok[p]?'ยืนยันแล้ว':'ยืนยัน'}</button>`).join('')}</div>`;
+return h+`<button class="btn" data-b="reveal" ${rd&&CS.ok[0]&&CS.ok[1]?'':'disabled'}>เปิดเฉลย</button><button class="btn ghost" data-b="back">กลับไปดูหลักฐาน</button>`}
+const sc=cScore(c),rw=B.caseReward[String(sc)]||[''],line=rw[k%rw.length];
+return h+`<div class="paper" id="done"><span class="stamp">ปิดคดี ${sc}/3</span><h3>เฉลย: ${esc(c.sus[c.who].n)}</h3>${esc(c.sol)}</div>
+<div class="box"><h3>รางวัลของทีม</h3><p class="soft">${esc(line)}</p></div>
+<div class="two"><button class="btn ghost" data-b="list">เลือกคดีอื่น</button><button class="btn" data-b="next">คดีต่อไป</button></div>`}
 
 /* 4 date themes */
 function dList(){const D=B.dates;
@@ -746,7 +793,7 @@ const inviteUrl=()=>location.origin+location.pathname+'#join='+R.code;
 const ssSave=()=>{try{R.code&&R.tok?sessionStorage.setItem('frm-room',JSON.stringify({code:R.code,tok:R.tok,role:R.role})):sessionStorage.removeItem('frm-room')}catch(e){}};
 function rsend(d){if(R.ws&&R.ws.readyState===1)R.ws.send(JSON.stringify({t:'msg',d}))}
 function snap(){const scr=curScr(),on=scr==='play'||scr==='end';
-return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
+return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,cs:scr==='bx'&&CS?CS:null,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
 function rsync(){if(R.role!=='host'||!R.peer||R.q)return;R.q=1;setTimeout(()=>{R.q=0;rsend({k:'snap',s:snap()})},0)}
 function rOpen(first){
 if(R.ws){const o=R.ws;R.ws=null;o.onclose=null;try{o.close()}catch(e){}}
@@ -760,7 +807,7 @@ else{if(R.st==='conn')R.err='เชื่อมต่อเซิร์ฟเว
 function rCreate(){R.err='';R.st='conn';rui();rOpen({t:'create'})}
 function rJoin(code){code=String(code||'').replace(/\D/g,'');if(code.length!==6){R.err='รหัสห้องต้องเป็นตัวเลข 6 หลัก';rui();return}R.err='';R.st='conn';rui();rOpen({t:'join',code})}
 function rClear(err){const ws=R.ws,wasGuest=R.role==='guest';clearTimeout(R.rt);
-Object.assign(R,{ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:err||'',last:null,hostScr:null,ovKey:null});ssSave();
+Object.assign(R,{ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:err||'',last:null,hostScr:null,hostKey:null,ovKey:null});ssSave();
 if(ws){ws.onclose=null;try{ws.close()}catch(e){}}
 if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}
 if(wasGuest&&curScr()!=='room'){S={};roomOpen();return}rui()}
@@ -779,13 +826,15 @@ if(R.role==='host'&&d.k==='act')rAct(d);
 else if(R.role==='guest'){if(d.k==='snap'&&d.s)rApply(d.s);
 else if(d.k==='tick'){S.left=Math.max(0,+d.left|0);const el=$('clock');if(el)el.textContent=fmt(S.left)}}}}
 /* host: press the same button the other device pressed */
-function rAct(d){const scr=curScr();if(scr!=='play'&&scr!=='end')return;const v=String(d.v||'');if(!/^[A-Za-z0-9]{1,12}$/.test(v))return;
+function rAct(d){const scr=curScr(),v=String(d.v||'');if(!/^[A-Za-z0-9]{1,12}$/.test(v))return;
+if(d.w==='b'){if(scr==='bx'&&CS&&!/^sv/.test(v))caseAct(v,1);return}
+if(scr!=='play'&&scr!=='end')return;
 const sel=d.w==='a'?`#ctl button[data-a="${v}"]`:d.w==='o'?`#ovbody button[data-o="${v}"]`:d.w==='id'&&['plus','minus','lvchip','toEnd','again'].includes(v)?'#'+v:null;
 const el=sel&&document.querySelector(sel);if(el&&!el.disabled)el.click()}
 /* guest: draw the host's screen. Every value is checked, since it came over the network. */
 const num=(x,lo,hi)=>{x=Math.round(+x);return Number.isFinite(x)?Math.min(hi,Math.max(lo,x)):lo};
 function rApply(s){R.last=s;if(!ALL.length)return;
-const g=s.g,scr=s.scr,cur=curScr(),moved=R.hostScr!==scr;R.hostScr=scr;
+const g=s.g,scr=s.scr,cur=curScr(),key=scr+(s.cs&&typeof s.cs==='object'?':c'+s.cs.k:''),moved=R.hostKey!==key;R.hostKey=key;R.hostScr=scr;
 cfg.names=(Array.isArray(s.names)?s.names:[]).slice(0,2).map(x=>String(x||'').slice(0,16));while(cfg.names.length<2)cfg.names.push('');
 cfg.x5=!!s.x5;cfg.safe=String(s.safe||'').slice(0,20);if(DM[s.dm])cfg.mode=s.dm;
 if((scr==='play'||scr==='end')&&g&&typeof g==='object'){
@@ -797,16 +846,31 @@ total:num(g.total,0,999),deckN:num(g.deckN,0,999),deck:undefined});
 S.lvls=[...new Set((Array.isArray(g.lvls)?g.lvls:[]).map(x=>num(x,1,5)))].sort();if(!S.lvls.length)S.lvls=[S.level];
 S.card=ALL.find(c=>c.code===g.card)||null;
 if(!moved&&cur!=='play'&&cur!=='end'){rui();return}   // stepped away on purpose: stay there
-if(scr==='play'){if(cur!=='play')show('play');render();rOv()}
+if(scr==='play'){R.caseView=false;if(cur!=='play')show('play');render();rOv()}
 else{rOvClose();if(cur!=='end')endView()}}
-else{rOvClose();if(cur==='play'||cur==='end')roomOpen();else rui()}}
+else if(scr==='bx'&&s.cs&&typeof s.cs==='object'){rOvClose();rCase(s.cs,moved)}
+else{rOvClose();if(cur==='play'||cur==='end'||(cur==='bx'&&R.caseView)){R.caseView=false;CS=null;roomOpen()}else rui()}}
+/* guest: show the host's case. The private evidence shown is this device's own (player 2). */
+function rCase(cs,moved){loadB().then(()=>{const n=B.cases.length,k=num(cs.k,0,n-1),c=B.cases[k];
+const v={k,ph:['brief','intel','ans','done'].includes(cs.ph)?cs.ph:'brief',pub:num(cs.pub,0,c.pub.length),w:num(cs.w,-1,c.sus.length-1),h:num(cs.h,-1,3),y:num(cs.y,-1,3),ok:[0,1].map(i=>!!(cs.ok||[])[i])};
+const cur=curScr();
+if(!(moved||(cur==='bx'&&R.caseView))){rui();return}   // stepped away on purpose: stay there
+if(!(cur==='bx'&&R.caseView&&CS&&CS.k===k)){bx('โบนัส 3','คดีที่ '+(k+1)+': '+c.t,'',cList);bxH=null;window.scrollTo(0,0)}
+CS=v;R.caseView=true;cRender()}).catch(()=>{})}
 function rOvClose(){if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}R.ovKey=null}
 function rOv(){const key=JSON.stringify([S.ov,S.ready]);if(key===R.ovKey)return;
 if(!S.ov){rOvClose();return}
 R.ovKey=key;R.gameOv=true;
 if(S.ov.k==='red')redStop();else if(S.ov.k==='up')levelUp(S.ov.to,true);else levelMenu()}
 /* guest taps go to the host instead of acting locally */
-document.addEventListener('click',e=>{if(R.role!=='guest')return;const scr=curScr();if(scr!=='play'&&scr!=='end')return;
+document.addEventListener('click',e=>{if(R.role!=='guest')return;const scr=curScr();
+if(scr==='bx'&&R.caseView){let b;
+if(e.target.closest('#bxBack')){e.preventDefault();e.stopPropagation();roomOpen();return}
+if(!(b=e.target.closest('#bxc [data-b]')))return;e.preventDefault();e.stopPropagation();
+if(b.disabled||/^sv/.test(b.dataset.b))return;
+if(!R.ws||R.ws.readyState!==1||!R.peer){rui();return}
+rsend({k:'act',w:'b',v:b.dataset.b});return}
+if(scr!=='play'&&scr!=='end')return;
 let b,m=null;
 if(b=e.target.closest('#ctl button[data-a]'))m={w:'a',v:b.dataset.a};
 else if(R.gameOv&&(b=e.target.closest('#ovbody button[data-o]')))m={w:'o',v:b.dataset.o};
@@ -822,7 +886,7 @@ const ok=R.st==='ok'&&R.peer;$('rban').classList.toggle('wait',!ok);
 $('rbanT').textContent=R.st==='re'?'กำลังต่อใหม่… ห้อง '+R.code:R.role==='host'?(R.peer?'ห้อง '+R.code+' · อีกเครื่องเชื่อมต่อแล้ว':'ห้อง '+R.code+' · รออีกเครื่องเข้าห้อง'):(R.peer?'เชื่อมกับห้อง '+R.code:'ห้อง '+R.code+' · เครื่องหลักหลุดการเชื่อมต่อ')}
 function rui(){rban();if(curScr()==='room')roomView()}
 function roomOpen(){const c=curScr();if(c!=='room')R.ret=c;show('room');roomView()}
-const gameOn=()=>R.role==='guest'?(R.hostScr==='play'||R.hostScr==='end'):!!(S&&S.deck&&(R.ret==='play'||R.ret==='end'));
+const gameOn=()=>R.role==='guest'?(R.hostScr==='play'||R.hostScr==='end'||(R.hostScr==='bx'&&!!(R.last&&R.last.cs))):(R.ret==='bx'&&!!CS)||!!(S&&S.deck&&(R.ret==='play'||R.ret==='end'));
 function roomView(){let h='';const tag=R.code?R.code.slice(0,3)+' '+R.code.slice(3):'';
 $('roomBack').hidden=R.role==='guest'&&!gameOn();
 if(!R.code){const busy=R.st==='conn';
@@ -850,7 +914,7 @@ function drawQR(){const el=$('rqr');if(!el)return;loadQR().then(()=>{if(!$('rqr'
 for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))p+=`M${c} ${r}h1v1h-1z`;
 $('rqr').innerHTML=`<svg viewBox="-3 -3 ${n+6} ${n+6}" shape-rendering="crispEdges" role="img" aria-label="QR สำหรับเข้าห้อง"><rect x="-3" y="-3" width="${n+6}" height="${n+6}" fill="#fff"/><path d="${p}" fill="#140C0F"/></svg>`}).catch(()=>{const e=$('rqr');if(e)e.hidden=true})}
 function roomBack(){const r=R.ret;
-if((r==='play'||r==='end')&&gameOn()){if(R.role==='guest'&&R.last){R.hostScr=null;rApply(R.last)}else{show(r);if(r==='play')render()}return}
+if((r==='play'||r==='end'||r==='bx')&&gameOn()){if(R.role==='guest'&&R.last){R.hostScr=null;R.hostKey=null;rApply(R.last)}else{show(r);if(r==='play')render();else if(r==='bx')cRender()}return}
 openSetup()}
 $('roomc').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b||b.disabled)return;const a=b.dataset.r;
 if(a==='create')rCreate();
