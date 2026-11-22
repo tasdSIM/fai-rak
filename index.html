@@ -166,6 +166,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .rcode{font-size:44px;font-weight:700;letter-spacing:6px;color:var(--goldi);font-variant-numeric:tabular-nums;line-height:1.2}
 .qr svg{display:block;border-radius:12px;width:200px;height:200px}
 .rstat{text-align:center;color:#FFD8A8;font-weight:600}.rstat.ok{color:#8CE99A}
+.xchip{margin-top:8px;border-color:#B3122E;color:#FF8A9A;background:#2A1218}
 /* สืบซ่อนรัก */
 .secret{border:1px dashed #B3122E;background:#1F1014}
 .ev{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.6;color:var(--ink)}
@@ -227,7 +228,8 @@ input[type=range]{width:100%;accent-color:#B3122E}
 </section>
 
 <section class="scr" id="setup" aria-labelledby="s-t">
-<div><h2 id="s-t">ตั้งค่าคืนนี้</h2><p class="soft">ตั้งด้วยกันทั้งสองคน ใช้เวลา 1 นาที</p></div>
+<div><h2 id="s-t" style="user-select:none;-webkit-user-select:none">ตั้งค่าคืนนี้</h2><p class="soft">ตั้งด้วยกันทั้งสองคน ใช้เวลา 1 นาที</p>
+<button type="button" class="chip xchip" id="xchip" hidden>โหมดคำแรงเปิดอยู่ · แตะเพื่อตั้งค่า</button></div>
 <div class="col">
 <div class="row2">
 <div class="field"><label for="n0">ผู้เล่น 1</label><input type="text" id="n0" maxlength="16" placeholder="ชื่อเล่น"></div>
@@ -370,6 +372,12 @@ if(Array.isArray(d.lvls)){const l=d.lvls.filter(x=>x>=1&&x<=5);if(l.length)cfg.l
 /* deck modes: climb level by level, one level only, a mix of chosen levels, or every level */
 const DM={prog:['ไล่ทีละระดับ','เริ่มที่ระดับที่เลือก ครบ 9 ใบจะถามว่าไปต่อระดับถัดไปไหม'],one:['ระดับเดียว','เล่นเฉพาะระดับที่เลือก ไม่ถามขึ้นระดับ'],mix:['ผสมระดับ','เลือกได้หลายระดับ การ์ดทุกใบสับรวมเป็นกองเดียว'],all:['ทั้งหมด','ทุกระดับ 1–5 สับรวมเป็นกองเดียว']};
 const isMix=()=>cfg.mode==='mix'||cfg.mode==='all';
+/* strong-word texts (hidden mode), keyed by card code */
+cfg.crude=!!store.get('crude',0);
+let XT={},xP=null;
+const loadX=()=>Object.keys(XT).length?Promise.resolve(XT):xP||(xP=fetch('cards-x.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>(XT=d&&typeof d==='object'?d:{})).catch(e=>{xP=null;throw e}));
+const cText=c=>cfg.crude&&typeof XT[c.code]==='string'?XT[c.code]:c.text;
+if(cfg.crude)loadX().catch(()=>{});
 const selLv=()=>cfg.mode==='mix'?cfg.lvls.slice().sort():cfg.mode==='all'?[1,2,3,4,5]:[cfg.level];
 const rangeTxt=a=>{a=a.slice().sort();return a.length>1&&a[a.length-1]-a[0]===a.length-1?a[0]+'–'+a[a.length-1]:a.join(', ')};
 
@@ -408,7 +416,7 @@ $('n0').addEventListener('input',nameSync);$('n1').addEventListener('input',name
 function openSetup(){
 if(R.pend){const c=R.pend;R.pend=null;roomOpen();rJoin(c);return}
 if(R.role==='guest'){roomOpen();return}
-$('n0').value=cfg.names[0]||'';$('n1').value=cfg.names[1]||'';nameSync();renderLevels();renderEx();$('serr').textContent='';show('setup')}
+$('n0').value=cfg.names[0]||'';$('n1').value=cfg.names[1]||'';nameSync();renderLevels();$('xchip').hidden=!cfg.crude;renderEx();$('serr').textContent='';show('setup')}
 
 $('start').addEventListener('click',()=>{
 const n0=$('n0').value.trim(),n1=$('n1').value.trim();
@@ -464,7 +472,7 @@ $('card').innerHTML=`<div class="band" style="background:${L.band}"></div><div c
 <div class="chead"><span class="ctype">${esc(c.type)}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
 <button class="fav" id="fav" aria-pressed="${fav}" aria-label="เก็บการ์ดนี้ไว้ในที่ชอบ"><svg width="22" height="22" viewBox="0 0 24 24" fill="${fav?'#B3122E':'none'}" stroke="${fav?'#B3122E':'#A8967A'}" stroke-width="1.8" aria-hidden="true">${HEART}</svg></button></div>
 <div class="cicon">${svg(c.icon,ink,1.3)}</div>
-<p class="ctext">${esc(c.text)}</p>
+<p class="ctext">${esc(cText(c))}</p>
 ${S.left?`<div class="ctime">${S.mode==='signal'?'<button class="adj" id="minus" aria-label="ลดเวลา 15 วินาที">−</button>':''}<span>${tlabel(S.left)}</span>${S.mode==='signal'?'<button class="adj" id="plus" aria-label="เพิ่มเวลา 15 วินาที">+</button>':''}</div>`:''}
 ${c.code==='X-01'?`<p class="safe">คำหยุดคืนนี้: <b>${esc(cfg.safe)}</b></p>`:''}
 </div>`;
@@ -537,7 +545,7 @@ function endView(){
 const favs=store.get('favs',[]);
 $('sum').textContent='คืนนี้เล่นไป '+S.played.length+' ใบ '+(isMix()&&Array.isArray(S.lvls)?'จากกองผสมระดับ '+rangeTxt(S.lvls):'ไปถึงระดับ '+S.maxLevel+' '+LV[S.maxLevel].n);
 const list=ALL.filter(c=>favs.includes(c.code));
-$('favs').innerHTML=list.length?list.map(c=>`<div class="li"><b style="background:${LV[c.l].band}"></b><span style="flex:1">${esc(c.text)}</span><span class="mute">${c.code}</span></div>`).join(''):'<p class="mute">ยังไม่มี แตะหัวใจบนการ์ดระหว่างเล่นเพื่อเก็บไว้</p>';
+$('favs').innerHTML=list.length?list.map(c=>`<div class="li"><b style="background:${LV[c.l].band}"></b><span style="flex:1">${esc(cText(c))}</span><span class="mute">${c.code}</span></div>`).join(''):'<p class="mute">ยังไม่มี แตะหัวใจบนการ์ดระหว่างเล่นเพื่อเก็บไว้</p>';
 hugLeft=300;$('hug').textContent=fmt(hugLeft);$('hugbtn').textContent='เริ่มจับเวลา 5 นาที';show('end')}
 $('hugbtn').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null;$('hugbtn').textContent='จับเวลาต่อ';return}
 $('hugbtn').textContent='หยุดชั่วคราว';hugT=setInterval(()=>{hugLeft--;$('hug').textContent=fmt(Math.max(0,hugLeft));if(hugLeft<=0){clearInterval(hugT);hugT=null;$('hugbtn').textContent='ครบ 5 นาทีแล้ว'}},1000)});
@@ -793,7 +801,7 @@ const inviteUrl=()=>location.origin+location.pathname+'#join='+R.code;
 const ssSave=()=>{try{R.code&&R.tok?sessionStorage.setItem('frm-room',JSON.stringify({code:R.code,tok:R.tok,role:R.role})):sessionStorage.removeItem('frm-room')}catch(e){}};
 function rsend(d){if(R.ws&&R.ws.readyState===1)R.ws.send(JSON.stringify({t:'msg',d}))}
 function snap(){const scr=curScr(),on=scr==='play'||scr==='end';
-return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,cs:scr==='bx'&&CS?CS:null,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
+return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,cr:cfg.crude,cs:scr==='bx'&&CS?CS:null,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
 function rsync(){if(R.role!=='host'||!R.peer||R.q)return;R.q=1;setTimeout(()=>{R.q=0;rsend({k:'snap',s:snap()})},0)}
 function rOpen(first){
 if(R.ws){const o=R.ws;R.ws=null;o.onclose=null;try{o.close()}catch(e){}}
@@ -837,6 +845,7 @@ function rApply(s){R.last=s;if(!ALL.length)return;
 const g=s.g,scr=s.scr,cur=curScr(),key=scr+(s.cs&&typeof s.cs==='object'?':c'+s.cs.k:''),moved=R.hostKey!==key;R.hostKey=key;R.hostScr=scr;
 cfg.names=(Array.isArray(s.names)?s.names:[]).slice(0,2).map(x=>String(x||'').slice(0,16));while(cfg.names.length<2)cfg.names.push('');
 cfg.x5=!!s.x5;cfg.safe=String(s.safe||'').slice(0,20);if(DM[s.dm])cfg.mode=s.dm;
+if(!!s.cr!==cfg.crude){cfg.crude=!!s.cr;if(cfg.crude)loadX().then(()=>{if(curScr()==='play')render();else if(curScr()==='end')endView()})}
 if((scr==='play'||scr==='end')&&g&&typeof g==='object'){
 const ov=g.ov&&typeof g.ov==='object'&&['red','up','menu'].includes(g.ov.k)?{k:g.ov.k,to:num(g.ov.to,1,5)}:null;
 Object.assign(S,{turn:num(g.turn,0,1),level:num(g.level,1,5),inLevel:num(g.inLevel,0,999),passes:[0,1].map(i=>num((g.passes||[])[i],0,9)),
@@ -932,6 +941,24 @@ $('rbanB').addEventListener('click',roomOpen);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&R.code&&R.tok&&!R.ws){clearTimeout(R.rt);R.retry=0;rOpen({t:'resume',code:R.code,tok:R.tok})}});
 {const m=location.hash.match(/join=(\d{6})/);if(m){R.pend=m[1];history.replaceState(null,'',location.pathname+location.search)}
 else{try{const s=JSON.parse(sessionStorage.getItem('frm-room')||'null');if(s&&s.code&&s.tok){Object.assign(R,{code:s.code,tok:s.tok,role:s.role,st:'re'});rOpen({t:'resume',code:s.code,tok:s.tok})}}catch(e){}}}
+
+/* hidden strong-word mode: tap the setup title 5 times. Both have to agree; the text lives in
+   cards-x.json and is only fetched once the mode is on. */
+{let taps=[];
+$('s-t').addEventListener('click',()=>{const n=Date.now();taps=taps.filter(t=>n-t<3000);taps.push(n);if(taps.length>=5){taps=[];xDialog()}});
+$('xchip').addEventListener('click',xDialog);
+$('ovbody').addEventListener('click',e=>{const b=e.target.closest('[data-x]');if(!b)return;const a=b.dataset.x;
+if(a==='on'){if(!$('xok0').checked||!$('xok1').checked){$('xerr').textContent='ติ๊กยินยอมทั้งสองคนก่อน';return}
+loadX().then(()=>{cfg.crude=true;store.set('crude',1);closeOv();xSync()}).catch(()=>{$('xerr').textContent='โหลดไม่สำเร็จ ต้องต่อเน็ตครั้งแรก'})}
+else if(a==='off'){cfg.crude=false;store.set('crude',0);closeOv();xSync()}
+else closeOv()})}
+function xDialog(){if(R.role==='guest')return;
+overlay(cfg.crude?`<h2 id="ov-t">โหมดคำแรง</h2><p class="soft">ตอนนี้การ์ดบางใบใช้คำหยาบอยู่ ปิดได้ทุกเมื่อ</p><button class="btn" data-x="off">ปิดโหมดคำแรง</button><button class="btn ghost" data-x="no">ใช้ต่อ</button>`
+:`<h2 id="ov-t">ฟังก์ชันลับ: โหมดคำแรง</h2><p class="soft">การ์ดระดับ 3–5 จำนวน ${Object.keys(XT).length||'หลายสิบ'} ใบจะเปลี่ยนเป็นคำพูดตรง ๆ แบบหยาบ เหมาะกับคู่ที่ชอบ dirty talk เปิดหรือปิดได้ทุกเมื่อ</p>
+<label class="check" style="text-align:left;width:100%"><input type="checkbox" id="xok0">${esc(nm(0))} โอเคกับคำหยาบบนการ์ด</label>
+<label class="check" style="text-align:left;width:100%"><input type="checkbox" id="xok1">${esc(nm(1))} โอเคกับคำหยาบบนการ์ด</label>
+<p class="err" id="xerr" role="alert"></p><button class="btn" data-x="on">เปิดโหมดคำแรง</button><button class="btn ghost" data-x="no">ยกเลิก</button>`)}
+function xSync(){$('xchip').hidden=!cfg.crude;if(curScr()==='play')render();rsync()}
 
 /* load cards */
 fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}));if(curScr()==='setup')renderLevels();if(R.role==='guest'&&R.last)rApply(R.last)}).catch(()=>{ALL=[]});
