@@ -26,7 +26,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{padding-bottom:env(safe-area-inset-bottom)}
 body{font:16px/1.55 'IBM Plex Sans Thai',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center}
-.app{width:100%;max-width:460px;padding:24px 18px 28px;display:flex;flex-direction:column;gap:16px;min-height:100vh}
+.app{width:100%;max-width:460px;padding:calc(24px + env(safe-area-inset-top)) 18px 28px;display:flex;flex-direction:column;gap:16px;min-height:100vh}
 .scr{display:none;flex-direction:column;gap:18px;flex:1}.scr.on{display:flex}
 h1,h2{font-family:'Noto Serif Thai',serif;margin:0;line-height:1.25;color:var(--goldi);text-wrap:balance}
 h1{font-size:32px}h2{font-size:24px}
@@ -182,7 +182,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 /* wider screens: column wrappers vanish on phones, become real columns on computers, iPads and landscape */
 .col{display:contents}
 @media (min-width:700px){
-.app{max-width:760px;padding:28px 32px 36px}
+.app{max-width:760px;padding:calc(28px + env(safe-area-inset-top)) 32px 36px}
 .mbar{max-width:760px}.msheet{max-width:640px}
 #hub,#bxc .list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .poses{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -190,7 +190,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 #gate.on,#end.on{width:100%;max-width:600px;margin:0 auto}
 }
 @media (min-width:1000px),(orientation:landscape) and (min-width:700px){
-.app{max-width:1180px;padding:32px 40px 40px}
+.app{max-width:1180px;padding:calc(32px + env(safe-area-inset-top)) 40px 40px}
 .mbar{max-width:1180px}.msheet{max-width:760px}
 .col{display:flex;flex-direction:column;gap:18px}
 #setup.on{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 44px;align-content:start}
@@ -228,7 +228,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 </section>
 
 <section class="scr" id="setup" aria-labelledby="s-t">
-<div><h2 id="s-t" style="user-select:none;-webkit-user-select:none">ตั้งค่าคืนนี้</h2><p class="soft">ตั้งด้วยกันทั้งสองคน ใช้เวลา 1 นาที</p>
+<div><h2 id="s-t" style="user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:pointer">ตั้งค่าคืนนี้</h2><p class="soft">ตั้งด้วยกันทั้งสองคน ใช้เวลา 1 นาที</p>
 <button type="button" class="chip xchip" id="xchip" hidden>โหมดคำแรงเปิดอยู่ · แตะเพื่อตั้งค่า</button></div>
 <div class="col">
 <div class="row2">
@@ -945,7 +945,14 @@ else{try{const s=JSON.parse(sessionStorage.getItem('frm-room')||'null');if(s&&s.
 /* hidden strong-word mode: tap the setup title 5 times. Both have to agree; the text lives in
    cards-x.json and is only fetched once the mode is on. */
 {let taps=[];
-$('s-t').addEventListener('click',()=>{const n=Date.now();taps=taps.filter(t=>n-t<3000);taps.push(n);if(taps.length>=5){taps=[];xDialog()}});
+// pointerdown, not click: iPhone drops quick repeated clicks on plain text (double-tap zoom).
+// Holding the title for 1 second opens it too.
+let hold=0;const st=$('s-t'),stop=()=>{clearTimeout(hold);hold=0};
+st.addEventListener('pointerdown',()=>{const n=Date.now();taps=taps.filter(t=>n-t<3000);taps.push(n);
+if(taps.length>=5){taps=[];stop();xDialog();return}
+stop();hold=setTimeout(()=>{hold=0;taps=[];xDialog()},1000)});
+['pointerup','pointercancel','pointerleave'].forEach(t=>st.addEventListener(t,stop));
+st.addEventListener('contextmenu',e=>e.preventDefault());
 $('xchip').addEventListener('click',xDialog);
 $('ovbody').addEventListener('click',e=>{const b=e.target.closest('[data-x]');if(!b)return;const a=b.dataset.x;
 if(a==='on'){if(!$('xok0').checked||!$('xok1').checked){$('xerr').textContent='ติ๊กยินยอมทั้งสองคนก่อน';return}
