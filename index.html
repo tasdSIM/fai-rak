@@ -47,6 +47,11 @@ button{font:inherit;cursor:pointer;border:none;color:inherit}
 .lv[aria-pressed=true]{border:2px solid var(--gold);background:#2A1C14}
 .lv .dot{width:14px;height:14px;border-radius:50%;flex:none}
 .lv .note{margin-left:auto;font-size:12px;color:var(--mute)}
+.lv:disabled{cursor:default}
+.lv .ck{width:20px;height:20px;border-radius:6px;border:2px solid #7A6A50;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none}
+.lv[aria-pressed=true] .ck{background:var(--gold);border-color:var(--gold);color:#1E1216}
+#dmode{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:520px){#dmode{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:40px;border-radius:999px;border:1px solid #5A4228;background:transparent;padding:0 14px;font-size:14px;display:flex;align-items:center;gap:6px}
 .chip svg{width:16px;height:16px}
@@ -216,7 +221,10 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <div class="field"><label for="n0">ผู้เล่น 1</label><input type="text" id="n0" maxlength="16" placeholder="ชื่อเล่น"></div>
 <div class="field"><label for="n1">ผู้เล่น 2</label><input type="text" id="n1" maxlength="16" placeholder="ชื่อเล่น"></div>
 </div>
-<div class="field"><span style="font-size:14px;font-weight:600">เริ่มที่ระดับ</span><div id="levels" class="list"></div></div>
+<div class="field"><span style="font-size:14px;font-weight:600">ใช้การ์ดระดับไหน</span>
+<div class="pick dmode" id="dmode"></div>
+<span class="mute" id="dhint"></span>
+<div id="levels" class="list"></div></div>
 <div class="box" id="x5" hidden>
 <p style="font-weight:600;color:#FFC078">ปลดล็อกระดับ 5 เอ็กซ์ตรีม</p>
 <p class="mute">ทั้งสองคนต้องยินยอม และตั้งคำหยุดร่วมกัน พูดคำนี้เมื่อไหร่ ทุกอย่างหยุดทันที</p>
@@ -344,7 +352,14 @@ const tlabel=s=>s>=60&&s%60===0?(s/60)+' นาที':s+' วินาที';
 let ALL=[],S={},timer=null,lastCard=null;
 /* two-device room state (see "two devices" below) */
 const R={ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:'',retry:0,rt:0,q:0,last:null,hostScr:null,ovKey:null,gameOv:false,ret:null,pend:null};
-const cfg={names:store.get('names',['','']),level:1,ex:[],sp:true,x5:false,safe:''};
+const cfg={names:store.get('names',['','']),level:1,ex:[],sp:true,x5:false,safe:'',mode:'prog',lvls:[1,2,3]};
+{const d=store.get('deck',{});if(['prog','one','mix','all'].includes(d.mode))cfg.mode=d.mode;if(d.level>=1&&d.level<=5)cfg.level=d.level;
+if(Array.isArray(d.lvls)){const l=d.lvls.filter(x=>x>=1&&x<=5);if(l.length)cfg.lvls=l}}
+/* deck modes: climb level by level, one level only, a mix of chosen levels, or every level */
+const DM={prog:['ไล่ทีละระดับ','เริ่มที่ระดับที่เลือก ครบ 9 ใบจะถามว่าไปต่อระดับถัดไปไหม'],one:['ระดับเดียว','เล่นเฉพาะระดับที่เลือก ไม่ถามขึ้นระดับ'],mix:['ผสมระดับ','เลือกได้หลายระดับ การ์ดทุกใบสับรวมเป็นกองเดียว'],all:['ทั้งหมด','ทุกระดับ 1–5 สับรวมเป็นกองเดียว']};
+const isMix=()=>cfg.mode==='mix'||cfg.mode==='all';
+const selLv=()=>cfg.mode==='mix'?cfg.lvls.slice().sort():cfg.mode==='all'?[1,2,3,4,5]:[cfg.level];
+const rangeTxt=a=>{a=a.slice().sort();return a.length>1&&a[a.length-1]-a[0]===a.length-1?a[0]+'–'+a[a.length-1]:a.join(', ')};
 
 function show(id){for(const s of document.querySelectorAll('.scr'))s.classList.toggle('on',s.id===id);window.scrollTo(0,0);
 const bar=id!=='gate';$('mbar').hidden=!bar;document.body.classList.toggle('hasbar',bar);if(bar&&window.musPrep)window.musPrep();
@@ -360,10 +375,20 @@ store.set('age',1);openSetup();if(mus.on&&!musStarted)musPlay()});
 
 /* setup */
 function renderLevels(){
-$('levels').innerHTML=[1,2,3,4,5].map(l=>`<button type="button" class="lv" data-l="${l}" aria-pressed="${cfg.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span><span class="note">${l===1?'แนะนำ':l===4?'ต้องไฟเขียวทั้งคู่':l===5?'18+ ต้องปลดล็อก':''}</span></button>`).join('');
-$('x5').hidden=cfg.level!==5;
+const sel=selLv(),multi=isMix();
+const cnt=l=>ALL.length?ALL.filter(c=>c.l===l&&c.code!=='X-01').length+' ใบ':'';
+$('dmode').innerHTML=Object.keys(DM).map(k=>`<button type="button" data-dm="${k}" aria-pressed="${cfg.mode===k}">${DM[k][0]}</button>`).join('');
+$('dhint').textContent=DM[cfg.mode][1]+' การ์ดที่เล่นแล้วจะถูกนำออกจากกองจนกว่าจะเริ่มเกมใหม่';
+$('levels').innerHTML=[1,2,3,4,5].map(l=>{const on=sel.includes(l),note=[l===1&&!multi?'แนะนำ':'',l===4?'ต้องไฟเขียวทั้งคู่':'',l===5?'18+ ต้องปลดล็อก':'',cnt(l)].filter(Boolean).join(' · ');
+return `<button type="button" class="lv" data-l="${l}" aria-pressed="${on}" ${cfg.mode==='all'?'disabled':''}>${multi?`<span class="ck" aria-hidden="true">${on?'✓':''}</span>`:''}<span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span><span class="note">${note}</span></button>`}).join('');
+$('x5').hidden=!sel.includes(5);
 }
-$('levels').addEventListener('click',e=>{const b=e.target.closest('.lv');if(!b)return;cfg.level=+b.dataset.l;renderLevels()});
+const saveDeck=()=>store.set('deck',{mode:cfg.mode,level:cfg.level,lvls:cfg.lvls});
+$('dmode').addEventListener('click',e=>{const b=e.target.closest('[data-dm]');if(!b)return;cfg.mode=b.dataset.dm;
+if(cfg.mode==='mix'&&!cfg.lvls.length)cfg.lvls=[cfg.level];saveDeck();renderLevels()});
+$('levels').addEventListener('click',e=>{const b=e.target.closest('.lv');if(!b||b.disabled)return;const l=+b.dataset.l;
+if(cfg.mode==='mix'){if(cfg.lvls.includes(l)){if(cfg.lvls.length>1)cfg.lvls=cfg.lvls.filter(x=>x!==l)}else cfg.lvls=cfg.lvls.concat(l)}
+else cfg.level=l;saveDeck();renderLevels()});
 function renderEx(){$('ex').innerHTML=EXCL.map(n=>`<button type="button" class="chip" data-n="${n}" aria-pressed="${cfg.ex.includes(n)}">${svg(n,'currentColor',1.8)}${n}</button>`).join('')}
 $('ex').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const n=b.dataset.n;cfg.ex=cfg.ex.includes(n)?cfg.ex.filter(x=>x!==n):cfg.ex.concat(n);renderEx()});
 const nameSync=()=>{$('ok0t').textContent=($('n0').value.trim()||'ผู้เล่น 1')+' ยินยอม';$('ok1t').textContent=($('n1').value.trim()||'ผู้เล่น 2')+' ยินยอม'};
@@ -378,39 +403,48 @@ const n0=$('n0').value.trim(),n1=$('n1').value.trim();
 if(!n0||!n1){$('serr').textContent='ใส่ชื่อเล่นทั้งสองคนก่อน';return}
 if(!ALL.length){$('serr').textContent='โหลดการ์ดไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง';return}
 cfg.names=[n0,n1];store.set('names',cfg.names);cfg.sp=$('sp').checked;
-if(cfg.level===5){const sw=$('safe').value.trim();
+if(selLv().includes(5)){const sw=$('safe').value.trim();
 if(!sw||!$('ok0').checked||!$('ok1').checked){$('serr').textContent='ระดับ 5 ต้องตั้งคำหยุด และติ๊กยินยอมทั้งสองคน';return}
 cfg.x5=true;cfg.safe=sw}
 startGame()});
 
 /* game */
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function deckFor(l){return shuffle(ALL.filter(c=>c.l===l&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)))}
-function startGame(){
-S={turn:0,level:cfg.level,deck:deckFor(cfg.level),inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>['SP-05','SP-06','SP-07','SP-08','SP-09'].includes(c.code))),maxLevel:cfg.level,card:null};
-if(S.level===5)S.card=ALL.find(c=>c.code==='X-01');
+/* the deck for the current levels, minus every card already drawn this game (S.used) */
+const poolLv=()=>isMix()?S.lvls:[S.level];
+function deckFor(){const p=poolLv();return shuffle(ALL.filter(c=>p.includes(c.l)&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]))}
+function newDeck(){S.deck=deckFor();S.total=S.deck.length}
+function startGame(){const lv=selLv();
+S={turn:0,level:isMix()?lv[0]:cfg.level,lvls:lv,used:{},deck:[],total:0,inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>['SP-05','SP-06','SP-07','SP-08','SP-09'].includes(c.code))),maxLevel:isMix()?lv[lv.length-1]:cfg.level,card:null};
+newDeck();lastCard=null;
+if(lv.includes(5))S.card=ALL.find(c=>c.code==='X-01');
 draw(!!S.card);show('play')}
 function draw(keep){
 stopTimer();
 if(!keep){
-if(cfg.sp&&S.specials.length&&S.inLevel>2&&Math.random()<0.12)S.card=S.specials.pop();
-else{if(!S.deck.length)S.deck=deckFor(S.level);S.card=S.deck.pop()||null;S.inLevel++}}
+if(cfg.sp&&S.specials.length&&S.inLevel>2&&S.deck.length&&Math.random()<0.12)S.card=S.specials.pop();
+else{S.card=S.deck.pop()||null;if(S.card){S.used[S.card.code]=1;S.inLevel++}}}
 S.mode=S.card&&(S.card.l===0||S.card.code==='X-01')?'special':'signal';
 const base=S.card?S.card.secs:0;S.left=S.dbl&&S.card&&S.card.l!==0?base*2:base;if(S.card&&S.card.l!==0)S.dbl=false;
 render();
+if(cfg.mode!=='prog'||!S.card)return;
 if(S.inLevel===9&&S.level<4&&!S.asked[S.level]){S.asked[S.level]=1;levelUp(S.level+1)}
 else if(S.inLevel===9&&S.level===4&&cfg.x5&&!S.asked[4]){S.asked[4]=1;levelUp(5)}
 }
+function setLevel(l){S.level=l;S.maxLevel=Math.max(S.maxLevel,l);S.inLevel=0;newDeck()}
 function next(){if(S.card)S.played.push(S.card);S.turn=1-S.turn;draw()}
 const reader=()=>cfg.names[S.turn],listener=()=>cfg.names[1-S.turn];
 
 function render(){
-const c=S.card,lv=LV[S.level];
-$('lvdot').style.background=lv.dot;$('lvname').textContent='ระดับ '+S.level+' '+lv.n;
-$('prog').style.width=Math.min(100,S.inLevel/9*100)+'%';
+const c=S.card,mixed=isMix(),lvs=Array.isArray(S.lvls)&&S.lvls.length?S.lvls:[S.level],top=mixed?lvs[lvs.length-1]:S.level;
+const deckN=Array.isArray(S.deck)?S.deck.length:(S.deckN||0);
+$('lvdot').style.background=LV[top].dot;$('lvname').textContent=mixed?'ผสมระดับ '+rangeTxt(lvs)+' · เหลือ '+deckN+' ใบ':'ระดับ '+S.level+' '+LV[S.level].n;
+$('prog').style.width=(cfg.mode==='prog'?Math.min(100,S.inLevel/9*100):S.total?(S.total-deckN)/S.total*100:0)+'%';
 $('who').textContent='ตาของ'+reader();$('whoto').textContent='อ่านออกเสียงให้'+listener()+'ฟัง';
 $('passes').textContent='บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ';
-if(!c){$('card').innerHTML='<div class="cbody"><p class="ctext">การ์ดหมวดนี้หมดแล้ว ลองเปลี่ยนระดับ หรือเอาหมวดที่ซ่อนไว้ออก</p></div>';$('ctl').innerHTML='';rsync();return}
+if(!c){const what=mixed?'กองผสมระดับ '+rangeTxt(lvs):'ระดับ '+S.level;
+$('card').innerHTML=`<div class="cbody"><p class="ctext">การ์ดในกองหมดแล้ว</p><p style="color:#6B5A4A">เล่นครบทุกใบของ${what} แล้ว สับกองใหม่เพื่อเอาการ์ดที่เล่นแล้วกลับมา${mixed?'':' หรือแตะปุ่มระดับด้านบนเพื่อเปลี่ยนระดับ'} หรือไปหลังเกม${cfg.ex.length?' (หมวดที่ซ่อนไว้จะไม่ถูกสุ่ม)':''}</p></div>`;
+$('ctl').innerHTML='<div class="two"><button class="btn ghost" data-a="reshuffle">สับกองใหม่</button><button class="btn" data-a="finish">ไปหลังเกม</button></div>';rsync();return}
 const L=LV[c.l],fav=store.get('favs',[]).includes(c.code);
 const ink=c.l===3||c.l===2?'#8A1024':'#6B4A12';
 if(c.code!==lastCard){lastCard=c.code;$('card').style.animation='none';void $('card').offsetWidth;$('card').style.animation=''}
@@ -443,7 +477,9 @@ else if(a==='red'){stopTimer();redStop()}
 else if(a==='pass'){const k=1-S.turn;if(S.passes[k]>0){S.passes[k]--;S.turn=1-S.turn;draw()}}
 else if(a==='next')next();
 else if(a==='time'){S.mode='doing';render();startTimer()}
-else if(a==='sp'){if(S.card.code==='SP-07')S.dbl=true;S.turn=1-S.turn;draw()}});
+else if(a==='sp'){if(S.card.code==='SP-07')S.dbl=true;S.turn=1-S.turn;draw()}
+else if(a==='reshuffle'){const p=poolLv();for(const k in S.used){const c=ALL.find(x=>x.code===k);if(c&&p.includes(c.l))delete S.used[k]}S.inLevel=0;newDeck();draw()}
+else if(a==='finish')toEnd()});
 
 $('card').addEventListener('click',e=>{
 if(e.target.closest('#plus')){S.left=Math.min(900,S.left+15);render()}
@@ -455,21 +491,26 @@ function closeOv(){$('ov').classList.remove('on');S.ov=null;R.ovKey=null;R.gameO
 function redStop(){S.ovh=null;S.ov={k:'red'};overlay(`<span style="width:72px;height:72px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true">${HEART}</svg></span>
 <h2 id="ov-t">หยุดก่อน</h2><p class="soft">กอดกันสักครู่ แล้วถาม${esc(listener())}ว่าโอเคไหม ไม่ต้องอธิบายเหตุผล</p>
 ${cfg.x5?`<p class="safe">คำหยุด: <b>${esc(cfg.safe)}</b></p>`:''}
-<button class="btn" data-o="cont">เล่นต่อด้วยการ์ดใบใหม่</button><button class="btn ghost" data-o="down">ลดระดับลง 1 ขั้น</button><button class="btn ghost" data-o="end">พอแค่นี้ ไปหลังเกม</button>`)}
+<button class="btn" data-o="cont">เล่นต่อด้วยการ์ดใบใหม่</button>${isMix()?(S.lvls.length>1?`<button class="btn ghost" data-o="down">เอาระดับ ${S.lvls[S.lvls.length-1]} ออกจากกอง</button>`:''):S.level>1?'<button class="btn ghost" data-o="down">ลดระดับลง 1 ขั้น</button>':''}<button class="btn ghost" data-o="end">พอแค่นี้ ไปหลังเกม</button>`)}
 function levelUp(to,keep){if(!keep||!Array.isArray(S.ready))S.ready=[false,false];const ready=S.ready;S.ov={k:'up',to};
 const paint=()=>overlay(`<h2 id="ov-t">ไปต่อระดับ ${to} ${LV[to].n}?</h2><p class="soft">${to>=4?'ระดับนี้ต้องกดพร้อมทั้งสองคน':'กดพร้อมทั้งสองคน แล้วแอปจะเปิดระดับถัดไป'}</p>
 <div class="two" style="width:100%">${[0,1].map(i=>`<button class="btn ${ready[i]?'':'ghost'}" data-o="r${i}" aria-pressed="${ready[i]}" style="${ready[i]?'background:var(--green);color:#fff':''}">${esc(cfg.names[i])} ${ready[i]?'พร้อม':'กดถ้าพร้อม'}</button>`).join('')}</div>
 <button class="btn" data-o="go" ${ready[0]&&ready[1]?'':'disabled'}>ไปต่อ</button><button class="btn ghost" data-o="stay">อยู่ระดับ ${S.level} ต่อ</button>`);
 S.ovh=o=>{if(o==='r0'||o==='r1'){ready[+o[1]]=!ready[+o[1]];paint();return true}
-if(o==='go'){S.level=to;S.maxLevel=Math.max(S.maxLevel,to);S.inLevel=0;S.deck=deckFor(to);closeOv();if(to===5){S.card=ALL.find(c=>c.code==='X-01');draw(true)}else draw();return true}
+if(o==='go'){setLevel(to);closeOv();if(to===5){S.card=ALL.find(c=>c.code==='X-01');draw(true)}else draw();return true}
 if(o==='stay'){closeOv();return true}return false};paint()}
 function levelMenu(){const opts=[1,2,3,4].concat(cfg.x5?[5]:[]);S.ov={k:'menu'};
+if(isMix()){S.ovh=null;const n=Array.isArray(S.deck)?S.deck.length:(S.deckN||0);
+overlay(`<h2 id="ov-t">กองผสมระดับ ${rangeTxt(S.lvls)}</h2><p class="soft">เหลือ ${n} ใบจาก ${S.total||0} ใบ การ์ดที่เล่นแล้วจะไม่กลับมาจนกว่าจะเริ่มเกมใหม่ หรือกดสับกองใหม่ตอนการ์ดหมด</p><button class="btn ghost" data-o="stay">ปิด</button>`);return}
 overlay(`<h2 id="ov-t">เปลี่ยนระดับ</h2><p class="soft">ลดระดับได้ทุกเมื่อ ขึ้นระดับต้องพร้อมทั้งสองคน</p>${opts.map(l=>`<button class="lv" data-o="L${l}" aria-pressed="${S.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span></button>`).join('')}<button class="btn ghost" data-o="stay">ปิด</button>`);
-S.ovh=o=>{if(o[0]!=='L')return false;const l=+o.slice(1);if(l>S.level){levelUp(l);return true}S.level=l;S.inLevel=0;S.deck=deckFor(l);closeOv();draw();return true}}
+S.ovh=o=>{if(o[0]!=='L')return false;const l=+o.slice(1);if(l>S.level){levelUp(l);return true}setLevel(l);closeOv();draw();return true}}
 $('ovbody').addEventListener('click',e=>{const b=e.target.closest('button[data-o]');if(!b)return;const o=b.dataset.o;
 if(S.ovh&&S.ovh(o))return;
 if(o==='cont'){closeOv();S.turn=1-S.turn;draw()}
-else if(o==='down'){closeOv();if(S.level>1){S.level--;S.inLevel=0;S.deck=deckFor(S.level)}draw()}
+else if(o==='down'){closeOv();
+if(isMix()){if(S.lvls.length>1){S.lvls=S.lvls.slice(0,-1);S.deck=S.deck.filter(c=>S.lvls.includes(c.l));
+S.total=S.deck.length+Object.keys(S.used).filter(k=>{const c=ALL.find(x=>x.code===k);return c&&S.lvls.includes(c.l)}).length}}
+else if(S.level>1)setLevel(S.level-1);draw()}
 else if(o==='end'){closeOv();toEnd()}
 else if(o==='stay')closeOv()});
 $('lvchip').addEventListener('click',()=>{S.ovh=null;levelMenu()});
@@ -482,7 +523,7 @@ let hugT=null,hugLeft=300;
 function toEnd(){if(S.card&&S.mode==='doing')S.played.push(S.card);endView()}
 function endView(){
 const favs=store.get('favs',[]);
-$('sum').textContent='คืนนี้เล่นไป '+S.played.length+' ใบ ไปถึงระดับ '+S.maxLevel+' '+LV[S.maxLevel].n;
+$('sum').textContent='คืนนี้เล่นไป '+S.played.length+' ใบ '+(isMix()&&Array.isArray(S.lvls)?'จากกองผสมระดับ '+rangeTxt(S.lvls):'ไปถึงระดับ '+S.maxLevel+' '+LV[S.maxLevel].n);
 const list=ALL.filter(c=>favs.includes(c.code));
 $('favs').innerHTML=list.length?list.map(c=>`<div class="li"><b style="background:${LV[c.l].band}"></b><span style="flex:1">${esc(c.text)}</span><span class="mute">${c.code}</span></div>`).join(''):'<p class="mute">ยังไม่มี แตะหัวใจบนการ์ดระหว่างเล่นเพื่อเก็บไว้</p>';
 hugLeft=300;$('hug').textContent=fmt(hugLeft);$('hugbtn').textContent='เริ่มจับเวลา 5 นาที';show('end')}
@@ -692,7 +733,7 @@ bx('โบนัส 4',t.t,`<p class="soft">${esc(t.v)}</p>
 <button class="btn" data-b="play">เริ่มเกมการ์ดตามธีมนี้ (ระดับ ${t.level})</button>
 ${/มือที่รู้ใจ/.test(t.flow.join(''))?'<button class="btn ghost" data-b="massage">เปิดโหมดนวด มือที่รู้ใจ</button>':''}
 <p class="mute" style="text-align:center">ดื่มแต่พอดี ทั้งสองคนต้องมีสติพอจะยินยอมตลอดเกม</p>`,dList);
-bxH=b=>{if(b==='play'){cfg.level=t.level;openSetup()}else if(b==='massage')mSetup()}}
+bxH=b=>{if(b==='play'){cfg.level=t.level;if(isMix())cfg.mode='prog';saveDeck();openSetup()}else if(b==='massage')mSetup()}}
 
 /* two devices: the device that creates the room runs the game; after every change it sends a
    small snapshot (card code, level, turn, overlay) through the relay and the other device draws
@@ -705,7 +746,7 @@ const inviteUrl=()=>location.origin+location.pathname+'#join='+R.code;
 const ssSave=()=>{try{R.code&&R.tok?sessionStorage.setItem('frm-room',JSON.stringify({code:R.code,tok:R.tok,role:R.role})):sessionStorage.removeItem('frm-room')}catch(e){}};
 function rsend(d){if(R.ws&&R.ws.readyState===1)R.ws.send(JSON.stringify({t:'msg',d}))}
 function snap(){const scr=curScr(),on=scr==='play'||scr==='end';
-return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,g:on?{turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
+return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
 function rsync(){if(R.role!=='host'||!R.peer||R.q)return;R.q=1;setTimeout(()=>{R.q=0;rsend({k:'snap',s:snap()})},0)}
 function rOpen(first){
 if(R.ws){const o=R.ws;R.ws=null;o.onclose=null;try{o.close()}catch(e){}}
@@ -746,12 +787,14 @@ const num=(x,lo,hi)=>{x=Math.round(+x);return Number.isFinite(x)?Math.min(hi,Mat
 function rApply(s){R.last=s;if(!ALL.length)return;
 const g=s.g,scr=s.scr,cur=curScr(),moved=R.hostScr!==scr;R.hostScr=scr;
 cfg.names=(Array.isArray(s.names)?s.names:[]).slice(0,2).map(x=>String(x||'').slice(0,16));while(cfg.names.length<2)cfg.names.push('');
-cfg.x5=!!s.x5;cfg.safe=String(s.safe||'').slice(0,20);
+cfg.x5=!!s.x5;cfg.safe=String(s.safe||'').slice(0,20);if(DM[s.dm])cfg.mode=s.dm;
 if((scr==='play'||scr==='end')&&g&&typeof g==='object'){
 const ov=g.ov&&typeof g.ov==='object'&&['red','up','menu'].includes(g.ov.k)?{k:g.ov.k,to:num(g.ov.to,1,5)}:null;
 Object.assign(S,{turn:num(g.turn,0,1),level:num(g.level,1,5),inLevel:num(g.inLevel,0,999),passes:[0,1].map(i=>num((g.passes||[])[i],0,9)),
 mode:['signal','yellow','doing','special'].includes(g.mode)?g.mode:'signal',left:num(g.left,0,3600),maxLevel:num(g.maxLevel,1,5),
-played:new Array(num(g.played,0,999)),ready:[0,1].map(i=>!!(g.ready||[])[i]),ov});
+played:new Array(num(g.played,0,999)),ready:[0,1].map(i=>!!(g.ready||[])[i]),ov,
+total:num(g.total,0,999),deckN:num(g.deckN,0,999),deck:undefined});
+S.lvls=[...new Set((Array.isArray(g.lvls)?g.lvls:[]).map(x=>num(x,1,5)))].sort();if(!S.lvls.length)S.lvls=[S.level];
 S.card=ALL.find(c=>c.code===g.card)||null;
 if(!moved&&cur!=='play'&&cur!=='end'){rui();return}   // stepped away on purpose: stay there
 if(scr==='play'){if(cur!=='play')show('play');render();rOv()}
@@ -827,7 +870,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 else{try{const s=JSON.parse(sessionStorage.getItem('frm-room')||'null');if(s&&s.code&&s.tok){Object.assign(R,{code:s.code,tok:s.tok,role:s.role,st:'re'});rOpen({t:'resume',code:s.code,tok:s.tok})}}catch(e){}}}
 
 /* load cards */
-fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}));if(R.role==='guest'&&R.last)rApply(R.last)}).catch(()=>{ALL=[]});
+fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}));if(curScr()==='setup')renderLevels();if(R.role==='guest'&&R.last)rApply(R.last)}).catch(()=>{ALL=[]});
 if(store.get('age',0))openSetup();else show('gate');
 
 /* add to home screen */
