@@ -439,27 +439,60 @@ const poolLv=()=>isMix()?S.lvls:[S.level];
 function deckFor(){const p=poolLv();return shuffle(ALL.filter(c=>p.includes(c.l)&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]))}
 function newDeck(){S.deck=deckFor();S.total=S.deck.length}
 function startGame(){const lv=selLv();
-S={turn:0,level:isMix()?lv[0]:cfg.level,lvls:lv,used:{},deck:[],total:0,inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>['SP-05','SP-06','SP-07','SP-08','SP-09'].includes(c.code))),maxLevel:isMix()?lv[lv.length-1]:cfg.level,card:null,rules:[],noteK:null,noteNext:null,rp:false,pickL:0};
+S={turn:0,level:isMix()?lv[0]:cfg.level,lvls:lv,used:{},deck:[],total:0,inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>c.l===0&&!['SP-01','SP-02','SP-03','SP-04','SP-10'].includes(c.code))),maxLevel:isMix()?lv[lv.length-1]:cfg.level,card:null,rules:[],noteK:null,noteNext:null,rp:false,pickL:0,nextFrom:0,half:false,lastPlay:null,lastReader:0};
 newDeck();lastCard=null;
 if(lv.includes(5))S.card=ALL.find(c=>c.code==='X-01');
 draw(!!S.card);show('play')}
 function draw(keep){
 stopTimer();
-if(!keep){S.noteK=S.noteNext||null;S.noteNext=null;S.rp=false;
-if(cfg.sp&&S.specials.length&&S.inLevel>2&&S.deck.length&&Math.random()<0.12)S.card=S.specials.pop();
+if(!keep){const wasSp=!!(S.card&&S.card.l===0);   // never two specials in a row: the next real card must get the note
+S.noteK=S.noteNext||null;S.noteNext=null;S.rp=false;if(S.noteK==='half')S.noteK=null;   // 'half' shows only on the card it shortens
+const from=S.nextFrom,pool=from?shuffle(ALL.filter(c=>c.l===from&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code])):[];S.nextFrom=0;
+if(from&&!pool.length&&(S.noteK==='up'||S.noteK==='down'))S.noteK=null;   // that pile is empty: just play on
+if(pool.length){S.card=pool[0];S.used[S.card.code]=1;S.deck=S.deck.filter(x=>x.code!==S.card.code);S.pickL=from}
+else if(cfg.sp&&!wasSp&&!S.noteK&&S.specials.length&&S.inLevel>2&&S.deck.length&&Math.random()<0.15)S.card=S.specials.pop();
 else{S.card=S.deck.pop()||null;if(S.card){S.used[S.card.code]=1;S.inLevel++}}}
 S.mode=S.card&&(S.card.l===0||S.card.code==='X-01')?'special':'signal';
-const base=S.card?S.card.secs:0;S.left=S.dbl&&S.card&&S.card.l!==0?base*2:base;if(S.card&&S.card.l!==0)S.dbl=false;
+const base=S.card?S.card.secs:0,real=S.card&&S.card.l!==0;
+// double / half time wait for the next real card that has a timer
+S.left=base;
+if(real&&base&&S.dbl){S.left=base*2;S.dbl=false}
+else if(real&&base&&S.half){S.left=Math.max(10,Math.round(base/2/5)*5);S.half=false;if(!keep)S.noteK=S.noteK||'half'}
 render();
 if(cfg.mode!=='prog'||!S.card)return;
 if(S.inLevel===9&&S.level<4&&!S.asked[S.level]){S.asked[S.level]=1;levelUp(S.level+1)}
 else if(S.inLevel===9&&S.level===4&&cfg.x5&&!S.asked[4]){S.asked[4]=1;levelUp(5)}
 }
 function setLevel(l){S.level=l;S.maxLevel=Math.max(S.maxLevel,l);S.inLevel=0;newDeck()}
-function next(){if(S.card){S.played.push(S.card);if(S.card.code==='L4-34')S.noteNext='carry'}S.turn=1-S.turn;draw()}
+function next(){if(S.card){S.played.push(S.card);if(S.card.code==='L4-34')S.noteNext='carry';if(S.card.l>0){S.lastPlay=S.card;S.lastReader=S.turn}}S.turn=1-S.turn;draw()}
+/* level a "one step up/down" special pulls from: the last real card's level, else the current level */
+const baseLv=()=>S.lastPlay?S.lastPlay.l:S.level;
+const NOTE={both:()=>'ใบนี้ทำให้กันพร้อมกันทั้งสองคน',nohand:()=>'ห้ามใช้มือทั้งคู่ในใบนี้',blind:()=>listener()+' ต้องปิดตาทำใบนี้',
+quiet:()=>'ใบนี้ห้ามส่งเสียง ใครหลุดเสียงก่อน ถอด 1 ชิ้น',up:()=>'เร่งไฟ: การ์ดใบนี้มาจากระดับ '+S.pickL,down:()=>'ผ่อนไฟ: การ์ดใบนี้มาจากระดับ '+S.pickL,
+half:()=>'ครึ่งเวลา: ใบนี้เหลือเวลาครึ่งเดียว',rand:()=>'สุ่มบท: แอปสุ่มให้ '+reader()+' เป็นคนอ่านใบนี้',rev:()=>'ย้อนรอย: การ์ดใบล่าสุดกลับมา แต่สลับคนทำ',
+burn:()=>'ทิ้งการ์ดบนสุดของกองไปแล้ว 1 ใบ',gift:()=>reader()+' ได้บัตรผ่านเพิ่ม 1 ใบ',steal:()=>reader()+' ขโมยบัตรผ่านมาได้ 1 ใบ',steal0:()=>'ไม่มีบัตรผ่านเหลือให้ขโมย'};
+/* SP-11..30: what the app does when the special card is accepted. Returns true when handled. */
+function spAct(code){const go=(note,flip=true)=>{S.noteNext=note||null;if(flip)S.turn=1-S.turn;draw()};
+switch(code){
+case 'SP-11':go('both');return true;
+case 'SP-12':S.passes[1-S.turn]=Math.min(9,S.passes[1-S.turn]+1);go('gift');return true;
+case 'SP-13':if(S.passes[S.turn]>0){S.passes[S.turn]--;S.passes[1-S.turn]=Math.min(9,S.passes[1-S.turn]+1);go('steal')}else go('steal0');return true;
+case 'SP-14':{const l=baseLv()+1;if(l<=4||(l===5&&cfg.x5)){S.nextFrom=l;go('up')}else go(null)}return true;
+case 'SP-15':{const l=baseLv()-1;if(l>=1){S.nextFrom=l;go('down')}else go(null)}return true;
+case 'SP-16':go('nohand');return true;
+case 'SP-17':go('blind');return true;
+case 'SP-18':go('quiet');return true;
+case 'SP-19':S.half=true;go('half');return true;
+case 'SP-20':S.noteNext='rand';S.turn=Math.random()<.5?0:1;draw();return true;
+case 'SP-21':{const c=S.lastPlay;if(!c){go(null);return true}
+S.card=c;S.turn=1-S.lastReader;S.noteK='rev';S.rp=false;S.mode='signal';S.left=c.secs;stopTimer();render();return true}
+case 'SP-22':{const b=S.deck.pop();if(b)S.used[b.code]=1;go(b?'burn':null)}return true;
+case 'SP-27':musNew();go(null);return true}
+return false}
+function musNew(){try{if(R.role!=='guest'&&typeof musGo==='function')musGo(musNextIdx())}catch(e){}}
 /* cards that need the app to act: L4-15 (replay a played card at double time), SP-06 (partner
    picks a pile), SP-08 (a new house rule kept on screen), SP-05 (swap roles), SP-09 (level menu) */
-const noteText=()=>S.rp?'ทำซ้ำการ์ดที่เคยเล่น · เวลานานขึ้น 2 เท่า':S.noteK==='swap'?'สลับบท: ใบนี้ '+reader()+' ได้เป็นฝ่ายสั่งแทน':S.noteK==='pick'?reader()+' เลือกการ์ดใบนี้จากกองระดับ '+S.pickL+' ให้ '+listener():S.noteK==='carry'?'กติกาจากใบก่อน: ใช้ได้แค่ปากหรือมือ ตามที่เลือกไว้':'';
+const noteText=()=>S.rp?'ทำซ้ำการ์ดที่เคยเล่น · เวลานานขึ้น 2 เท่า':NOTE[S.noteK]?NOTE[S.noteK]():S.noteK==='swap'?'สลับบท: ใบนี้ '+reader()+' ได้เป็นฝ่ายสั่งแทน':S.noteK==='pick'?reader()+' เลือกการ์ดใบนี้จากกองระดับ '+S.pickL+' ให้ '+listener():S.noteK==='carry'?'กติกาจากใบก่อน: ใช้ได้แค่ปากหรือมือ ตามที่เลือกไว้':'';
 const playedList=()=>[...new Map((S.played||[]).filter(c=>c&&c.l>0&&c.code!=='L4-15').map(c=>[c.code,c])).values()];
 const oid=code=>String(code).replace(/[^A-Za-z0-9]/g,'');
 function replayMenu(){const list=playedList();S.ov={k:'replay'};
@@ -524,11 +557,12 @@ else if(a==='back'){S.mode='signal';renderCtl()}
 else if(a==='red'){stopTimer();redStop()}
 else if(a==='pass'){const k=1-S.turn;if(S.passes[k]>0){S.passes[k]--;S.turn=1-S.turn;draw()}}
 else if(a==='next')next();
-else if(a==='time'){S.mode='doing';render();startTimer()}
+else if(a==='time'){if(S.card&&S.card.code==='SP-27')musNew();S.mode='doing';render();startTimer()}
 else if(a==='sp'){const code=S.card.code;
 if(code==='SP-06'){pickMenu();return}
 if(code==='SP-08'){ruleMenu();return}
 if(code==='SP-05'){S.noteNext='swap';draw();return}   // same reader again: the one who would be told now tells
+if(spAct(code))return;
 if(code==='SP-07')S.dbl=true;S.turn=1-S.turn;draw()}
 else if(a==='lvl'){S.ovh=null;levelMenu()}
 else if(a==='reshuffle'){const p=poolLv();for(const k in S.used){const c=ALL.find(x=>x.code===k);if(c&&p.includes(c.l))delete S.used[k]}S.inLevel=0;newDeck();draw()}
@@ -886,7 +920,7 @@ const ov=g.ov&&typeof g.ov==='object'&&['red','up','menu','replay','pick','rule'
 Object.assign(S,{turn:num(g.turn,0,1),level:num(g.level,1,5),inLevel:num(g.inLevel,0,999),passes:[0,1].map(i=>num((g.passes||[])[i],0,9)),
 mode:['signal','yellow','doing','special'].includes(g.mode)?g.mode:'signal',left:num(g.left,0,3600),maxLevel:num(g.maxLevel,1,5),
 played:(Array.isArray(g.pl)?g.pl:[]).slice(-200).map(k=>ALL.find(c=>c.code===k)).filter(Boolean),
-rules:(Array.isArray(g.rules)?g.rules:[]).slice(-5).map(t=>String(t).slice(0,80)),noteK:['swap','pick','carry'].includes(g.nk)?g.nk:null,rp:!!g.rp,pickL:num(g.pkl,0,5),
+rules:(Array.isArray(g.rules)?g.rules:[]).slice(-5).map(t=>String(t).slice(0,80)),noteK:['swap','pick','carry','both','nohand','blind','quiet','up','down','half','rand','rev','burn','gift','steal','steal0'].includes(g.nk)?g.nk:null,rp:!!g.rp,pickL:num(g.pkl,0,5),
 pk:g.pk&&typeof g.pk==='object'?Object.fromEntries([1,2,3,4,5].map(l=>[l,num(g.pk[l],0,999)])):null,used:undefined,ready:[0,1].map(i=>!!(g.ready||[])[i]),ov,
 total:num(g.total,0,999),deckN:num(g.deckN,0,999),deck:undefined});
 S.lvls=[...new Set((Array.isArray(g.lvls)?g.lvls:[]).map(x=>num(x,1,5)))].sort();if(!S.lvls.length)S.lvls=[S.level];
