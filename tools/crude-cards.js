@@ -63,12 +63,101 @@ const X = {
 'X-50':'ใช้มือทำให้ฉันน้ำแตก ขณะจ้องตาฉันตลอด',
 'X-51':'ห้ามน้ำแตกก่อนที่ฉันจะอนุญาต ถ้าฉันยังไม่พูดว่า "ได้" เธอต้องกลั้นไว้',
 'X-52':'นั่งขย่มบนตักฉันแบบหันหลังให้ ตรงหน้ากระจก แล้วมองตากันผ่านกระจกตลอด',
-'X-54':'รอบนี้ฉันห้ามใช้มือ เธอห้ามใช้ปาก เย็ดกันได้เลย'
+'X-54':'รอบนี้ฉันห้ามใช้มือ เธอห้ามใช้ปาก เย็ดกันได้เลย',
+// special cards
+'SP-08':'ตั้งกติกาหื่น ๆ 1 ข้อ ใช้จนจบเกมถ้าทั้งคู่เห็นด้วย เช่น ห้ามใส่กางเกงในจนจบเกม',
+'SP-11':'เล่นพร้อมกัน: ใบถัดไปทำให้กันพร้อมกันทั้งคู่ ใครน้ำแตกก่อนแพ้',
+'SP-16':'ห้ามใช้มือ: ใบถัดไปใช้ได้แค่ปาก ลิ้น กับตัว ห้ามจับด้วยมือเด็ดขาด',
+'SP-17':'ปิดตา: คนที่ทำการ์ดใบถัดไปต้องปิดตา แล้วใช้ลิ้นกับมือหาทางเอาเอง',
+'SP-18':'เงียบสนิท: ใบถัดไปห้ามคราง ใครหลุดครางก่อน ถอด 1 ชิ้น',
+'SP-23':'จูบดูดลิ้น: จูบกันแบบดูดลิ้น ห้ามแยกปากจนหมดเวลา',
+'SP-24':'แก้ผ้าเพิ่ม: คนที่ยังใส่มากกว่าถอด 1 ชิ้น ถ้าเหลือแต่กางเกงในก็ถอดเลย',
+'SP-25':'จิบแล้วเลีย: จิบเครื่องดื่มแล้วหยดลงบนตัวอีกฝ่าย แล้วเลียให้เกลี้ยง',
+'SP-26':'ชมแบบหื่น: ผลัดกันบอกว่าชอบส่วนไหนของร่างกายอีกฝ่ายตอนเงี่ยนที่สุด คนละ 3 ข้อ',
+'SP-28':'ย้ายห้อง: ไปเย็ดหรือเล่นการ์ดใบถัดไปในอีกห้องหนึ่งของบ้าน',
+'SP-29':'แช่แข็ง: หยุดนิ่งในท่าตอนนี้ ใครขยับก่อน ถอด 1 ชิ้น หรือโดนอีกคนเลีย 10 วินาที',
+'SP-30':'คำถามลามก: คนที่ฟังถามเรื่องเซ็กซ์อะไรก็ได้ 1 ข้อ คนอ่านต้องตอบตรง ๆ'
+};
+
+// English for every strong-word card (shown under the Thai, like the normal cards)
+const XEN = {
+'L3-01':'Lick circles around my nipple slowly until I\'m horny',
+'L3-05':'Suck my tits hard, switching sides, until time runs out',
+'L3-08':'Rub me through my underwear until I\'m wet. Hands stay outside',
+'L3-10':'Tell me which part of your tits gets you hornier than anything, then let me prove it',
+'L3-11':'Straddle my lap topless and grind your hips down slowly',
+'L3-18':'Say clearly where on you you want me to lick or suck tonight',
+'L3-23':'Stroke up my inner thigh until you almost touch me there, then pull back. 5 times, until I can\'t take it',
+'L3-25':'Breathe hot air on the crotch of my underwear. No hands',
+'L4-01':'Tell me clearly the position you want to fuck in tonight, and I answer green, yellow or red',
+'L4-08':'Tell me step by step, in the dirtiest words you dare, what you want me to do to you tonight',
+'L4-12':'Take turns lying still while the other licks anywhere, 1 minute each',
+'L4-14':'Shower together and soap each other everywhere, crotch and ass crack included',
+'L4-18':'I lie still. Grab, lick, suck me however you like. I can\'t move until time is up',
+'L4-21':'Pull my underwear off with your teeth. Absolutely no hands',
+'L4-25':'Lick me through my underwear, everywhere that\'s still covered',
+'L4-31':'Whisper where you want me to grab first. No pointing, say the dirty word for it out loud',
+'L4-32':'Trace the edge of my underwear until I\'m horny. No slipping inside until time is up',
+'L4-34':'Mouth or hands: choose one, and only that on me until the end of the next card',
+'L4-36':'Lick my inner thighs, left and right, almost touching me there, but don\'t',
+'L4-37':'Rub me through my pants slowly until I beg you to take them off',
+'L4-39':'Tell me the spot you want licked longest, and set how many seconds I must lick it',
+'L4-45':'Nuzzle my neck until I moan out loud',
+'X-02':'Tell me a fuck fantasy you have never shared, and I answer green, yellow or red',
+'X-05':'Get me right to the edge of cumming, then stop. Do it 3 times',
+'X-06':'Bring out a toy we own and play with me, with me controlling the pace',
+'X-07':'Move to the mirror and let me watch us fuck. No closing your eyes',
+'X-08':'Lick me all over with only your mouth, until I ask you to stop',
+'X-12':'Describe in dirty words, step by step, how you want me to fuck you tonight. No beating around the bush',
+'X-16':'Slow and deep, or fast and pounding, until this round ends',
+'X-18':'Whisper the dirtiest words you dare say to me right now',
+'X-19':'Which fuck position do you want to try but never dared to ask for?',
+'X-20':'Pick one fuck position you\'ve wanted to try, tell me exactly, then do it if we both say green',
+'X-21':'Tell me your most sensitive spot, and let me lick only that',
+'X-25':'Count down slowly from 60. I\'ll lick you so you can\'t finish',
+'X-26':'Take turns riding on top, switching every minute',
+'X-27':'You choose which position this round ends in and where I cum. I follow',
+'X-28':'Tell me about our best fuck ever, in detail, while I rub you',
+'X-30':'No fucking in bed this round. You pick a new spot in the house',
+'X-31':'Take my underwear off with your teeth, then lick every inch you just uncovered',
+'X-32':'Suck me until time runs out. No hands',
+'X-33':'I sit on the edge of the bed, you kneel in front of me and suck and lick me until I forget my own name',
+'X-35':'I lie on my back, you ride me and set the whole rhythm. I can\'t move my hips',
+'X-36':'Fuck me from behind, slowly. Every time I whisper "more", go in a little deeper',
+'X-37':'69, licking each other at the same time. Whoever cums or has to stop first loses',
+'X-38':'Tie your wrists loosely above your head, and I lick my way down to you',
+'X-39':'You lean against the wall, I kneel and lick you until your legs shake',
+'X-41':'Lights on. I want to see your face when you cum. No closing your eyes, no looking away',
+'X-42':'Go to the bathroom and fuck under the shower with the water running',
+'X-43':'Fuck without moaning. Whoever slips first must follow one order from the other',
+'X-44':'Play with yourself while I watch. I can\'t touch, only set the pace',
+'X-45':'Change fuck positions every minute. No repeating a position',
+'X-46':'Hold ice in your mouth while you suck me, then switch to a sip of something warm',
+'X-48':'Describe us fucking in dirty words, nonstop, until time is up',
+'X-49':'On the table, on the sofa, or in front of the mirror? Pick where we fuck next',
+'X-50':'Make me cum with only your hands, looking into my eyes the whole time',
+'X-51':'You may not cum until I allow it. Until I say "yes", you hold it',
+'X-52':'Ride me facing away, in front of the mirror, keeping our eyes locked in the reflection',
+'X-54':'This round I can\'t use my hands and you can\'t use your mouth. Now fuck',
+'SP-08':'Make one dirty rule for the rest of the game, if you both agree. Like: no underwear until the end',
+'SP-11':'Together: on the next card you both do it to each other at once. First to cum loses',
+'SP-16':'No hands: on the next card only mouths, tongues and bodies. Absolutely no grabbing',
+'SP-17':'Blindfold: whoever does the next card goes blind and finds the way with tongue and hands',
+'SP-18':'Total silence: no moaning on the next card. First to moan takes off 1 piece',
+'SP-23':'Tongue kiss: kiss deep and suck each other\'s tongues, lips locked until time is up',
+'SP-24':'Strip more: whoever is wearing more takes off 1 piece. Down to underwear? Then those come off',
+'SP-25':'Sip and lick: drip your drink on the other\'s body, then lick it all off',
+'SP-26':'Dirty compliments: take turns saying which part of the other\'s body turns you on most, 3 each',
+'SP-28':'New room: go fuck or play the next card in another room of the house',
+'SP-29':'Freeze: hold your position. First to move takes off 1 piece or gets licked for 10 seconds',
+'SP-30':'Dirty question: the listener asks any question about sex, the reader must answer straight'
 };
 
 const root = path.join(__dirname, '..');
 const codes = new Set(JSON.parse(fs.readFileSync(path.join(root, 'cards.json'), 'utf8')).map(r => r[0]));
 const missing = Object.keys(X).filter(k => !codes.has(k));
 if (missing.length) throw new Error('codes not in cards.json: ' + missing.join(' '));
-fs.writeFileSync(path.join(root, 'cards-x.json'), JSON.stringify(X, null, 1) + '\n');
-console.log('wrote', Object.keys(X).length, 'strong-word cards to cards-x.json');
+const noEn = Object.keys(X).filter(k => !XEN[k]), extraEn = Object.keys(XEN).filter(k => !X[k]);
+if (noEn.length || extraEn.length) throw new Error('English missing: ' + noEn.join(' ') + ' | without Thai: ' + extraEn.join(' '));
+fs.writeFileSync(path.join(root, 'cards-x.json'), JSON.stringify({ th: X, en: XEN }, null, 1) + '\n');
+console.log('wrote', Object.keys(X).length, 'strong-word cards (Thai + English) to cards-x.json');

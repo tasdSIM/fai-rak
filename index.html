@@ -166,6 +166,9 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .rcode{font-size:44px;font-weight:700;letter-spacing:6px;color:var(--goldi);font-variant-numeric:tabular-nums;line-height:1.2}
 .qr svg{display:block;border-radius:12px;width:200px;height:200px}
 .rstat{text-align:center;color:#FFD8A8;font-weight:600}.rstat.ok{color:#8CE99A}
+.en{display:block;font-size:.8em;line-height:1.35;opacity:.78;font-weight:400;margin-top:2px;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+.en.i{display:inline;margin:0 0 0 6px}
+.cen{margin:-6px 0 0;font-size:15px;line-height:1.45;color:#6B5A4A;font-style:italic;text-wrap:balance}
 .cnote{margin:0;border-radius:10px;background:#2A1218;border:1px solid #7A1A2A;color:#FFC9C9;padding:8px 12px;font-size:14px;text-align:center}
 .rules{display:flex;flex-direction:column;gap:4px;border-radius:12px;border:1px dashed #5A4228;padding:10px 14px;font-size:14px;color:var(--soft)}.rules b{color:var(--goldi);font-size:13px}
 .xchip{margin-top:8px;border-color:#B3122E;color:#FF8A9A;background:#2A1218}
@@ -378,9 +381,13 @@ const DM={prog:['ไล่ทีละระดับ','เริ่มที่
 const isMix=()=>cfg.mode==='mix'||cfg.mode==='all';
 /* strong-word texts (hidden mode), keyed by card code */
 cfg.crude=!!store.get('crude',0);
-let XT={},xP=null;
-const loadX=()=>Object.keys(XT).length?Promise.resolve(XT):xP||(xP=fetch('cards-x.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>(XT=d&&typeof d==='object'?d:{})).catch(e=>{xP=null;throw e}));
+let XT={},XEN={},EN={},xP=null;
+const loadX=()=>Object.keys(XT).length?Promise.resolve(XT):xP||(xP=fetch('cards-x.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{d=d&&typeof d==='object'?d:{};XT=d.th&&typeof d.th==='object'?d.th:d;XEN=d.en&&typeof d.en==='object'?d.en:{};return XT}).catch(e=>{xP=null;throw e}));
 const cText=c=>cfg.crude&&typeof XT[c.code]==='string'?XT[c.code]:c.text;
+/* English shown under the Thai everywhere in play (cards-en.json, strong-word English in cards-x.json) */
+const cEn=c=>(cfg.crude&&typeof XEN[c.code]==='string'?XEN[c.code]:EN[c.code])||'';
+const LVE={1:'Spark',2:'Warm',3:'Hot',4:'Blazing',5:'Extreme',0:'Special'},TYE={'คุย':'Talk','ทำ':'Do','เลือก':'Choose','พิเศษ':'Special'};
+const E=t=>'<span class="en">'+t+'</span>',Ei=t=>'<span class="en i">'+t+'</span>';
 if(cfg.crude)loadX().catch(()=>{});
 const selLv=()=>cfg.mode==='mix'?cfg.lvls.slice().sort():cfg.mode==='all'?[1,2,3,4,5]:[cfg.level];
 const rangeTxt=a=>{a=a.slice().sort();return a.length>1&&a[a.length-1]-a[0]===a.length-1?a[0]+'–'+a[a.length-1]:a.join(', ')};
@@ -401,10 +408,10 @@ store.set('age',1);openSetup();if(mus.on&&!musStarted)musPlay()});
 function renderLevels(){
 const sel=selLv(),multi=isMix();
 const cnt=l=>ALL.length?ALL.filter(c=>c.l===l&&c.code!=='X-01').length+' ใบ':'';
-$('dmode').innerHTML=Object.keys(DM).map(k=>`<button type="button" data-dm="${k}" aria-pressed="${cfg.mode===k}">${DM[k][0]}</button>`).join('');
-$('dhint').textContent=DM[cfg.mode][1]+' การ์ดที่เล่นแล้วจะถูกนำออกจากกองจนกว่าจะเริ่มเกมใหม่';
+$('dmode').innerHTML=Object.keys(DM).map(k=>`<button type="button" data-dm="${k}" aria-pressed="${cfg.mode===k}">${DM[k][0]}${E({prog:'Level by level',one:'One level',mix:'Mix levels',all:'All levels'}[k])}</button>`).join('');
+$('dhint').innerHTML=esc(DM[cfg.mode][1]+' การ์ดที่เล่นแล้วจะถูกนำออกจากกองจนกว่าจะเริ่มเกมใหม่')+E({prog:'Start at the chosen level; after 9 cards the app asks whether to go up',one:'Only the chosen level, never asks to go up',mix:'Pick several levels, all shuffled into one pile',all:'Every level 1–5 shuffled into one pile'}[cfg.mode]+'. Played cards leave the pile until a new game');
 $('levels').innerHTML=[1,2,3,4,5].map(l=>{const on=sel.includes(l),note=[l===1&&!multi?'แนะนำ':'',l===4?'ต้องไฟเขียวทั้งคู่':'',l===5?'18+ ต้องปลดล็อก':'',cnt(l)].filter(Boolean).join(' · ');
-return `<button type="button" class="lv" data-l="${l}" aria-pressed="${on}" ${cfg.mode==='all'?'disabled':''}>${multi?`<span class="ck" aria-hidden="true">${on?'✓':''}</span>`:''}<span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span><span class="note">${note}</span></button>`}).join('');
+return `<button type="button" class="lv" data-l="${l}" aria-pressed="${on}" ${cfg.mode==='all'?'disabled':''}>${multi?`<span class="ck" aria-hidden="true">${on?'✓':''}</span>`:''}<span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}${Ei(LVE[l])}</span><span class="note">${note}</span></button>`}).join('');
 $('x5').hidden=!sel.includes(5);
 }
 const saveDeck=()=>store.set('deck',{mode:cfg.mode,level:cfg.level,lvls:cfg.lvls});
@@ -467,10 +474,22 @@ function setLevel(l){S.level=l;S.maxLevel=Math.max(S.maxLevel,l);S.inLevel=0;new
 function next(){if(S.card){S.played.push(S.card);if(S.card.code==='L4-34')S.noteNext='carry';if(S.card.l>0){S.lastPlay=S.card;S.lastReader=S.turn}}S.turn=1-S.turn;draw()}
 /* level a "one step up/down" special pulls from: the last real card's level, else the current level */
 const baseLv=()=>S.lastPlay?S.lastPlay.l:S.level;
-const NOTE={both:()=>'ใบนี้ทำให้กันพร้อมกันทั้งสองคน',nohand:()=>'ห้ามใช้มือทั้งคู่ในใบนี้',blind:()=>listener()+' ต้องปิดตาทำใบนี้',
-quiet:()=>'ใบนี้ห้ามส่งเสียง ใครหลุดเสียงก่อน ถอด 1 ชิ้น',up:()=>'เร่งไฟ: การ์ดใบนี้มาจากระดับ '+S.pickL,down:()=>'ผ่อนไฟ: การ์ดใบนี้มาจากระดับ '+S.pickL,
-half:()=>'ครึ่งเวลา: ใบนี้เหลือเวลาครึ่งเดียว',rand:()=>'สุ่มบท: แอปสุ่มให้ '+reader()+' เป็นคนอ่านใบนี้',rev:()=>'ย้อนรอย: การ์ดใบล่าสุดกลับมา แต่สลับคนทำ',
-burn:()=>'ทิ้งการ์ดบนสุดของกองไปแล้ว 1 ใบ',gift:()=>reader()+' ได้บัตรผ่านเพิ่ม 1 ใบ',steal:()=>reader()+' ขโมยบัตรผ่านมาได้ 1 ใบ',steal0:()=>'ไม่มีบัตรผ่านเหลือให้ขโมย'};
+const NOTE={both:()=>['ใบนี้ทำให้กันพร้อมกันทั้งสองคน','Both of you do this card to each other at once'],
+nohand:()=>['ห้ามใช้มือทั้งคู่ในใบนี้','No hands for either of you on this card'],
+blind:()=>[listener()+' ต้องปิดตาทำใบนี้',listener()+' does this card blindfolded'],
+quiet:()=>['ใบนี้ห้ามส่งเสียง ใครหลุดเสียงก่อน ถอด 1 ชิ้น','No sounds on this card. First to slip takes off 1 piece'],
+up:()=>['เร่งไฟ: การ์ดใบนี้มาจากระดับ '+S.pickL,'Turned up: this card comes from level '+S.pickL],
+down:()=>['ผ่อนไฟ: การ์ดใบนี้มาจากระดับ '+S.pickL,'Eased off: this card comes from level '+S.pickL],
+half:()=>['ครึ่งเวลา: ใบนี้เหลือเวลาครึ่งเดียว','Half time: this card gets half the time'],
+rand:()=>['สุ่มบท: แอปสุ่มให้ '+reader()+' เป็นคนอ่านใบนี้','Random roles: the app picked '+reader()+' to read this card'],
+rev:()=>['ย้อนรอย: การ์ดใบล่าสุดกลับมา แต่สลับคนทำ','Rewind: the last card is back, roles swapped'],
+burn:()=>['ทิ้งการ์ดบนสุดของกองไปแล้ว 1 ใบ','The top card of the pile was discarded'],
+gift:()=>[reader()+' ได้บัตรผ่านเพิ่ม 1 ใบ',reader()+' gets 1 extra pass'],
+steal:()=>[reader()+' ขโมยบัตรผ่านมาได้ 1 ใบ',reader()+' stole 1 pass'],
+steal0:()=>['ไม่มีบัตรผ่านเหลือให้ขโมย','No passes left to steal'],
+swap:()=>['สลับบท: ใบนี้ '+reader()+' ได้เป็นฝ่ายสั่งแทน','Role swap: '+reader()+' gives the order this time'],
+pick:()=>[reader()+' เลือกการ์ดใบนี้จากกองระดับ '+S.pickL+' ให้ '+listener(),reader()+' picked this card from level '+S.pickL+' for '+listener()],
+carry:()=>['กติกาจากใบก่อน: ใช้ได้แค่ปากหรือมือ ตามที่เลือกไว้','Rule from the last card: only the mouth or hands you chose']};
 /* SP-11..30: what the app does when the special card is accepted. Returns true when handled. */
 function spAct(code){const go=(note,flip=true)=>{S.noteNext=note||null;if(flip)S.turn=1-S.turn;draw()};
 switch(code){
@@ -492,21 +511,21 @@ return false}
 function musNew(){try{if(R.role!=='guest'&&typeof musGo==='function')musGo(musNextIdx())}catch(e){}}
 /* cards that need the app to act: L4-15 (replay a played card at double time), SP-06 (partner
    picks a pile), SP-08 (a new house rule kept on screen), SP-05 (swap roles), SP-09 (level menu) */
-const noteText=()=>S.rp?'ทำซ้ำการ์ดที่เคยเล่น · เวลานานขึ้น 2 เท่า':NOTE[S.noteK]?NOTE[S.noteK]():S.noteK==='swap'?'สลับบท: ใบนี้ '+reader()+' ได้เป็นฝ่ายสั่งแทน':S.noteK==='pick'?reader()+' เลือกการ์ดใบนี้จากกองระดับ '+S.pickL+' ให้ '+listener():S.noteK==='carry'?'กติกาจากใบก่อน: ใช้ได้แค่ปากหรือมือ ตามที่เลือกไว้':'';
+const noteText=()=>S.rp?['ทำซ้ำการ์ดที่เคยเล่น · เวลานานขึ้น 2 เท่า','Replay of a played card · double time']:NOTE[S.noteK]?NOTE[S.noteK]():null;
 const playedList=()=>[...new Map((S.played||[]).filter(c=>c&&c.l>0&&c.code!=='L4-15').map(c=>[c.code,c])).values()];
 const oid=code=>String(code).replace(/[^A-Za-z0-9]/g,'');
 function replayMenu(){const list=playedList();S.ov={k:'replay'};
-overlay(`<h2 id="ov-t">เลือกการ์ดที่เล่นไปแล้ว</h2><p class="soft">เลือก 1 ใบให้ทำซ้ำ เวลาจะนานขึ้น 2 เท่า</p>${list.length?`<div class="list" style="width:100%;max-height:52vh;overflow:auto;text-align:left">${list.map(c=>`<button class="lv" data-o="P${oid(c.code)}" style="min-height:56px;padding:8px 14px"><span class="dot" style="background:${LV[c.l].dot}"></span><span style="flex:1">${esc(cText(c))}</span><span class="note">${c.secs?tlabel(c.secs*2):''}</span></button>`).join('')}</div>`:'<p class="mute">ยังไม่มีการ์ดที่เล่นไปแล้ว</p>'}<button class="btn ghost" data-o="skip">${list.length?'ไม่ทำซ้ำ ข้ามใบนี้':'ใบต่อไป'}</button>`);
+overlay(`<h2 id="ov-t">เลือกการ์ดที่เล่นไปแล้ว${E('Pick a played card')}</h2><p class="soft">เลือก 1 ใบให้ทำซ้ำ เวลาจะนานขึ้น 2 เท่า${E('Choose 1 to repeat at double time')}</p>${list.length?`<div class="list" style="width:100%;max-height:52vh;overflow:auto;text-align:left">${list.map(c=>`<button class="lv" data-o="P${oid(c.code)}" style="min-height:56px;padding:8px 14px"><span class="dot" style="background:${LV[c.l].dot}"></span><span style="flex:1">${esc(cText(c))}${cEn(c)?E(esc(cEn(c))):''}</span><span class="note">${c.secs?tlabel(c.secs*2):''}</span></button>`).join('')}</div>`:'<p class="mute">ยังไม่มีการ์ดที่เล่นไปแล้ว'+E('No cards played yet')+'</p>'}<button class="btn ghost" data-o="skip">${list.length?'ไม่ทำซ้ำ ข้ามใบนี้'+E("Don't repeat, skip this card"):'ใบต่อไป'+E('Next card')}</button>`);
 S.ovh=o=>{if(o[0]==='P'){const c=list.find(x=>oid(x.code)===o.slice(1));if(!c)return true;closeOv();S.card=c;S.rp=true;S.left=c.secs?c.secs*2:0;S.mode='doing';render();startTimer();return true}
 if(o==='skip'){closeOv();next();return true}return false}}
 const pileLeft=l=>S.used?ALL.filter(c=>c.l===l&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]).length:((S.pk||{})[l]||0);
 function pickMenu(){const lv=[1,2,3,4].concat(cfg.x5?[5]:[]);S.ov={k:'pick'};
-overlay(`<h2 id="ov-t">คู่เลือกให้</h2><p class="soft">${esc(reader())} เลือกกองให้ ${esc(listener())} แล้วแอปจะสุ่มการ์ด 1 ใบจากกองนั้นให้ทำ</p>${lv.map(l=>`<button class="lv" data-o="K${l}" ${pileLeft(l)?'':'disabled'}><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span><span class="note">เหลือ ${pileLeft(l)} ใบ</span></button>`).join('')}<button class="btn ghost" data-o="skip">ข้าม ไปใบต่อไป</button>`);
+overlay(`<h2 id="ov-t">คู่เลือกให้${E("Partner's pick")}</h2><p class="soft">${esc(reader())} เลือกกองให้ ${esc(listener())} แล้วแอปจะสุ่มการ์ด 1 ใบจากกองนั้นให้ทำ${E(esc(reader())+' picks a pile for '+esc(listener())+', and the app draws 1 card from it')}</p>${lv.map(l=>`<button class="lv" data-o="K${l}" ${pileLeft(l)?'':'disabled'}><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}${Ei(LVE[l])}</span><span class="note">เหลือ ${pileLeft(l)} ใบ · ${pileLeft(l)} left</span></button>`).join('')}<button class="btn ghost" data-o="skip">ข้าม ไปใบต่อไป${E('Skip to the next card')}</button>`);
 S.ovh=o=>{if(o[0]==='K'){const l=+o[1],pool=shuffle(ALL.filter(c=>c.l===l&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]));if(!pool.length)return true;
 const c=pool[0];closeOv();S.used[c.code]=1;S.deck=S.deck.filter(x=>x.code!==c.code);S.card=c;S.noteK='pick';S.pickL=l;S.rp=false;S.mode='signal';S.left=c.secs;stopTimer();render();return true}
 if(o==='skip'){closeOv();S.turn=1-S.turn;draw();return true}return false}}
 function ruleMenu(){S.ov={k:'rule'};const guest=R.role==='guest';
-overlay(`<h2 id="ov-t">ตั้งกติกาใหม่</h2><p class="soft">ตกลงกันให้ได้ 1 ข้อ ใช้จนจบเกม เช่น ห้ามจูบปาก หรือ ทุกใบต้องทำโดยไม่ใส่เสื้อ</p>${guest?'<p class="mute">พิมพ์กติกาที่เครื่องหลัก</p>':'<input type="text" id="ruleIn" maxlength="80" placeholder="กติกาข้อใหม่" style="width:100%">'}<button class="btn" data-o="rok">ทั้งคู่เห็นด้วย บันทึกกติกา</button><button class="btn ghost" data-o="skip">ไม่ตั้ง ข้ามไป</button>`);
+overlay(`<h2 id="ov-t">ตั้งกติกาใหม่${E('New house rule')}</h2><p class="soft">ตกลงกันให้ได้ 1 ข้อ ใช้จนจบเกม เช่น ห้ามจูบปาก หรือ ทุกใบต้องทำโดยไม่ใส่เสื้อ${E('Agree on 1 rule for the rest of the game, like no kissing on the mouth, or every card done shirtless')}</p>${guest?'<p class="mute">พิมพ์กติกาที่เครื่องหลัก'+E('Type the rule on the main device')+'</p>':'<input type="text" id="ruleIn" maxlength="80" placeholder="กติกาข้อใหม่ · New rule" style="width:100%">'}<button class="btn" data-o="rok">ทั้งคู่เห็นด้วย บันทึกกติกา${E('We both agree, save it')}</button><button class="btn ghost" data-o="skip">ไม่ตั้ง ข้ามไป${E('No rule, skip')}</button>`);
 const inp=$('ruleIn');if(inp)setTimeout(()=>inp.focus(),50);
 S.ovh=o=>{if(o==='rok'){const t=String((($('ruleIn')||{}).value)||'').trim().slice(0,80);if(!t){const i=$('ruleIn');if(i)i.focus();return true}
 S.rules=(S.rules||[]).concat(t).slice(-5);closeOv();S.turn=1-S.turn;draw();return true}
@@ -516,35 +535,35 @@ const reader=()=>cfg.names[S.turn],listener=()=>cfg.names[1-S.turn];
 function render(){
 const c=S.card,mixed=isMix(),lvs=Array.isArray(S.lvls)&&S.lvls.length?S.lvls:[S.level],top=mixed?lvs[lvs.length-1]:S.level;
 const deckN=Array.isArray(S.deck)?S.deck.length:(S.deckN||0);
-$('lvdot').style.background=LV[top].dot;$('lvname').textContent=mixed?'ผสมระดับ '+rangeTxt(lvs)+' · เหลือ '+deckN+' ใบ':'ระดับ '+S.level+' '+LV[S.level].n;
+$('lvdot').style.background=LV[top].dot;$('lvname').textContent=mixed?'ผสมระดับ '+rangeTxt(lvs)+' Mixed · เหลือ '+deckN+' ใบ left':'ระดับ '+S.level+' '+LV[S.level].n+' · '+LVE[S.level];
 $('prog').style.width=(cfg.mode==='prog'?Math.min(100,S.inLevel/9*100):S.total?(S.total-deckN)/S.total*100:0)+'%';
-$('who').textContent='ตาของ'+reader();$('whoto').textContent='อ่านออกเสียงให้'+listener()+'ฟัง';
-$('passes').textContent='บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ';
-{const n=c?noteText():'';$('cnote').hidden=!n;$('cnote').textContent=n;
-const rl=Array.isArray(S.rules)?S.rules:[];$('rules').hidden=!rl.length;$('rules').innerHTML=rl.length?'<b>กติกาคืนนี้</b>'+rl.map((t,i)=>`<span>${i+1}. ${esc(t)}</span>`).join(''):''}
+$('who').innerHTML=esc('ตาของ'+reader())+Ei(esc(reader())+"'s turn");$('whoto').innerHTML=esc('อ่านออกเสียงให้'+listener()+'ฟัง')+E('Read it aloud to '+esc(listener()));
+$('passes').innerHTML=esc('บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ')+E(esc('Passes: '+cfg.names[0]+' '+S.passes[0]+' · '+cfg.names[1]+' '+S.passes[1]));
+{const n=c?noteText():null;$('cnote').hidden=!n;$('cnote').innerHTML=n?esc(n[0])+E(esc(n[1])):'';
+const rl=Array.isArray(S.rules)?S.rules:[];$('rules').hidden=!rl.length;$('rules').innerHTML=rl.length?'<b>กติกาคืนนี้ · House rules</b>'+rl.map((t,i)=>`<span>${i+1}. ${esc(t)}</span>`).join(''):''}
 if(!c){const what=mixed?'กองผสมระดับ '+rangeTxt(lvs):'ระดับ '+S.level;
-$('card').innerHTML=`<div class="cbody"><p class="ctext">การ์ดในกองหมดแล้ว</p><p style="color:#6B5A4A">เล่นครบทุกใบของ${what} แล้ว สับกองใหม่เพื่อเอาการ์ดที่เล่นแล้วกลับมา${mixed?'':' หรือแตะปุ่มระดับด้านบนเพื่อเปลี่ยนระดับ'} หรือไปหลังเกม${cfg.ex.length?' (หมวดที่ซ่อนไว้จะไม่ถูกสุ่ม)':''}</p></div>`;
-$('ctl').innerHTML='<div class="two"><button class="btn ghost" data-a="reshuffle">สับกองใหม่</button><button class="btn" data-a="finish">ไปหลังเกม</button></div>';rsync();return}
+$('card').innerHTML=`<div class="cbody"><p class="ctext">การ์ดในกองหมดแล้ว</p><p class="cen">The pile is empty</p><p style="color:#6B5A4A">เล่นครบทุกใบของ${what} แล้ว สับกองใหม่เพื่อเอาการ์ดที่เล่นแล้วกลับมา${mixed?'':' หรือแตะปุ่มระดับด้านบนเพื่อเปลี่ยนระดับ'} หรือไปหลังเกม${cfg.ex.length?' (หมวดที่ซ่อนไว้จะไม่ถูกสุ่ม)':''}${E('Every card here has been played. Reshuffle to bring them back'+(mixed?'':', change level with the button at the top')+', or go to the after-game screen')}</p></div>`;
+$('ctl').innerHTML='<div class="two"><button class="btn ghost" data-a="reshuffle">สับกองใหม่'+E('Reshuffle')+'</button><button class="btn" data-a="finish">ไปหลังเกม'+E('After game')+'</button></div>';rsync();return}
 const L=LV[c.l],fav=store.get('favs',[]).includes(c.code);
 const ink=c.l===3||c.l===2?'#8A1024':'#6B4A12';
 if(c.code!==lastCard){lastCard=c.code;$('card').style.animation='none';void $('card').offsetWidth;$('card').style.animation=''}
 $('card').innerHTML=`<div class="band" style="background:${L.band}"></div><div class="cbody">
-<div class="chead"><span class="ctype">${esc(c.type)}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
+<div class="chead"><span class="ctype">${esc(c.type)} · ${TYE[c.type]||''}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
 <button class="fav" id="fav" aria-pressed="${fav}" aria-label="เก็บการ์ดนี้ไว้ในที่ชอบ"><svg width="22" height="22" viewBox="0 0 24 24" fill="${fav?'#B3122E':'none'}" stroke="${fav?'#B3122E':'#A8967A'}" stroke-width="1.8" aria-hidden="true">${HEART}</svg></button></div>
 <div class="cicon">${svg(c.icon,ink,1.3)}</div>
-<p class="ctext">${esc(cText(c))}</p>
+<p class="ctext">${esc(cText(c))}</p>${cEn(c)?`<p class="cen">${esc(cEn(c))}</p>`:''}
 ${S.left?`<div class="ctime">${S.mode==='signal'?'<button class="adj" id="minus" aria-label="ลดเวลา 15 วินาที">−</button>':''}<span>${tlabel(S.left)}</span>${S.mode==='signal'?'<button class="adj" id="plus" aria-label="เพิ่มเวลา 15 วินาที">+</button>':''}</div>`:''}
-${c.code==='X-01'?`<p class="safe">คำหยุดคืนนี้: <b>${esc(cfg.safe)}</b></p>`:''}
+${c.code==='X-01'?`<p class="safe">คำหยุดคืนนี้ · Stop word: <b>${esc(cfg.safe)}</b></p>`:''}
 </div>`;
 renderCtl()}
 
 function renderCtl(){
 const m=S.mode,lp=S.passes[1-S.turn];let h='';
-if(m==='signal')h=`<p class="mute" style="text-align:center;margin-bottom:8px">${esc(listener())} ชูไฟให้การ์ดใบนี้</p><div class="sig"><button class="g" data-a="green">ไฟเขียว</button><button class="y" data-a="yellow">ไฟเหลือง</button><button class="r" data-a="red">ไฟแดง</button></div>`;
-else if(m==='yellow')h=`<p style="text-align:center;color:#FFD8A8;margin-bottom:8px">ไฟเหลือง: ทำให้เบาลง หรือข้ามใบนี้</p><div class="two"><button class="btn ghost" data-a="green">ทำแบบเบาลง</button><button class="btn" data-a="pass" ${lp?'':'disabled'}>ใช้บัตรผ่าน (${lp})</button></div><button class="btn ghost" data-a="back" style="margin-top:10px;min-height:44px">กลับไปเลือกไฟใหม่</button>`;
-else if(m==='doing')h=S.left?`<div style="display:flex;align-items:center;gap:14px"><span class="clock" id="clock">${fmt(S.left)}</span><button class="btn ghost" data-a="next">${S.left?'เสร็จแล้ว ใบต่อไป':'หมดเวลา ใบต่อไป'}</button></div>`:`<button class="btn" data-a="next">เสร็จแล้ว ใบต่อไป</button>`;
-else if(m==='special'){const code=S.card&&S.card.code,lab={'SP-06':'เลือกกองการ์ดให้คู่','SP-08':'ตั้งกติกาข้อใหม่'}[code]||'รับทราบ ใบต่อไป';
-h=`<div class="two">${S.left?'<button class="btn ghost" data-a="time">เริ่มจับเวลา</button>':''}<button class="btn" data-a="sp" style="${S.left?'':'grid-column:1/-1'}">${lab}</button></div>${code==='SP-09'?'<button class="btn ghost" data-a="lvl" style="margin-top:10px">เปลี่ยนระดับ</button>':''}`}
+if(m==='signal')h=`<p class="mute" style="text-align:center;margin-bottom:8px">${esc(listener())} ชูไฟให้การ์ดใบนี้${E(esc(listener())+' shows a light for this card')}</p><div class="sig"><button class="g" data-a="green">ไฟเขียว${E('Green')}</button><button class="y" data-a="yellow">ไฟเหลือง${E('Yellow')}</button><button class="r" data-a="red">ไฟแดง${E('Red')}</button></div>`;
+else if(m==='yellow')h=`<p style="text-align:center;color:#FFD8A8;margin-bottom:8px">ไฟเหลือง: ทำให้เบาลง หรือข้ามใบนี้${E('Yellow: go gentler, or skip this card')}</p><div class="two"><button class="btn ghost" data-a="green">ทำแบบเบาลง${E('Go gentler')}</button><button class="btn" data-a="pass" ${lp?'':'disabled'}>ใช้บัตรผ่าน (${lp})${E('Use a pass')}</button></div><button class="btn ghost" data-a="back" style="margin-top:10px;min-height:44px">กลับไปเลือกไฟใหม่${E('Choose again')}</button>`;
+else if(m==='doing')h=S.left?`<div style="display:flex;align-items:center;gap:14px"><span class="clock" id="clock">${fmt(S.left)}</span><button class="btn ghost" data-a="next">${S.left?'เสร็จแล้ว ใบต่อไป'+E('Done, next card'):'หมดเวลา ใบต่อไป'+E("Time's up, next card")}</button></div>`:`<button class="btn" data-a="next">เสร็จแล้ว ใบต่อไป${E('Done, next card')}</button>`;
+else if(m==='special'){const code=S.card&&S.card.code,lab={'SP-06':'เลือกกองการ์ดให้คู่'+E('Pick a pile for your partner'),'SP-08':'ตั้งกติกาข้อใหม่'+E('Set a new rule')}[code]||'รับทราบ ใบต่อไป'+E('Got it, next card');
+h=`<div class="two">${S.left?'<button class="btn ghost" data-a="time">เริ่มจับเวลา'+E('Start timer')+'</button>':''}<button class="btn" data-a="sp" style="${S.left?'':'grid-column:1/-1'}">${lab}</button></div>${code==='SP-09'?'<button class="btn ghost" data-a="lvl" style="margin-top:10px">เปลี่ยนระดับ'+E('Change level')+'</button>':''}`}
 $('ctl').innerHTML=h;rsync()}
 
 function startTimer(){stopTimer();if(!S.left)return;timer=setInterval(()=>{S.left--;const el=$('clock');if(S.left<=0){S.left=0;stopTimer();renderCtl();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}return}if(el)el.textContent=fmt(S.left);if(R.role==='host'&&R.peer)rsend({k:'tick',left:S.left})},1000)}
@@ -576,20 +595,20 @@ else if(e.target.closest('#fav')){const f=store.get('favs',[]),c=S.card.code;sto
 function overlay(html){$('ovbody').innerHTML=html;$('ov').classList.add('on');const b=$('ovbody').querySelector('button');if(b)b.focus();rsync()}
 function closeOv(){$('ov').classList.remove('on');S.ov=null;R.ovKey=null;R.gameOv=false;rsync()}
 function redStop(){S.ovh=null;S.ov={k:'red'};overlay(`<span style="width:72px;height:72px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" aria-hidden="true">${HEART}</svg></span>
-<h2 id="ov-t">หยุดก่อน</h2><p class="soft">กอดกันสักครู่ แล้วถาม${esc(listener())}ว่าโอเคไหม ไม่ต้องอธิบายเหตุผล</p>
-${cfg.x5?`<p class="safe">คำหยุด: <b>${esc(cfg.safe)}</b></p>`:''}
-<button class="btn" data-o="cont">เล่นต่อด้วยการ์ดใบใหม่</button>${isMix()?(S.lvls.length>1?`<button class="btn ghost" data-o="down">เอาระดับ ${S.lvls[S.lvls.length-1]} ออกจากกอง</button>`:''):S.level>1?'<button class="btn ghost" data-o="down">ลดระดับลง 1 ขั้น</button>':''}<button class="btn ghost" data-o="end">พอแค่นี้ ไปหลังเกม</button>`)}
+<h2 id="ov-t">หยุดก่อน${E('Pause')}</h2><p class="soft">กอดกันสักครู่ แล้วถาม${esc(listener())}ว่าโอเคไหม ไม่ต้องอธิบายเหตุผล${E('Hold each other for a moment, then ask '+esc(listener())+' if they are okay. No reason needed')}</p>
+${cfg.x5?`<p class="safe">คำหยุด · Stop word: <b>${esc(cfg.safe)}</b></p>`:''}
+<button class="btn" data-o="cont">เล่นต่อด้วยการ์ดใบใหม่${E('Continue with a new card')}</button>${isMix()?(S.lvls.length>1?`<button class="btn ghost" data-o="down">เอาระดับ ${S.lvls[S.lvls.length-1]} ออกจากกอง${E('Remove level '+S.lvls[S.lvls.length-1]+' from the pile')}</button>`:''):S.level>1?'<button class="btn ghost" data-o="down">ลดระดับลง 1 ขั้น'+E('Go down one level')+'</button>':''}<button class="btn ghost" data-o="end">พอแค่นี้ ไปหลังเกม${E("That's enough, go to after-game")}</button>`)}
 function levelUp(to,keep){if(!keep||!Array.isArray(S.ready))S.ready=[false,false];const ready=S.ready;S.ov={k:'up',to};
-const paint=()=>overlay(`<h2 id="ov-t">ไปต่อระดับ ${to} ${LV[to].n}?</h2><p class="soft">${to>=4?'ระดับนี้ต้องกดพร้อมทั้งสองคน':'กดพร้อมทั้งสองคน แล้วแอปจะเปิดระดับถัดไป'}</p>
-<div class="two" style="width:100%">${[0,1].map(i=>`<button class="btn ${ready[i]?'':'ghost'}" data-o="r${i}" aria-pressed="${ready[i]}" style="${ready[i]?'background:var(--green);color:#fff':''}">${esc(cfg.names[i])} ${ready[i]?'พร้อม':'กดถ้าพร้อม'}</button>`).join('')}</div>
-<button class="btn" data-o="go" ${ready[0]&&ready[1]?'':'disabled'}>ไปต่อ</button><button class="btn ghost" data-o="stay">อยู่ระดับ ${S.level} ต่อ</button>`);
+const paint=()=>overlay(`<h2 id="ov-t">ไปต่อระดับ ${to} ${LV[to].n}?${E('Go on to level '+to+' '+LVE[to]+'?')}</h2><p class="soft">${to>=4?'ระดับนี้ต้องกดพร้อมทั้งสองคน'+E('Both of you must press ready for this level'):'กดพร้อมทั้งสองคน แล้วแอปจะเปิดระดับถัดไป'+E('Both press ready and the app opens the next level')}</p>
+<div class="two" style="width:100%">${[0,1].map(i=>`<button class="btn ${ready[i]?'':'ghost'}" data-o="r${i}" aria-pressed="${ready[i]}" style="${ready[i]?'background:var(--green);color:#fff':''}">${esc(cfg.names[i])} ${ready[i]?'พร้อม'+E('Ready'):'กดถ้าพร้อม'+E('Tap if ready')}</button>`).join('')}</div>
+<button class="btn" data-o="go" ${ready[0]&&ready[1]?'':'disabled'}>ไปต่อ${E('Go on')}</button><button class="btn ghost" data-o="stay">อยู่ระดับ ${S.level} ต่อ${E('Stay at level '+S.level)}</button>`);
 S.ovh=o=>{if(o==='r0'||o==='r1'){ready[+o[1]]=!ready[+o[1]];paint();return true}
 if(o==='go'){setLevel(to);closeOv();if(to===5){S.card=ALL.find(c=>c.code==='X-01');draw(true)}else draw();return true}
 if(o==='stay'){closeOv();return true}return false};paint()}
 function levelMenu(){const opts=[1,2,3,4].concat(cfg.x5?[5]:[]);S.ov={k:'menu'};
 if(isMix()){S.ovh=null;const n=Array.isArray(S.deck)?S.deck.length:(S.deckN||0);
-overlay(`<h2 id="ov-t">กองผสมระดับ ${rangeTxt(S.lvls)}</h2><p class="soft">เหลือ ${n} ใบจาก ${S.total||0} ใบ การ์ดที่เล่นแล้วจะไม่กลับมาจนกว่าจะเริ่มเกมใหม่ หรือกดสับกองใหม่ตอนการ์ดหมด</p><button class="btn ghost" data-o="stay">ปิด</button>`);return}
-overlay(`<h2 id="ov-t">เปลี่ยนระดับ</h2><p class="soft">ลดระดับได้ทุกเมื่อ ขึ้นระดับต้องพร้อมทั้งสองคน</p>${opts.map(l=>`<button class="lv" data-o="L${l}" aria-pressed="${S.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span></button>`).join('')}<button class="btn ghost" data-o="stay">ปิด</button>`);
+overlay(`<h2 id="ov-t">กองผสมระดับ ${rangeTxt(S.lvls)}${E('Mixed pile: levels '+rangeTxt(S.lvls))}</h2><p class="soft">เหลือ ${n} ใบจาก ${S.total||0} ใบ การ์ดที่เล่นแล้วจะไม่กลับมาจนกว่าจะเริ่มเกมใหม่ หรือกดสับกองใหม่ตอนการ์ดหมด${E(n+' of '+(S.total||0)+' cards left. Played cards stay out until a new game, or a reshuffle when the pile runs out')}</p><button class="btn ghost" data-o="stay">ปิด${E('Close')}</button>`);return}
+overlay(`<h2 id="ov-t">เปลี่ยนระดับ${E('Change level')}</h2><p class="soft">ลดระดับได้ทุกเมื่อ ขึ้นระดับต้องพร้อมทั้งสองคน${E('Go down anytime; going up needs both of you ready')}</p>${opts.map(l=>`<button class="lv" data-o="L${l}" aria-pressed="${S.level===l}"><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}${Ei(LVE[l])}</span></button>`).join('')}<button class="btn ghost" data-o="stay">ปิด${E('Close')}</button>`);
 S.ovh=o=>{if(o[0]!=='L')return false;const l=+o.slice(1);if(l>S.level){levelUp(l);return true}setLevel(l);closeOv();draw();return true}}
 $('ovbody').addEventListener('click',e=>{const b=e.target.closest('button[data-o]');if(!b)return;const o=b.dataset.o;
 if(S.ovh&&S.ovh(o))return;
@@ -612,7 +631,7 @@ function endView(){
 const favs=store.get('favs',[]);
 $('sum').textContent='คืนนี้เล่นไป '+S.played.length+' ใบ '+(isMix()&&Array.isArray(S.lvls)?'จากกองผสมระดับ '+rangeTxt(S.lvls):'ไปถึงระดับ '+S.maxLevel+' '+LV[S.maxLevel].n);
 const list=ALL.filter(c=>favs.includes(c.code));
-$('favs').innerHTML=list.length?list.map(c=>`<div class="li"><b style="background:${LV[c.l].band}"></b><span style="flex:1">${esc(cText(c))}</span><span class="mute">${c.code}</span></div>`).join(''):'<p class="mute">ยังไม่มี แตะหัวใจบนการ์ดระหว่างเล่นเพื่อเก็บไว้</p>';
+$('favs').innerHTML=list.length?list.map(c=>`<div class="li"><b style="background:${LV[c.l].band}"></b><span style="flex:1">${esc(cText(c))}${cEn(c)?E(esc(cEn(c))):''}</span><span class="mute">${c.code}</span></div>`).join(''):'<p class="mute">ยังไม่มี แตะหัวใจบนการ์ดระหว่างเล่นเพื่อเก็บไว้</p>';
 hugLeft=300;$('hug').textContent=fmt(hugLeft);$('hugbtn').textContent='เริ่มจับเวลา 5 นาที';show('end')}
 $('hugbtn').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null;$('hugbtn').textContent='จับเวลาต่อ';return}
 $('hugbtn').textContent='หยุดชั่วคราว';hugT=setInterval(()=>{hugLeft--;$('hug').textContent=fmt(Math.max(0,hugLeft));if(hugLeft<=0){clearInterval(hugT);hugT=null;$('hugbtn').textContent='ครบ 5 นาทีแล้ว'}},1000)});
@@ -1032,13 +1051,14 @@ else if(a==='off'){cfg.crude=false;store.set('crude',0);closeOv();xSync()}
 else closeOv()})}
 function xDialog(){if(R.role==='guest')return;
 overlay(cfg.crude?`<h2 id="ov-t">โหมดคำแรง</h2><p class="soft">ตอนนี้การ์ดบางใบใช้คำหยาบอยู่ ปิดได้ทุกเมื่อ</p><button class="btn" data-x="off">ปิดโหมดคำแรง</button><button class="btn ghost" data-x="no">ใช้ต่อ</button>`
-:`<h2 id="ov-t">ฟังก์ชันลับ: โหมดคำแรง</h2><p class="soft">การ์ดระดับ 3–5 จำนวน ${Object.keys(XT).length||'หลายสิบ'} ใบจะเปลี่ยนเป็นคำพูดตรง ๆ แบบหยาบ เหมาะกับคู่ที่ชอบ dirty talk เปิดหรือปิดได้ทุกเมื่อ</p>
+:`<h2 id="ov-t">ฟังก์ชันลับ: โหมดคำแรง</h2><p class="soft">การ์ดระดับ 3–5 และการ์ดพิเศษ รวม ${Object.keys(XT).length||'หลายสิบ'} ใบ จะเปลี่ยนเป็นคำพูดตรง ๆ แบบหยาบ ทั้งภาษาไทยและอังกฤษ เหมาะกับคู่ที่ชอบ dirty talk เปิดหรือปิดได้ทุกเมื่อ</p>
 <label class="check" style="text-align:left;width:100%"><input type="checkbox" id="xok0">${esc(nm(0))} โอเคกับคำหยาบบนการ์ด</label>
 <label class="check" style="text-align:left;width:100%"><input type="checkbox" id="xok1">${esc(nm(1))} โอเคกับคำหยาบบนการ์ด</label>
 <p class="err" id="xerr" role="alert"></p><button class="btn" data-x="on">เปิดโหมดคำแรง</button><button class="btn ghost" data-x="no">ยกเลิก</button>`)}
 function xSync(){$('xchip').hidden=!cfg.crude;if(curScr()==='play')render();rsync()}
 
 /* load cards */
+fetch('cards-en.json').then(r=>r.json()).then(d=>{EN=d&&typeof d==='object'?d:{};if(curScr()==='play')render()}).catch(()=>{});
 fetch('cards.json').then(r=>r.json()).then(rows=>{ALL=rows.map(r=>({code:r[0],l:r[1],type:r[2],text:r[3],secs:r[4]||0,icon:r[5]}));if(curScr()==='setup')renderLevels();if(R.role==='guest'&&R.last)rApply(R.last)}).catch(()=>{ALL=[]});
 if(store.get('age',0))openSetup();else show('gate');
 

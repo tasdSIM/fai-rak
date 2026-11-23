@@ -31,7 +31,7 @@ echo "== Deploying $REV: $(git log -1 --format=%s)"
 TARBALL=$(mktemp)
 trap 'rm -f "$TARBALL"' EXIT
 # The site files go in site/, the compose file and nginx.conf next to it.
-git archive --format=tar --prefix=site/ HEAD -- index.html cards.json cards-x.json bonus.json sw.js qrcode.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png icon-maskable-512.png > "$TARBALL"
+git archive --format=tar --prefix=site/ HEAD -- index.html cards.json cards-x.json cards-en.json bonus.json sw.js qrcode.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png icon-maskable-512.png > "$TARBALL"
 
 echo "== Checking the VM"
 vm true || { echo "Cannot reach $VM_HOST. If the key needs its passphrase, run: ssh-add ~/.ssh/id_ed25519" >&2; exit 1; }
