@@ -151,7 +151,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .task[aria-pressed=true]{border-color:#2F9E44}.task[aria-pressed=true] .ck{background:#2F9E44;border-color:#2F9E44}
 .paper{background:#F1E6D0;color:#2A1E14;border-radius:6px;padding:18px;font-size:16px;line-height:1.7;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative}
 .paper .stamp{position:absolute;top:10px;right:12px;border:2px solid #A11;color:#A11;font-size:11px;font-weight:700;padding:2px 8px;transform:rotate(6deg);letter-spacing:1px}
-.paper h3{margin:0 0 6px;font-family:'Noto Serif Thai',serif;font-size:15px;color:#7A1A10}
+.paper h3{padding-right:72px;margin:0 0 6px;font-family:'Noto Serif Thai',serif;font-size:15px;color:#7A1A10}
 .susp{display:flex;gap:12px;align-items:flex-start;border-radius:12px;background:var(--panel);padding:12px 14px}
 .susp .av{width:40px;height:40px;border-radius:50%;background:#3A2A2E;color:var(--goldi);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;font-family:'Noto Serif Thai',serif}
 .pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -171,6 +171,7 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .cen{margin:-6px 0 0;font-size:15px;line-height:1.45;color:#6B5A4A;font-style:italic;text-wrap:balance}
 .cnote{margin:0;border-radius:10px;background:#2A1218;border:1px solid #7A1A2A;color:#FFC9C9;padding:8px 12px;font-size:14px;text-align:center}
 .rules{display:flex;flex-direction:column;gap:4px;border-radius:12px;border:1px dashed #5A4228;padding:10px 14px;font-size:14px;color:var(--soft)}.rules b{color:var(--goldi);font-size:13px}
+.langbtn{font-weight:700;color:var(--goldi);min-width:56px}
 .xchip{margin-top:8px;border-color:#B3122E;color:#FF8A9A;background:#2A1218}
 /* สืบซ่อนรัก */
 .secret{border:1px dashed #B3122E;background:#1F1014}
@@ -295,13 +296,13 @@ input[type=range]{width:100%;accent-color:#B3122E}
 </section>
 
 <section class="scr" id="bonus" aria-labelledby="b-t">
-<div class="top"><button class="iconbtn" id="bonusBack" aria-label="กลับไปตั้งค่า"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill">โบนัส</span><span style="width:44px"></span></div>
-<div><h2 id="b-t">เกมเสริม</h2><p class="soft">เล่นแยกจากเกมการ์ด หรือเล่นต่อกันในคืนเดียวก็ได้</p></div>
+<div class="top"><button class="iconbtn" id="bonusBack" aria-label="กลับไปตั้งค่า"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill">โบนัส · Bonus</span><button type="button" class="iconbtn langbtn" id="langA">EN</button></div>
+<div><h2 id="b-t">เกมเสริม</h2><p class="soft" id="b-s">เล่นแยกจากเกมการ์ด หรือเล่นต่อกันในคืนเดียวก็ได้</p></div>
 <div class="list" id="hub"></div>
 </section>
 
 <section class="scr" id="bx" aria-labelledby="bxt">
-<div class="top"><button class="iconbtn" id="bxBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill" id="bxtag">โบนัส</span><span style="width:44px"></span></div>
+<div class="top"><button class="iconbtn" id="bxBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill" id="bxtag">โบนัส</span><button type="button" class="iconbtn langbtn" id="langB">EN</button></div>
 <h2 id="bxt"></h2>
 <div id="bxc" class="bxc"></div>
 </section>
@@ -713,21 +714,32 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('msheet').classLi
 document.addEventListener('click',e=>{if(musStarted||!mus.on||$('gate').classList.contains('on')||e.target.closest('#mbar,#msheet'))return;musPlay()});
 
 /* bonus games */
-let B=null,bxT=null,bxH=null,bxBackFn=null,wl=null;
-const nm=i=>cfg.names[i]||$('n'+i).value.trim()||('ผู้เล่น '+(i+1));
-const loadB=()=>B?Promise.resolve(B):fetch('bonus.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>(B=d));
+/* Language for the bonus games: chosen per device with the EN / ไทย button (never synced, so on
+   two devices each can read its own language). bonus-en.json has the same shape as bonus.json. */
+let B=null,BT=null,BE=null,bxT=null,bxH=null,bxBackFn=null,bxRe=null,wl=null,LANG=store.get('blang','th')==='en'?'en':'th';
+const L=(th,en)=>LANG==='en'?en:th;
+const nm=i=>cfg.names[i]||$('n'+i).value.trim()||(L('ผู้เล่น ','Player ')+(i+1));
+const getJ=f=>fetch(f).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
+const loadB=()=>(BT?Promise.resolve():getJ('bonus.json').then(d=>{BT=d})).then(()=>LANG==='en'&&!BE?getJ('bonus-en.json').then(d=>{BE=d}).catch(()=>{}):0).then(()=>(B=LANG==='en'&&BE?BE:BT));
 const hubT=id=>B.hub.find(h=>h.id===id);
 const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+const retitle=(tag,title)=>{$('bxtag').textContent=tag;$('bxt').textContent=title};
+function langUI(){for(const id of ['langA','langB']){const b=$(id);if(b){b.textContent=LANG==='en'?'ไทย':'EN';b.setAttribute('aria-label',LANG==='en'?'เปลี่ยนเป็นภาษาไทย':'Switch to English')}}}
+function setLang(l){LANG=l==='en'?'en':'th';store.set('blang',LANG);langUI();
+loadB().then(()=>{if(curScr()==='bonus')openBonus();else if(curScr()==='bx'&&bxRe)bxRe()}).catch(()=>{})}
 function wake(on){try{if(on&&navigator.wakeLock&&!wl)navigator.wakeLock.request('screen').then(l=>{wl=l}).catch(()=>{});else if(!on&&wl){wl.release();wl=null}}catch(e){}}
 function bxStop(){if(bxT){clearInterval(bxT);bxT=null}wake(false)}
 function bxSet(html){$('bxc').innerHTML=html}
-function bx(tag,title,html,back){bxStop();CS=null;R.caseView=false;$('bxtag').textContent=tag;$('bxt').textContent=title;bxSet(html);bxBackFn=back||openBonus;show('bx')}
+function bx(tag,title,html,back){bxStop();CS=null;R.caseView=false;bxRe=null;retitle(tag,title);bxSet(html);bxBackFn=back||openBonus;show('bx')}
 function openBonus(){bxStop();bxH=null;loadB().then(()=>{
-$('hub').innerHTML=B.hub.map(h=>`<button type="button" class="tile" data-h="${h.id}"><span class="ti">${svg(h.icon,'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">โบนัส ${h.n} · ${esc(h.sub)}</span><b>${esc(h.title)}</b><span class="td">${esc(h.desc)}</span></span></button>`).join('');
-show('bonus')}).catch(()=>{$('serr').textContent='โหลดเกมเสริมไม่สำเร็จ ต่อเน็ตแล้วลองอีกครั้ง';show('setup')})}
+$('b-t').textContent=L('เกมเสริม','Bonus games');$('b-s').textContent=L('เล่นแยกจากเกมการ์ด หรือเล่นต่อกันในคืนเดียวก็ได้','Play them on their own, or right after the card game');
+$('hub').innerHTML=B.hub.map(h=>`<button type="button" class="tile" data-h="${h.id}"><span class="ti">${svg(h.icon,'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">${L('โบนัส','Bonus')} ${h.n} · ${esc(h.sub)}</span><b>${esc(h.title)}</b><span class="td">${esc(h.desc)}</span></span></button>`).join('');
+langUI();show('bonus')}).catch(()=>{$('serr').textContent='โหลดเกมเสริมไม่สำเร็จ ต่อเน็ตแล้วลองอีกครั้ง';show('setup')})}
 $('toBonus').addEventListener('click',openBonus);
 $('bonusBack').addEventListener('click',openSetup);
 $('bxBack').addEventListener('click',()=>{bxStop();(bxBackFn||openBonus)()});
+for(const id of ['langA','langB'])$(id).addEventListener('click',()=>setLang(LANG==='en'?'th':'en'));
+langUI();
 $('hub').addEventListener('click',e=>{const t=e.target.closest('[data-h]');if(t)({massage:mSetup,nights:nList,cases:cList,dates:dList})[t.dataset.h]()});
 $('bxc').addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(b&&!b.disabled&&bxH)bxH(b.dataset.b)});
 $('endMassage').addEventListener('click',()=>{if(hugT){clearInterval(hugT);hugT=null}loadB().then(mSetup).catch(()=>{})});
@@ -750,71 +762,79 @@ glide:bed+prone+h(G,50,68)+l(G,'64,74 136,76 206,80',12)+l(G,'66,76 46,86',8),
 spoon:bed+h(G,44,80)+l(G,'58,84 130,86 168,94')+h(R,62,92)+l(R,'76,96 146,96 196,99')+l(G,'70,86 96,94 114,92',8)};
 return k=>`<svg viewBox="0 0 240 118" width="100%" style="max-width:280px" aria-hidden="true">${P[k]||P.side}</svg>`})();
 
-function mSetup(){const M=B.massage,H=hubT('massage');let g=0,len='20',hot=false;
-const mins=l=>+l,R=()=>hot?M.hotRoutines:M.routines;
-const html=()=>`<p class="soft">${esc(hot?M.hotIntro:M.intro)}</p>
-<div class="field"><span class="lbl">โหมด</span><div class="two"><button class="btn ${hot?'ghost':''}" data-b="mrelax" aria-pressed="${!hot}">ผ่อนคลาย</button><button class="btn ${hot?'':'ghost'}" data-b="mhot" aria-pressed="${hot}" style="${hot?'background:#B3122E;color:#fff':''}">เร่าร้อน 18+</button></div></div>
-<div class="field"><span class="lbl">ใครนวดก่อน</span><div class="two">${[0,1].map(i=>`<button class="btn ${g===i?'':'ghost'}" data-b="g${i}" aria-pressed="${g===i}">${esc(nm(i))}</button>`).join('')}</div></div>
-<div class="field"><span class="lbl">ความยาว</span><div class="pick">${['10','20','30'].map(l=>`<button data-b="l${l}" aria-pressed="${len===l}">${mins(l)} นาที</button>`).join('')}</div><span class="mute">${R()[len].length} ขั้น: ${R()[len].map(id=>esc(M.steps[id].t)).join(' · ')}</span></div>
-<div class="box"><h3>ท่าที่ใช้</h3><div class="poses">${[...new Set(R()[len].map(id=>M.steps[id].p))].map(p=>`<figure>${POSE(p)}<figcaption>${esc(M.poses[p])}</figcaption></figure>`).join('')}</div></div>
-<div class="box"><h3>เตรียมก่อนเริ่ม</h3>${ul(hot?M.hotPrep:M.prep)}</div>
-<div class="box"><h3>${hot?'ข้อตกลงก่อนเริ่ม':'ความปลอดภัย'}</h3>${ul(hot?M.hotRules.concat(M.safety.slice(0,1)):M.safety)}</div>
-<button class="btn" data-b="go" style="${hot?'background:#B3122E;color:#fff':''}">${hot?'ตกลงกันแล้ว เริ่มเลย':'เริ่มนวด'}</button>`;
-bx('โบนัส 1',H.title,html());
+function mSetup(){let g=0,len='20',hot=false;
+const R=()=>hot?B.massage.hotRoutines:B.massage.routines;
+const html=()=>{const M=B.massage;return `<p class="soft">${esc(hot?M.hotIntro:M.intro)}</p>
+<div class="field"><span class="lbl">${L('โหมด','Mode')}</span><div class="two"><button class="btn ${hot?'ghost':''}" data-b="mrelax" aria-pressed="${!hot}">${L('ผ่อนคลาย','Relax')}</button><button class="btn ${hot?'':'ghost'}" data-b="mhot" aria-pressed="${hot}" style="${hot?'background:#B3122E;color:#fff':''}">${L('เร่าร้อน 18+','Sensual 18+')}</button></div></div>
+<div class="field"><span class="lbl">${L('ใครนวดก่อน','Who gives first')}</span><div class="two">${[0,1].map(i=>`<button class="btn ${g===i?'':'ghost'}" data-b="g${i}" aria-pressed="${g===i}">${esc(nm(i))}</button>`).join('')}</div></div>
+<div class="field"><span class="lbl">${L('ความยาว','Length')}</span><div class="pick">${['10','20','30'].map(l=>`<button data-b="l${l}" aria-pressed="${len===l}">${l} ${L('นาที','min')}</button>`).join('')}</div><span class="mute">${R()[len].length} ${L('ขั้น','steps')}: ${R()[len].map(id=>esc(M.steps[id].t)).join(' · ')}</span></div>
+<div class="box"><h3>${L('ท่าที่ใช้','Poses used')}</h3><div class="poses">${[...new Set(R()[len].map(id=>M.steps[id].p))].map(p=>`<figure>${POSE(p)}<figcaption>${esc(M.poses[p])}</figcaption></figure>`).join('')}</div></div>
+<div class="box"><h3>${L('เตรียมก่อนเริ่ม','Before you start')}</h3>${ul(hot?M.hotPrep:M.prep)}</div>
+<div class="box"><h3>${hot?L('ข้อตกลงก่อนเริ่ม','Agree first'):L('ความปลอดภัย','Safety')}</h3>${ul(hot?M.hotRules.concat(M.safety.slice(0,1)):M.safety)}</div>
+<button class="btn" data-b="go" style="${hot?'background:#B3122E;color:#fff':''}">${hot?L('ตกลงกันแล้ว เริ่มเลย','Agreed, start'):L('เริ่มนวด','Start massage')}</button>`};
+bx(L('โบนัส 1','Bonus 1'),hubT('massage').title,html());
+bxRe=()=>{retitle(L('โบนัส 1','Bonus 1'),hubT('massage').title);bxSet(html())};
 bxH=b=>{if(b==='go')mRun(g,len,hot);else if(b==='mhot'||b==='mrelax'){hot=b==='mhot';bxSet(html())}else if(b[0]==='g'){g=+b[1];bxSet(html())}else if(b[0]==='l'){len=b.slice(1);bxSet(html())}}}
-function mRun(g,len,hot){const M=B.massage,ids=(hot?M.hotRoutines:M.routines)[len];
+function mRun(g,len,hot){const ids=(hot?B.massage.hotRoutines:B.massage.routines)[len];
 // Stretch each step so the whole routine lasts the chosen 10, 20 or 30 minutes.
-const k=len*60/ids.reduce((s,id)=>s+M.steps[id].s,0),secs=ids.map(id=>Math.max(30,Math.round(M.steps[id].s*k/15)*15));
-let i=0,left=secs[0],paused=false;
-const html=()=>{const s=M.steps[ids[i]];return `<p class="mute" style="text-align:center">${esc(nm(g))} นวดให้ ${esc(nm(1-g))} · ขั้น ${i+1}/${ids.length}</p>
+const k=len*60/ids.reduce((s,id)=>s+B.massage.steps[id].s,0),secs=ids.map(id=>Math.max(30,Math.round(B.massage.steps[id].s*k/15)*15));
+let i=0,left=secs[0],paused=false,over=false;
+const html=()=>{const M=B.massage,s=M.steps[ids[i]];return `<p class="mute" style="text-align:center">${L(esc(nm(g))+' นวดให้ '+esc(nm(1-g))+' · ขั้น '+(i+1)+'/'+ids.length,esc(nm(g))+' massages '+esc(nm(1-g))+' · step '+(i+1)+'/'+ids.length)}</p>
 <div class="bar"><i style="width:${i/ids.length*100}%"></i></div>
-<div class="stepcard"><span class="area">${esc(s.a)}</span><h3>${esc(s.t)}</h3>${POSE(s.p)}<span class="posecap">ท่า: ${esc(M.poses[s.p]||'')}</span><p>${esc(s.d)}</p><span class="clock" id="mclock">${fmt(left)}</span></div>
-<div class="two"><button class="btn ghost" data-b="pause">${paused?'นวดต่อ':'พักแป๊บ'}</button><button class="btn" data-b="next">${i<ids.length-1?'ขั้นต่อไป':'เสร็จแล้ว'}</button></div>
-<p class="mute" style="text-align:center">หมดเวลาแล้วแอปจะสั่นและไปขั้นต่อไปเอง</p>`};
-const finish=()=>{bxStop();bxSet(`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>นวดครบแล้ว</h2><p class="soft">ถาม${esc(nm(1-g))}ว่าชอบขั้นไหนที่สุด แล้วสลับกันนวด</p></div>
-<button class="btn" data-b="swap">สลับให้ ${esc(nm(1-g))} นวด</button><button class="btn ghost" data-b="menu">กลับเมนูเกมเสริม</button>`);
-bxH=b=>{if(b==='swap')mRun(1-g,len,hot);else if(b==='menu')openBonus()}};
+<div class="stepcard"><span class="area">${esc(s.a)}</span><h3>${esc(s.t)}</h3>${POSE(s.p)}<span class="posecap">${L('ท่า','Pose')}: ${esc(M.poses[s.p]||'')}</span><p>${esc(s.d)}</p><span class="clock" id="mclock">${fmt(left)}</span></div>
+<div class="two"><button class="btn ghost" data-b="pause">${paused?L('นวดต่อ','Resume'):L('พักแป๊บ','Pause')}</button><button class="btn" data-b="next">${i<ids.length-1?L('ขั้นต่อไป','Next step'):L('เสร็จแล้ว','Done')}</button></div>
+<p class="mute" style="text-align:center">${L('หมดเวลาแล้วแอปจะสั่นและไปขั้นต่อไปเอง','When time is up the phone buzzes and moves to the next step')}</p>`};
+const doneHtml=()=>`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>${L('นวดครบแล้ว','All done')}</h2><p class="soft">${L('ถาม'+esc(nm(1-g))+'ว่าชอบขั้นไหนที่สุด แล้วสลับกันนวด','Ask '+esc(nm(1-g))+' which step they liked best, then swap')}</p></div>
+<button class="btn" data-b="swap">${L('สลับให้ '+esc(nm(1-g))+' นวด','Swap: '+esc(nm(1-g))+' gives')}</button><button class="btn ghost" data-b="menu">${L('กลับเมนูเกมเสริม','Back to bonus games')}</button>`;
+const finish=()=>{bxStop();over=true;bxSet(doneHtml());bxH=b=>{if(b==='swap')mRun(1-g,len,hot);else if(b==='menu')openBonus()}};
 const go=()=>{i++;if(i>=ids.length){finish();return}left=secs[i];paused=false;bxSet(html());window.scrollTo(0,0)};
-bx('โบนัส 1',hubT('massage').title,html(),mSetup);wake(true);
+bx(L('โบนัส 1','Bonus 1'),hubT('massage').title,html(),mSetup);wake(true);
+bxRe=()=>{retitle(L('โบนัส 1','Bonus 1'),hubT('massage').title);bxSet(over?doneHtml():html())};
 bxT=setInterval(()=>{if(paused)return;left--;const el=$('mclock');if(el)el.textContent=fmt(Math.max(0,left));if(left<=0){try{navigator.vibrate&&navigator.vibrate([150,80,150])}catch(e){}go()}},1000);
 bxH=b=>{if(b==='pause'){paused=!paused;bxSet(html())}else if(b==='next')go()}}
 
 /* 2 seven nights */
 function nList(){const N=B.nights,done=store.get('nights',[]);
-bx('โบนัส 2',hubT('nights').title,`<p class="soft">ทำคืนละหนึ่งภารกิจตามลำดับ จะเว้นวันก็ได้ คืนถัดไปจะเปิดเมื่อทำคืนก่อนหน้าเสร็จ</p>
-<div class="bar"><i style="width:${done.length/N.length*100}%"></i></div><p class="mute">ทำแล้ว ${done.length}/${N.length} คืน</p>
-<div class="list">${N.map((n,k)=>{const d=done.includes(k),open=d||k===0||done.includes(k-1);return `<button class="night ${d?'done':''}" data-b="n${k}" ${open?'':'disabled'}><span class="no">${d?'✓':k+1}</span><span style="flex:1"><b>คืนที่ ${k+1}: ${esc(n.t)}</b><span class="mute" style="display:block">${d?'ทำแล้ว แตะเพื่อเล่นซ้ำ':open?'พร้อมเล่นคืนนี้':'ล็อกอยู่'}</span></span></button>`}).join('')}</div>
-${done.length?'<button class="btn ghost" data-b="reset">เริ่ม 7 คืนใหม่ตั้งแต่คืนแรก</button>':''}`);
-bxH=b=>{if(b[0]==='n')nNight(+b.slice(1));else if(b==='reset'&&confirm('ล้างความคืบหน้าทั้ง 7 คืน?')){store.set('nights',[]);nList()}}}
-function nNight(k){const n=B.nights[k],ck=n.tasks.map(()=>false);
-const html=()=>`<p class="soft">${esc(n.i)}</p>
+bx(L('โบนัส 2','Bonus 2'),hubT('nights').title,`<p class="soft">${L('ทำคืนละหนึ่งภารกิจตามลำดับ จะเว้นวันก็ได้ คืนถัดไปจะเปิดเมื่อทำคืนก่อนหน้าเสร็จ','One mission a night, in order. Skipping days is fine; each night unlocks when the one before is done')}</p>
+<div class="bar"><i style="width:${done.length/N.length*100}%"></i></div><p class="mute">${L('ทำแล้ว '+done.length+'/'+N.length+' คืน',done.length+'/'+N.length+' nights done')}</p>
+<div class="list">${N.map((n,k)=>{const d=done.includes(k),open=d||k===0||done.includes(k-1);return `<button class="night ${d?'done':''}" data-b="n${k}" ${open?'':'disabled'}><span class="no">${d?'✓':k+1}</span><span style="flex:1"><b>${L('คืนที่','Night')} ${k+1}: ${esc(n.t)}</b><span class="mute" style="display:block">${d?L('ทำแล้ว แตะเพื่อเล่นซ้ำ','Done, tap to replay'):open?L('พร้อมเล่นคืนนี้','Ready for tonight'):L('ล็อกอยู่','Locked')}</span></span></button>`}).join('')}</div>
+${done.length?`<button class="btn ghost" data-b="reset">${L('เริ่ม 7 คืนใหม่ตั้งแต่คืนแรก','Restart the 7 nights from night 1')}</button>`:''}`);
+bxRe=nList;
+bxH=b=>{if(b[0]==='n')nNight(+b.slice(1));else if(b==='reset'&&confirm(L('ล้างความคืบหน้าทั้ง 7 คืน?','Clear progress for all 7 nights?'))){store.set('nights',[]);nList()}}}
+function nNight(k){const ck=B.nights[k].tasks.map(()=>false);let fin=false;
+const html=()=>{const n=B.nights[k];return `<p class="soft">${esc(n.i)}</p>
 <div class="list">${n.tasks.map((t,j)=>`<button class="task" data-b="t${j}" aria-pressed="${ck[j]}"><span class="ck">${ck[j]?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span>${esc(t)}</span></button>`).join('')}</div>
-<div class="box"><h3>คำถามก่อนนอน</h3><p class="soft">${esc(n.q)}</p></div>
-${k===B.nights.length-1?'<button class="btn ghost" data-b="cards">เปิดเกมการ์ดหลัก</button>':''}
-<button class="btn" data-b="done" ${ck.every(Boolean)?'':'disabled'}>คืนนี้ทำครบแล้ว</button>
-<p class="mute" style="text-align:center">ข้อไหนไม่สบายใจ ข้ามได้เสมอ แตะข้อนั้นให้ติ๊กแล้วบอกกันว่าข้าม</p>`;
-bx('โบนัส 2','คืนที่ '+(k+1)+': '+n.t,html(),nList);
+<div class="box"><h3>${L('คำถามก่อนนอน','Pillow question')}</h3><p class="soft">${esc(n.q)}</p></div>
+${k===B.nights.length-1?`<button class="btn ghost" data-b="cards">${L('เปิดเกมการ์ดหลัก','Open the card game')}</button>`:''}
+<button class="btn" data-b="done" ${ck.every(Boolean)?'':'disabled'}>${L('คืนนี้ทำครบแล้ว','Tonight is complete')}</button>
+<p class="mute" style="text-align:center">${L('ข้อไหนไม่สบายใจ ข้ามได้เสมอ แตะข้อนั้นให้ติ๊กแล้วบอกกันว่าข้าม','Anything that feels wrong can always be skipped: tick it and tell each other you are skipping it')}</p>`};
+const finHtml=()=>`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>${L('จบคืนที่ '+(k+1)+' แล้ว','Night '+(k+1)+' complete')}</h2><p class="soft">${k<B.nights.length-1?L('คืนที่ '+(k+2)+' เปิดแล้ว เล่นคืนไหนก็ได้ที่ทั้งคู่พร้อม','Night '+(k+2)+' is unlocked. Play it whenever you are both ready'):L('ครบ 7 คืนแล้ว เลือกคืนที่ชอบมาเล่นซ้ำได้ตลอด','All 7 nights done. Replay your favourites any time')}</p></div><button class="btn" data-b="list">${L('กลับไปดู 7 คืน','Back to the 7 nights')}</button>`;
+const ttl=()=>L('คืนที่ ','Night ')+(k+1)+': '+B.nights[k].t;
+bx(L('โบนัส 2','Bonus 2'),ttl(),html(),nList);
+bxRe=()=>{retitle(L('โบนัส 2','Bonus 2'),ttl());bxSet(fin?finHtml():html())};
 bxH=b=>{if(b[0]==='t'){const j=+b.slice(1);ck[j]=!ck[j];bxSet(html())}
 else if(b==='cards')openSetup();
-else if(b==='done'){const d=store.get('nights',[]);if(!d.includes(k))store.set('nights',d.concat(k));
-bxSet(`<div class="logo" style="padding-top:8px"><span class="bb-ic" style="width:64px;height:64px;border-radius:50%">${svg('หัวใจ','#FFE8A3',1.6)}</span><h2>จบคืนที่ ${k+1} แล้ว</h2><p class="soft">${k<B.nights.length-1?'คืนที่ '+(k+2)+' เปิดแล้ว เล่นคืนไหนก็ได้ที่ทั้งคู่พร้อม':'ครบ 7 คืนแล้ว เลือกคืนที่ชอบมาเล่นซ้ำได้ตลอด'}</p></div><button class="btn" data-b="list">กลับไปดู 7 คืน</button>`);
+else if(b==='done'){const d=store.get('nights',[]);if(!d.includes(k))store.set('nights',d.concat(k));fin=true;bxSet(finHtml());
 bxH=x=>{if(x==='list')nList()}}}}
 
 /* 3 detective cases */
 /* สืบซ่อนรัก: co-op cases. Each player holds private evidence (a / b); the answer is shared
    and needs both to confirm. On two devices the host runs CS and the guest mirrors it; on one
-   device the private evidence sits in two sealed envelopes. */
-const STAR=n=>['','ง่าย','กลาง','ยาก'][n]||'';
+   device the private evidence sits in two sealed envelopes. Each device shows its own language. */
+const STAR=n=>(LANG==='en'?['','easy','medium','hard']:['','ง่าย','กลาง','ยาก'])[n]||'';
 const cDuo=()=>R.role==='guest'?!!R.caseView:R.role==='host'&&R.peer;
 const cMe=()=>R.role==='guest'?1:0;
 function cList(){const C=B.cases,sol=store.get('cases2',{});CS=null;
-bx('โบนัส 3',hubT('cases').title,`<div class="box"><h3>วิธีเล่น</h3><ol class="steps"><li><span>อ่านเรื่องย่อและผู้ต้องสงสัยด้วยกัน</span></li><li><span>แต่ละคนเปิดหลักฐานลับของตัวเอง ห้ามยื่นจอให้อีกคนดู ต้องเล่าด้วยคำพูดเท่านั้น</span></li><li><span>เปิดหลักฐานกลางทีละชิ้น แล้วช่วยกันต่อภาพ ไม่มีใครไขคดีได้คนเดียว</span></li><li><span>ตอบร่วมกัน 3 ข้อ: ใครทำ ทำอย่างไร และทำไม ทั้งคู่ต้องกดยืนยันก่อนเปิดเฉลย</span></li></ol>
-<p class="mute">${R.role==='host'&&R.peer?'เชื่อมกับอีกเครื่องอยู่: หลักฐานลับจะขึ้นเฉพาะในเครื่องของแต่ละคน':'เล่น 2 เครื่องได้: สร้างห้องจากปุ่ม เล่น 2 เครื่อง ในหน้าตั้งค่า แล้วเลือกคดีจากเครื่องหลัก'}</p></div>
-<div class="list">${C.map((c,k)=>{const sc=sol[c.id];return `<button class="night ${sc!=null?'done':''}" data-b="c${k}"><span class="no">${sc!=null?sc:k+1}</span><span style="flex:1"><b>คดีที่ ${k+1}: ${esc(c.t)}</b><span class="mute" style="display:block">${esc(c.tag)} · ${STAR(c.lv)}${sc!=null?' · ปิดคดีแล้ว '+sc+'/3':''}</span></span></button>`}).join('')}</div>`);
+bx(L('โบนัส 3','Bonus 3'),hubT('cases').title,`<div class="box"><h3>${L('วิธีเล่น','How to play')}</h3><ol class="steps"><li><span>${L('อ่านเรื่องย่อและผู้ต้องสงสัยด้วยกัน','Read the story and the suspects together')}</span></li><li><span>${L('แต่ละคนเปิดหลักฐานลับของตัวเอง ห้ามยื่นจอให้อีกคนดู ต้องเล่าด้วยคำพูดเท่านั้น','Each opens their own secret evidence. No showing your screen, you can only tell it')}</span></li><li><span>${L('เปิดหลักฐานกลางทีละชิ้น แล้วช่วยกันต่อภาพ ไม่มีใครไขคดีได้คนเดียว','Open the shared evidence one piece at a time and piece it together. Nobody can solve it alone')}</span></li><li><span>${L('ตอบร่วมกัน 3 ข้อ: ใครทำ ทำอย่างไร และทำไม ทั้งคู่ต้องกดยืนยันก่อนเปิดเฉลย','Answer 3 questions together: who, how and why. Both must confirm before the reveal')}</span></li></ol>
+<p class="mute">${R.role==='host'&&R.peer?L('เชื่อมกับอีกเครื่องอยู่: หลักฐานลับจะขึ้นเฉพาะในเครื่องของแต่ละคน','Connected to the other device: secret evidence shows only on each person\'s own device'):L('เล่น 2 เครื่องได้: สร้างห้องจากปุ่ม เล่น 2 เครื่อง ในหน้าตั้งค่า แล้วเลือกคดีจากเครื่องหลัก','You can play on 2 devices: create a room with the 2-device button on the setup screen, then pick a case on the main device')}</p></div>
+<div class="list">${C.map((c,k)=>{const sc=sol[c.id];return `<button class="night ${sc!=null?'done':''}" data-b="c${k}"><span class="no">${sc!=null?sc:k+1}</span><span style="flex:1"><b>${L('คดีที่','Case')} ${k+1}: ${esc(c.t)}</b><span class="mute" style="display:block">${esc(c.tag)} · ${STAR(c.lv)}${sc!=null?' · '+L('ปิดคดีแล้ว','closed')+' '+sc+'/3':''}</span></span></button>`}).join('')}</div>`);
+bxRe=cList;
 bxH=b=>{if(b[0]==='c')cPlay(+b.slice(1))}}
-function cPlay(k){const c=B.cases[k];
-bx('โบนัส 3','คดีที่ '+(k+1)+': '+c.t,'',cList);
+const cTitle=k=>L('คดีที่ ','Case ')+(k+1)+': '+B.cases[k].t;
+function cPlay(k){
+bx(L('โบนัส 3','Bonus 3'),cTitle(k),'',cList);
 CS={k,ph:'brief',pub:0,w:-1,h:-1,y:-1,ok:[false,false]};R.sv=[false,false];
+bxRe=()=>{if(CS){retitle(L('โบนัส 3','Bonus 3'),cTitle(CS.k));cRender()}};
 bxH=v=>{if(/^sv[01]$/.test(v)){const p=+v[2];R.sv=[false,false].map((_,i)=>i===p?!(R.sv||[])[p]:false);cRender();return}caseAct(v,cMe())};
 cRender();window.scrollTo(0,0)}
 const cReady=()=>CS.w>=0&&CS.h>=0&&CS.y>=0;
@@ -837,43 +857,46 @@ function cRender(){if(!CS||!B)return;bxSet(caseHTML());
 if(CS.ph==='done'){const c=B.cases[CS.k],s=store.get('cases2',{}),sc=cScore(c);if(s[c.id]==null||sc>s[c.id]){s[c.id]=sc;store.set('cases2',s)}}
 rsync()}
 function caseHTML(){const k=CS.k,c=B.cases[k],duo=cDuo(),me=cMe(),done=CS.ph==='done';
-const clueList=(arr,tag)=>`<ol class="ev">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
-let h=`<div class="paper"><span class="stamp">ลับ</span><h3>แฟ้มคดี ${k+1} · ${esc(c.tag)} · ${STAR(c.lv)}</h3>${esc(c.story)}</div>
-<div class="field"><span class="lbl">ผู้ต้องสงสัย</span>${c.sus.map(s=>`<div class="susp"><span class="av">${esc(s.n.replace(/^[เแโใไ]/,'')[0])}</span><span><b>${esc(s.n)}</b> <span class="mute">${esc(s.r)}</span><br><span class="soft" style="font-size:14px">${esc(s.m)}</span></span></div>`).join('')}</div>`;
-if(CS.ph==='brief')return h+`<div class="box"><h3>ก่อนเปิดแฟ้ม</h3><ul><li>${duo?'หลักฐานลับจะขึ้นเฉพาะในเครื่องของแต่ละคน':'หลักฐานลับอยู่ในซองของแต่ละคน เปิดดูทีละคน แล้วกดซ่อนก่อนส่งเครื่อง'}</li><li>ห้ามยื่นจอให้อีกคนดู เล่าด้วยคำพูดเท่านั้น จะเล่าทั้งหมดหรือเลือกเล่าก็ได้</li><li>หลักฐานลับของแต่ละคนช่วยได้ครึ่งเดียว ต้องเอามาต่อกันถึงจะปิดคดีได้</li></ul></div>
-<button class="btn" data-b="go">เปิดแฟ้มหลักฐาน</button>`;
+const clueList=arr=>`<ol class="ev">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`;
+const secretOf=p=>L('หลักฐานลับของ ','Secret evidence: ')+esc(nm(p));
+let h=`<div class="paper"><span class="stamp">${L('ลับ','SECRET')}</span><h3>${L('แฟ้มคดี','Case file')} ${k+1} · ${esc(c.tag)} · ${STAR(c.lv)}</h3>${esc(c.story)}</div>
+<div class="field"><span class="lbl">${L('ผู้ต้องสงสัย','Suspects')}</span>${c.sus.map(s=>`<div class="susp"><span class="av">${esc(s.n.replace(/^[เแโใไ]/,'')[0])}</span><span><b>${esc(s.n)}</b> <span class="mute">${esc(s.r)}</span><br><span class="soft" style="font-size:14px">${esc(s.m)}</span></span></div>`).join('')}</div>`;
+if(CS.ph==='brief')return h+`<div class="box"><h3>${L('ก่อนเปิดแฟ้ม','Before you open the file')}</h3><ul><li>${duo?L('หลักฐานลับจะขึ้นเฉพาะในเครื่องของแต่ละคน','Secret evidence shows only on each person\'s own device'):L('หลักฐานลับอยู่ในซองของแต่ละคน เปิดดูทีละคน แล้วกดซ่อนก่อนส่งเครื่อง','Secret evidence is in each person\'s envelope. Open them one at a time and hide before passing the phone')}</li><li>${L('ห้ามยื่นจอให้อีกคนดู เล่าด้วยคำพูดเท่านั้น จะเล่าทั้งหมดหรือเลือกเล่าก็ได้','No showing screens. Tell it in words only, all of it or just what you choose')}</li><li>${L('หลักฐานลับของแต่ละคนช่วยได้ครึ่งเดียว ต้องเอามาต่อกันถึงจะปิดคดีได้','Each person\'s evidence is only half the picture. You need both halves to close the case')}</li></ul></div>
+<button class="btn" data-b="go">${L('เปิดแฟ้มหลักฐาน','Open the evidence')}</button>`;
 // private evidence
-if(done)h+=`<div class="box secret"><h3>หลักฐานลับของ ${esc(nm(0))}</h3>${clueList(c.a)}<h3>หลักฐานลับของ ${esc(nm(1))}</h3>${clueList(c.b)}</div>`;
-else if(duo)h+=`<div class="box secret"><h3>หลักฐานลับของ ${esc(nm(me))}</h3><p class="mute">ขึ้นเฉพาะเครื่องนี้ ห้ามยื่นจอให้ ${esc(nm(1-me))} ดู เล่าด้วยคำพูดเท่านั้น</p>${clueList(me?c.b:c.a)}</div>`;
-else h+=[0,1].map(p=>(R.sv||[])[p]?`<div class="box secret"><h3>หลักฐานลับของ ${esc(nm(p))}</h3><p class="mute">${esc(nm(1-p))} อย่าแอบดู</p>${clueList(p?c.b:c.a)}<button class="btn ghost" data-b="sv${p}">อ่านแล้ว ซ่อนซอง</button></div>`:`<button class="env" data-b="sv${p}"><span class="seal">ลับ</span><span style="flex:1;text-align:left"><b>ซองหลักฐานของ ${esc(nm(p))}</b><span class="mute" style="display:block">ให้ ${esc(nm(p))} เปิดดูคนเดียว</span></span></button>`).join('');
+if(done)h+=`<div class="box secret"><h3>${secretOf(0)}</h3>${clueList(c.a)}<h3>${secretOf(1)}</h3>${clueList(c.b)}</div>`;
+else if(duo)h+=`<div class="box secret"><h3>${secretOf(me)}</h3><p class="mute">${L('ขึ้นเฉพาะเครื่องนี้ ห้ามยื่นจอให้ '+esc(nm(1-me))+' ดู เล่าด้วยคำพูดเท่านั้น','Only on this device. Don\'t show '+esc(nm(1-me))+', tell it in words only')}</p>${clueList(me?c.b:c.a)}</div>`;
+else h+=[0,1].map(p=>(R.sv||[])[p]?`<div class="box secret"><h3>${secretOf(p)}</h3><p class="mute">${L(esc(nm(1-p))+' อย่าแอบดู',esc(nm(1-p))+', no peeking')}</p>${clueList(p?c.b:c.a)}<button class="btn ghost" data-b="sv${p}">${L('อ่านแล้ว ซ่อนซอง','Read it, hide the envelope')}</button></div>`:`<button class="env" data-b="sv${p}"><span class="seal">${L('ลับ','TOP')}</span><span style="flex:1;text-align:left"><b>${L('ซองหลักฐานของ ','Evidence envelope: ')}${esc(nm(p))}</b><span class="mute" style="display:block">${L('ให้ '+esc(nm(p))+' เปิดดูคนเดียว','For '+esc(nm(p))+'\'s eyes only')}</span></span></button>`).join('');
 // shared evidence
-h+=`<div class="field"><span class="lbl">หลักฐานกลาง ${CS.pub}/${c.pub.length}</span>${c.pub.slice(0,CS.pub).map((x,j)=>`<div class="paper" id="pub${j}" style="padding:14px 16px;font-size:15px"><h3>หลักฐานกลาง ${j+1}</h3>${esc(x)}</div>`).join('')}</div>`;
-if(CS.ph==='intel')return h+(CS.pub<c.pub.length?`<button class="btn" data-b="clue">เปิดหลักฐานกลางชิ้นที่ ${CS.pub+1}</button>`:`<button class="btn" data-b="ask">คุยกันครบแล้ว ไปสรุปคดี</button>`);
+h+=`<div class="field"><span class="lbl">${L('หลักฐานกลาง','Shared evidence')} ${CS.pub}/${c.pub.length}</span>${c.pub.slice(0,CS.pub).map((x,j)=>`<div class="paper" id="pub${j}" style="padding:14px 16px;font-size:15px"><h3>${L('หลักฐานกลาง','Shared evidence')} ${j+1}</h3>${esc(x)}</div>`).join('')}</div>`;
+if(CS.ph==='intel')return h+(CS.pub<c.pub.length?`<button class="btn" data-b="clue">${L('เปิดหลักฐานกลางชิ้นที่ '+(CS.pub+1),'Open shared evidence '+(CS.pub+1))}</button>`:`<button class="btn" data-b="ask">${L('คุยกันครบแล้ว ไปสรุปคดี','We\'ve talked it through, solve the case')}</button>`);
 const grp=(key,title,opts,ans)=>`<div class="field"><span class="lbl">${title}</span><div class="opts">${opts.map((o,i)=>{const sel=CS[key]===i,cls=done?(i===ans?' right':sel?' wrong':''):'';return `<button class="opt${cls}" data-b="${key}${i}" aria-pressed="${sel}" ${done?'disabled':''}>${esc(o)}</button>`}).join('')}</div></div>`;
-h+=`<div class="box" id="ans"><h3>${done?'คำตอบของทีม':'สรุปคดีร่วมกัน'}</h3>${done?'':'<p class="mute">เลือกด้วยกันข้อละหนึ่งคำตอบ ถ้าเปลี่ยนคำตอบ ทั้งคู่ต้องกดยืนยันใหม่</p>'}
-${grp('w','1. ใครคือคนร้าย',c.sus.map(s=>s.n),c.who)}${grp('h','2. ทำอย่างไร',c.how.o,c.how.a)}${grp('y','3. ทำไม',c.why.o,c.why.a)}</div>`;
+h+=`<div class="box" id="ans"><h3>${done?L('คำตอบของทีม','Your team\'s answer'):L('สรุปคดีร่วมกัน','Solve it together')}</h3>${done?'':`<p class="mute">${L('เลือกด้วยกันข้อละหนึ่งคำตอบ ถ้าเปลี่ยนคำตอบ ทั้งคู่ต้องกดยืนยันใหม่','Choose one answer per question together. If an answer changes, both must confirm again')}</p>`}
+${grp('w',L('1. ใครคือคนร้าย','1. Who did it?'),c.sus.map(s=>s.n),c.who)}${grp('h',L('2. ทำอย่างไร','2. How?'),c.how.o,c.how.a)}${grp('y',L('3. ทำไม','3. Why?'),c.why.o,c.why.a)}</div>`;
 if(!done){const rd=cReady();
-h+=duo?`<button class="btn ${CS.ok[me]?'':'ghost'}" data-b="ok" ${rd?'':'disabled'} style="${CS.ok[me]?'background:var(--green);color:#fff':''}">${CS.ok[me]?'✓ '+esc(nm(me))+' ยืนยันแล้ว':esc(nm(me))+' กดยืนยันคำตอบนี้'}</button><p class="mute" style="text-align:center">${CS.ok[1-me]?esc(nm(1-me))+' ยืนยันแล้ว':'รอ '+esc(nm(1-me))+' ยืนยัน'}</p>`
-:`<div class="two">${[0,1].map(p=>`<button class="btn ${CS.ok[p]?'':'ghost'}" data-b="ok${p}" ${rd?'':'disabled'} style="${CS.ok[p]?'background:var(--green);color:#fff':''}">${CS.ok[p]?'✓ ':''}${esc(nm(p))} ${CS.ok[p]?'ยืนยันแล้ว':'ยืนยัน'}</button>`).join('')}</div>`;
-return h+`<button class="btn" data-b="reveal" ${rd&&CS.ok[0]&&CS.ok[1]?'':'disabled'}>เปิดเฉลย</button><button class="btn ghost" data-b="back">กลับไปดูหลักฐาน</button>`}
+h+=duo?`<button class="btn ${CS.ok[me]?'':'ghost'}" data-b="ok" ${rd?'':'disabled'} style="${CS.ok[me]?'background:var(--green);color:#fff':''}">${CS.ok[me]?'✓ '+esc(nm(me))+L(' ยืนยันแล้ว',' confirmed'):esc(nm(me))+L(' กดยืนยันคำตอบนี้',': confirm this answer')}</button><p class="mute" style="text-align:center">${CS.ok[1-me]?esc(nm(1-me))+L(' ยืนยันแล้ว',' has confirmed'):L('รอ '+esc(nm(1-me))+' ยืนยัน','Waiting for '+esc(nm(1-me))+' to confirm')}</p>`
+:`<div class="two">${[0,1].map(p=>`<button class="btn ${CS.ok[p]?'':'ghost'}" data-b="ok${p}" ${rd?'':'disabled'} style="${CS.ok[p]?'background:var(--green);color:#fff':''}">${CS.ok[p]?'✓ ':''}${esc(nm(p))} ${CS.ok[p]?L('ยืนยันแล้ว','confirmed'):L('ยืนยัน','confirm')}</button>`).join('')}</div>`;
+return h+`<button class="btn" data-b="reveal" ${rd&&CS.ok[0]&&CS.ok[1]?'':'disabled'}>${L('เปิดเฉลย','Reveal')}</button><button class="btn ghost" data-b="back">${L('กลับไปดูหลักฐาน','Back to the evidence')}</button>`}
 const sc=cScore(c),rw=B.caseReward[String(sc)]||[''],line=rw[k%rw.length];
-return h+`<div class="paper" id="done"><span class="stamp">ปิดคดี ${sc}/3</span><h3>เฉลย: ${esc(c.sus[c.who].n)}</h3>${esc(c.sol)}</div>
-<div class="box"><h3>รางวัลของทีม</h3><p class="soft">${esc(line)}</p></div>
-<div class="two"><button class="btn ghost" data-b="list">เลือกคดีอื่น</button><button class="btn" data-b="next">คดีต่อไป</button></div>`}
+return h+`<div class="paper" id="done"><span class="stamp">${L('ปิดคดี','CLOSED')} ${sc}/3</span><h3>${L('เฉลย','Answer')}: ${esc(c.sus[c.who].n)}</h3>${esc(c.sol)}</div>
+<div class="box"><h3>${L('รางวัลของทีม','Team reward')}</h3><p class="soft">${esc(line)}</p></div>
+<div class="two"><button class="btn ghost" data-b="list">${L('เลือกคดีอื่น','Pick another case')}</button><button class="btn" data-b="next">${L('คดีต่อไป','Next case')}</button></div>`}
 
 /* 4 date themes */
 function dList(){const D=B.dates;
-bx('โบนัส 4',hubT('dates').title,`<p class="soft">เลือกธีมคืนนี้ เตรียมตามรายการ แล้วกดเริ่มเกมการ์ดในระดับที่เข้ากับธีม</p>
-<div class="list">${D.map((t,k)=>`<button class="tile" data-b="d${k}" style="border-top-color:${LV[t.level].dot}"><span class="ti">${svg(['เทียน','สถานที่','หัวใจ','เพลง','น้ำแข็ง','เลือก'][k%6],'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">ธีม ${k+1} · การ์ดระดับ ${t.level} ${LV[t.level].n}</span><b>${esc(t.t)}</b><span class="td">${esc(t.v)}</span></span></button>`).join('')}</div>`);
+bx(L('โบนัส 4','Bonus 4'),hubT('dates').title,`<p class="soft">${L('เลือกธีมคืนนี้ เตรียมตามรายการ แล้วกดเริ่มเกมการ์ดในระดับที่เข้ากับธีม','Pick tonight\'s theme, prepare from the list, then start the card game at the matching level')}</p>
+<div class="list">${D.map((t,k)=>`<button class="tile" data-b="d${k}" style="border-top-color:${LV[t.level].dot}"><span class="ti">${svg(['เทียน','สถานที่','หัวใจ','เพลง','น้ำแข็ง','เลือก'][k%6],'#FFE8A3',1.5)}</span><span style="flex:1"><span class="ts">${L('ธีม '+(k+1)+' · การ์ดระดับ '+t.level+' '+LV[t.level].n,'Theme '+(k+1)+' · card level '+t.level+' '+LVE[t.level])}</span><b>${esc(t.t)}</b><span class="td">${esc(t.v)}</span></span></button>`).join('')}</div>`);
+bxRe=dList;
 bxH=b=>{if(b[0]==='d')dTheme(+b.slice(1))}}
-function dTheme(k){const t=B.dates[k];
-bx('โบนัส 4',t.t,`<p class="soft">${esc(t.v)}</p>
-<div class="box"><h3>เตรียมห้องและตัว</h3>${ul(t.setup)}</div>
-<div class="box"><h3>เมนูคืนนี้</h3><dl class="dl"><dt>เพลง</dt><dd>${esc(t.music)}</dd><dt>อาหาร</dt><dd>${t.food.map(esc).join('<br>')}</dd><dt>เครื่องดื่ม</dt><dd>${esc(t.drink.a)}</dd><dt>ไม่มีแอลกอฮอล์</dt><dd>${esc(t.drink.m)}</dd></dl></div>
-<div class="box"><h3>ลำดับคืนนี้</h3><ol class="steps">${t.flow.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol></div>
-<button class="btn" data-b="play">เริ่มเกมการ์ดตามธีมนี้ (ระดับ ${t.level})</button>
-${/มือที่รู้ใจ/.test(t.flow.join(''))?'<button class="btn ghost" data-b="massage">เปิดโหมดนวด มือที่รู้ใจ</button>':''}
-<p class="mute" style="text-align:center">ดื่มแต่พอดี ทั้งสองคนต้องมีสติพอจะยินยอมตลอดเกม</p>`,dList);
+function dTheme(k){const t=B.dates[k],massage=/มือที่รู้ใจ/.test(BT.dates[k].flow.join(''));
+bx(L('โบนัส 4','Bonus 4'),t.t,`<p class="soft">${esc(t.v)}</p>
+<div class="box"><h3>${L('เตรียมห้องและตัว','Set the room and yourselves')}</h3>${ul(t.setup)}</div>
+<div class="box"><h3>${L('เมนูคืนนี้','Tonight\'s menu')}</h3><dl class="dl"><dt>${L('เพลง','Music')}</dt><dd>${esc(t.music)}</dd><dt>${L('อาหาร','Food')}</dt><dd>${t.food.map(esc).join('<br>')}</dd><dt>${L('เครื่องดื่ม','Drinks')}</dt><dd>${esc(t.drink.a)}</dd><dt>${L('ไม่มีแอลกอฮอล์','Alcohol-free')}</dt><dd>${esc(t.drink.m)}</dd></dl></div>
+<div class="box"><h3>${L('ลำดับคืนนี้','Running order')}</h3><ol class="steps">${t.flow.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol></div>
+<button class="btn" data-b="play">${L('เริ่มเกมการ์ดตามธีมนี้ (ระดับ '+t.level+')','Start the card game for this theme (level '+t.level+')')}</button>
+${massage?`<button class="btn ghost" data-b="massage">${L('เปิดโหมดนวด มือที่รู้ใจ','Open Hands That Know massage')}</button>`:''}
+<p class="mute" style="text-align:center">${L('ดื่มแต่พอดี ทั้งสองคนต้องมีสติพอจะยินยอมตลอดเกม','Drink in moderation. You both need to stay clear-headed enough to consent the whole time')}</p>`,dList);
+bxRe=()=>dTheme(k);
 bxH=b=>{if(b==='play'){cfg.level=t.level;if(isMix())cfg.mode='prog';saveDeck();openSetup()}else if(b==='massage')mSetup()}}
 
 /* two devices: the device that creates the room runs the game; after every change it sends a
@@ -954,8 +977,8 @@ function rCase(cs,moved){loadB().then(()=>{const n=B.cases.length,k=num(cs.k,0,n
 const v={k,ph:['brief','intel','ans','done'].includes(cs.ph)?cs.ph:'brief',pub:num(cs.pub,0,c.pub.length),w:num(cs.w,-1,c.sus.length-1),h:num(cs.h,-1,3),y:num(cs.y,-1,3),ok:[0,1].map(i=>!!(cs.ok||[])[i])};
 const cur=curScr();
 if(!(moved||(cur==='bx'&&R.caseView))){rui();return}   // stepped away on purpose: stay there
-if(!(cur==='bx'&&R.caseView&&CS&&CS.k===k)){bx('โบนัส 3','คดีที่ '+(k+1)+': '+c.t,'',cList);bxH=null;window.scrollTo(0,0)}
-CS=v;R.caseView=true;cRender()}).catch(()=>{})}
+if(!(cur==='bx'&&R.caseView&&CS&&CS.k===k)){bx(L('โบนัส 3','Bonus 3'),cTitle(k),'',cList);bxH=null;window.scrollTo(0,0)}
+CS=v;R.caseView=true;bxRe=()=>{if(CS){retitle(L('โบนัส 3','Bonus 3'),cTitle(CS.k));cRender()}};cRender()}).catch(()=>{})}
 function rOvClose(){if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}R.ovKey=null}
 function rOv(){const key=JSON.stringify([S.ov,S.ready]);if(key===R.ovKey)return;
 if(!S.ov){rOvClose();return}
