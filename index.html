@@ -166,6 +166,8 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .rcode{font-size:44px;font-weight:700;letter-spacing:6px;color:var(--goldi);font-variant-numeric:tabular-nums;line-height:1.2}
 .qr svg{display:block;border-radius:12px;width:200px;height:200px}
 .rstat{text-align:center;color:#FFD8A8;font-weight:600}.rstat.ok{color:#8CE99A}
+.cnote{margin:0;border-radius:10px;background:#2A1218;border:1px solid #7A1A2A;color:#FFC9C9;padding:8px 12px;font-size:14px;text-align:center}
+.rules{display:flex;flex-direction:column;gap:4px;border-radius:12px;border:1px dashed #5A4228;padding:10px 14px;font-size:14px;color:var(--soft)}.rules b{color:var(--goldi);font-size:13px}
 .xchip{margin-top:8px;border-color:#B3122E;color:#FF8A9A;background:#2A1218}
 /* สืบซ่อนรัก */
 .secret{border:1px dashed #B3122E;background:#1F1014}
@@ -267,11 +269,13 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <div class="bar" aria-hidden="true"><i id="prog" style="width:0"></i></div>
 <div class="col pl">
 <div class="turn"><span style="font-size:17px;font-weight:600" id="who"></span><span class="mute" id="whoto"></span></div>
+<p class="cnote" id="cnote" hidden></p>
 <article class="card" id="card" aria-live="polite"></article>
 </div>
 <div class="col pr">
 <div id="ctl"></div>
 <p class="mute" style="text-align:center" id="passes"></p>
+<div class="rules" id="rules" hidden></div>
 </div>
 </section>
 
@@ -435,13 +439,13 @@ const poolLv=()=>isMix()?S.lvls:[S.level];
 function deckFor(){const p=poolLv();return shuffle(ALL.filter(c=>p.includes(c.l)&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]))}
 function newDeck(){S.deck=deckFor();S.total=S.deck.length}
 function startGame(){const lv=selLv();
-S={turn:0,level:isMix()?lv[0]:cfg.level,lvls:lv,used:{},deck:[],total:0,inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>['SP-05','SP-06','SP-07','SP-08','SP-09'].includes(c.code))),maxLevel:isMix()?lv[lv.length-1]:cfg.level,card:null};
+S={turn:0,level:isMix()?lv[0]:cfg.level,lvls:lv,used:{},deck:[],total:0,inLevel:0,asked:{},played:[],passes:[2,2],mode:'signal',left:0,dbl:false,specials:shuffle(ALL.filter(c=>['SP-05','SP-06','SP-07','SP-08','SP-09'].includes(c.code))),maxLevel:isMix()?lv[lv.length-1]:cfg.level,card:null,rules:[],noteK:null,noteNext:null,rp:false,pickL:0};
 newDeck();lastCard=null;
 if(lv.includes(5))S.card=ALL.find(c=>c.code==='X-01');
 draw(!!S.card);show('play')}
 function draw(keep){
 stopTimer();
-if(!keep){
+if(!keep){S.noteK=S.noteNext||null;S.noteNext=null;S.rp=false;
 if(cfg.sp&&S.specials.length&&S.inLevel>2&&S.deck.length&&Math.random()<0.12)S.card=S.specials.pop();
 else{S.card=S.deck.pop()||null;if(S.card){S.used[S.card.code]=1;S.inLevel++}}}
 S.mode=S.card&&(S.card.l===0||S.card.code==='X-01')?'special':'signal';
@@ -452,7 +456,28 @@ if(S.inLevel===9&&S.level<4&&!S.asked[S.level]){S.asked[S.level]=1;levelUp(S.lev
 else if(S.inLevel===9&&S.level===4&&cfg.x5&&!S.asked[4]){S.asked[4]=1;levelUp(5)}
 }
 function setLevel(l){S.level=l;S.maxLevel=Math.max(S.maxLevel,l);S.inLevel=0;newDeck()}
-function next(){if(S.card)S.played.push(S.card);S.turn=1-S.turn;draw()}
+function next(){if(S.card){S.played.push(S.card);if(S.card.code==='L4-34')S.noteNext='carry'}S.turn=1-S.turn;draw()}
+/* cards that need the app to act: L4-15 (replay a played card at double time), SP-06 (partner
+   picks a pile), SP-08 (a new house rule kept on screen), SP-05 (swap roles), SP-09 (level menu) */
+const noteText=()=>S.rp?'ทำซ้ำการ์ดที่เคยเล่น · เวลานานขึ้น 2 เท่า':S.noteK==='swap'?'สลับบท: ใบนี้ '+reader()+' ได้เป็นฝ่ายสั่งแทน':S.noteK==='pick'?reader()+' เลือกการ์ดใบนี้จากกองระดับ '+S.pickL+' ให้ '+listener():S.noteK==='carry'?'กติกาจากใบก่อน: ใช้ได้แค่ปากหรือมือ ตามที่เลือกไว้':'';
+const playedList=()=>[...new Map((S.played||[]).filter(c=>c&&c.l>0&&c.code!=='L4-15').map(c=>[c.code,c])).values()];
+const oid=code=>String(code).replace(/[^A-Za-z0-9]/g,'');
+function replayMenu(){const list=playedList();S.ov={k:'replay'};
+overlay(`<h2 id="ov-t">เลือกการ์ดที่เล่นไปแล้ว</h2><p class="soft">เลือก 1 ใบให้ทำซ้ำ เวลาจะนานขึ้น 2 เท่า</p>${list.length?`<div class="list" style="width:100%;max-height:52vh;overflow:auto;text-align:left">${list.map(c=>`<button class="lv" data-o="P${oid(c.code)}" style="min-height:56px;padding:8px 14px"><span class="dot" style="background:${LV[c.l].dot}"></span><span style="flex:1">${esc(cText(c))}</span><span class="note">${c.secs?tlabel(c.secs*2):''}</span></button>`).join('')}</div>`:'<p class="mute">ยังไม่มีการ์ดที่เล่นไปแล้ว</p>'}<button class="btn ghost" data-o="skip">${list.length?'ไม่ทำซ้ำ ข้ามใบนี้':'ใบต่อไป'}</button>`);
+S.ovh=o=>{if(o[0]==='P'){const c=list.find(x=>oid(x.code)===o.slice(1));if(!c)return true;closeOv();S.card=c;S.rp=true;S.left=c.secs?c.secs*2:0;S.mode='doing';render();startTimer();return true}
+if(o==='skip'){closeOv();next();return true}return false}}
+const pileLeft=l=>S.used?ALL.filter(c=>c.l===l&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]).length:((S.pk||{})[l]||0);
+function pickMenu(){const lv=[1,2,3,4].concat(cfg.x5?[5]:[]);S.ov={k:'pick'};
+overlay(`<h2 id="ov-t">คู่เลือกให้</h2><p class="soft">${esc(reader())} เลือกกองให้ ${esc(listener())} แล้วแอปจะสุ่มการ์ด 1 ใบจากกองนั้นให้ทำ</p>${lv.map(l=>`<button class="lv" data-o="K${l}" ${pileLeft(l)?'':'disabled'}><span class="dot" style="background:${LV[l].dot}"></span><span>${l} ${LV[l].n}</span><span class="note">เหลือ ${pileLeft(l)} ใบ</span></button>`).join('')}<button class="btn ghost" data-o="skip">ข้าม ไปใบต่อไป</button>`);
+S.ovh=o=>{if(o[0]==='K'){const l=+o[1],pool=shuffle(ALL.filter(c=>c.l===l&&c.code!=='X-01'&&!cfg.ex.includes(c.icon)&&!S.used[c.code]));if(!pool.length)return true;
+const c=pool[0];closeOv();S.used[c.code]=1;S.deck=S.deck.filter(x=>x.code!==c.code);S.card=c;S.noteK='pick';S.pickL=l;S.rp=false;S.mode='signal';S.left=c.secs;stopTimer();render();return true}
+if(o==='skip'){closeOv();S.turn=1-S.turn;draw();return true}return false}}
+function ruleMenu(){S.ov={k:'rule'};const guest=R.role==='guest';
+overlay(`<h2 id="ov-t">ตั้งกติกาใหม่</h2><p class="soft">ตกลงกันให้ได้ 1 ข้อ ใช้จนจบเกม เช่น ห้ามจูบปาก หรือ ทุกใบต้องทำโดยไม่ใส่เสื้อ</p>${guest?'<p class="mute">พิมพ์กติกาที่เครื่องหลัก</p>':'<input type="text" id="ruleIn" maxlength="80" placeholder="กติกาข้อใหม่" style="width:100%">'}<button class="btn" data-o="rok">ทั้งคู่เห็นด้วย บันทึกกติกา</button><button class="btn ghost" data-o="skip">ไม่ตั้ง ข้ามไป</button>`);
+const inp=$('ruleIn');if(inp)setTimeout(()=>inp.focus(),50);
+S.ovh=o=>{if(o==='rok'){const t=String((($('ruleIn')||{}).value)||'').trim().slice(0,80);if(!t){const i=$('ruleIn');if(i)i.focus();return true}
+S.rules=(S.rules||[]).concat(t).slice(-5);closeOv();S.turn=1-S.turn;draw();return true}
+if(o==='skip'){closeOv();S.turn=1-S.turn;draw();return true}return false}}
 const reader=()=>cfg.names[S.turn],listener=()=>cfg.names[1-S.turn];
 
 function render(){
@@ -462,6 +487,8 @@ $('lvdot').style.background=LV[top].dot;$('lvname').textContent=mixed?'ผสม
 $('prog').style.width=(cfg.mode==='prog'?Math.min(100,S.inLevel/9*100):S.total?(S.total-deckN)/S.total*100:0)+'%';
 $('who').textContent='ตาของ'+reader();$('whoto').textContent='อ่านออกเสียงให้'+listener()+'ฟัง';
 $('passes').textContent='บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ';
+{const n=c?noteText():'';$('cnote').hidden=!n;$('cnote').textContent=n;
+const rl=Array.isArray(S.rules)?S.rules:[];$('rules').hidden=!rl.length;$('rules').innerHTML=rl.length?'<b>กติกาคืนนี้</b>'+rl.map((t,i)=>`<span>${i+1}. ${esc(t)}</span>`).join(''):''}
 if(!c){const what=mixed?'กองผสมระดับ '+rangeTxt(lvs):'ระดับ '+S.level;
 $('card').innerHTML=`<div class="cbody"><p class="ctext">การ์ดในกองหมดแล้ว</p><p style="color:#6B5A4A">เล่นครบทุกใบของ${what} แล้ว สับกองใหม่เพื่อเอาการ์ดที่เล่นแล้วกลับมา${mixed?'':' หรือแตะปุ่มระดับด้านบนเพื่อเปลี่ยนระดับ'} หรือไปหลังเกม${cfg.ex.length?' (หมวดที่ซ่อนไว้จะไม่ถูกสุ่ม)':''}</p></div>`;
 $('ctl').innerHTML='<div class="two"><button class="btn ghost" data-a="reshuffle">สับกองใหม่</button><button class="btn" data-a="finish">ไปหลังเกม</button></div>';rsync();return}
@@ -483,21 +510,27 @@ const m=S.mode,lp=S.passes[1-S.turn];let h='';
 if(m==='signal')h=`<p class="mute" style="text-align:center;margin-bottom:8px">${esc(listener())} ชูไฟให้การ์ดใบนี้</p><div class="sig"><button class="g" data-a="green">ไฟเขียว</button><button class="y" data-a="yellow">ไฟเหลือง</button><button class="r" data-a="red">ไฟแดง</button></div>`;
 else if(m==='yellow')h=`<p style="text-align:center;color:#FFD8A8;margin-bottom:8px">ไฟเหลือง: ทำให้เบาลง หรือข้ามใบนี้</p><div class="two"><button class="btn ghost" data-a="green">ทำแบบเบาลง</button><button class="btn" data-a="pass" ${lp?'':'disabled'}>ใช้บัตรผ่าน (${lp})</button></div><button class="btn ghost" data-a="back" style="margin-top:10px;min-height:44px">กลับไปเลือกไฟใหม่</button>`;
 else if(m==='doing')h=S.left?`<div style="display:flex;align-items:center;gap:14px"><span class="clock" id="clock">${fmt(S.left)}</span><button class="btn ghost" data-a="next">${S.left?'เสร็จแล้ว ใบต่อไป':'หมดเวลา ใบต่อไป'}</button></div>`:`<button class="btn" data-a="next">เสร็จแล้ว ใบต่อไป</button>`;
-else if(m==='special')h=`<div class="two">${S.left?'<button class="btn ghost" data-a="time">เริ่มจับเวลา</button>':''}<button class="btn" data-a="sp" style="${S.left?'':'grid-column:1/-1'}">รับทราบ ใบต่อไป</button></div>`;
+else if(m==='special'){const code=S.card&&S.card.code,lab={'SP-06':'เลือกกองการ์ดให้คู่','SP-08':'ตั้งกติกาข้อใหม่'}[code]||'รับทราบ ใบต่อไป';
+h=`<div class="two">${S.left?'<button class="btn ghost" data-a="time">เริ่มจับเวลา</button>':''}<button class="btn" data-a="sp" style="${S.left?'':'grid-column:1/-1'}">${lab}</button></div>${code==='SP-09'?'<button class="btn ghost" data-a="lvl" style="margin-top:10px">เปลี่ยนระดับ</button>':''}`}
 $('ctl').innerHTML=h;rsync()}
 
 function startTimer(){stopTimer();if(!S.left)return;timer=setInterval(()=>{S.left--;const el=$('clock');if(S.left<=0){S.left=0;stopTimer();renderCtl();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}return}if(el)el.textContent=fmt(S.left);if(R.role==='host'&&R.peer)rsend({k:'tick',left:S.left})},1000)}
 function stopTimer(){if(timer){clearInterval(timer);timer=null}}
 
 $('ctl').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a;
-if(a==='green'){S.mode='doing';render();startTimer()}
+if(a==='green'){if(S.card&&S.card.code==='L4-15'&&!S.rp){replayMenu();return}S.mode='doing';render();startTimer()}
 else if(a==='yellow'){S.mode='yellow';renderCtl()}
 else if(a==='back'){S.mode='signal';renderCtl()}
 else if(a==='red'){stopTimer();redStop()}
 else if(a==='pass'){const k=1-S.turn;if(S.passes[k]>0){S.passes[k]--;S.turn=1-S.turn;draw()}}
 else if(a==='next')next();
 else if(a==='time'){S.mode='doing';render();startTimer()}
-else if(a==='sp'){if(S.card.code==='SP-07')S.dbl=true;S.turn=1-S.turn;draw()}
+else if(a==='sp'){const code=S.card.code;
+if(code==='SP-06'){pickMenu();return}
+if(code==='SP-08'){ruleMenu();return}
+if(code==='SP-05'){S.noteNext='swap';draw();return}   // same reader again: the one who would be told now tells
+if(code==='SP-07')S.dbl=true;S.turn=1-S.turn;draw()}
+else if(a==='lvl'){S.ovh=null;levelMenu()}
 else if(a==='reshuffle'){const p=poolLv();for(const k in S.used){const c=ALL.find(x=>x.code===k);if(c&&p.includes(c.l))delete S.used[k]}S.inLevel=0;newDeck();draw()}
 else if(a==='finish')toEnd()});
 
@@ -794,14 +827,16 @@ bxH=b=>{if(b==='play'){cfg.level=t.level;if(isMix())cfg.mode='prog';saveDeck();o
    small snapshot (card code, level, turn, overlay) through the relay and the other device draws
    the same screen from its own cards.json. Buttons pressed on the other device are sent back
    and pressed on the host, so both always show the same thing. */
-if(/^(127.0.0.1|localhost)$/.test(location.hostname))window.__R=R;   // local test hook only
+if(/^(127\.0\.0\.1|localhost)$/.test(location.hostname)){window.__R=R;window.__T={force:(code,mode)=>{S.card=ALL.find(c=>c.code===code);S.mode=mode||(S.card.l===0?"special":"signal");S.left=S.card.secs;S.rp=false;S.noteK=null;render()},get S(){return S}}}   // local test hooks only
 const curScr=()=>(document.querySelector('.scr.on')||{}).id;
 const wsUrl=()=>/^(127\.0\.0\.1|localhost)$/.test(location.hostname)?'ws://127.0.0.1:8799/ws':(location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws';
 const inviteUrl=()=>location.origin+location.pathname+'#join='+R.code;
 const ssSave=()=>{try{R.code&&R.tok?sessionStorage.setItem('frm-room',JSON.stringify({code:R.code,tok:R.tok,role:R.role})):sessionStorage.removeItem('frm-room')}catch(e){}};
 function rsend(d){if(R.ws&&R.ws.readyState===1)R.ws.send(JSON.stringify({t:'msg',d}))}
 function snap(){const scr=curScr(),on=scr==='play'||scr==='end';
-return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,cr:cfg.crude,cs:scr==='bx'&&CS?CS:null,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null}:null}}
+return{scr,names:cfg.names,x5:cfg.x5,safe:cfg.safe,dm:cfg.mode,cr:cfg.crude,cs:scr==='bx'&&CS?CS:null,g:on?{lvls:S.lvls,total:S.total,deckN:Array.isArray(S.deck)?S.deck.length:0,turn:S.turn,level:S.level,inLevel:S.inLevel,passes:S.passes,mode:S.mode,left:S.left,maxLevel:S.maxLevel,card:S.card?S.card.code:null,played:(S.played||[]).length,ov:S.ov||null,ready:S.ready||null,
+pl:(S.played||[]).filter(Boolean).map(c=>c.code).slice(-200),rules:S.rules||[],nk:S.noteK||null,rp:!!S.rp,pkl:S.pickL||0,
+pk:S.ov&&S.ov.k==='pick'?Object.fromEntries([1,2,3,4,5].map(l=>[l,pileLeft(l)])):null}:null}}
 function rsync(){if(R.role!=='host'||!R.peer||R.q)return;R.q=1;setTimeout(()=>{R.q=0;rsend({k:'snap',s:snap()})},0)}
 function rOpen(first){
 if(R.ws){const o=R.ws;R.ws=null;o.onclose=null;try{o.close()}catch(e){}}
@@ -847,10 +882,12 @@ cfg.names=(Array.isArray(s.names)?s.names:[]).slice(0,2).map(x=>String(x||'').sl
 cfg.x5=!!s.x5;cfg.safe=String(s.safe||'').slice(0,20);if(DM[s.dm])cfg.mode=s.dm;
 if(!!s.cr!==cfg.crude){cfg.crude=!!s.cr;if(cfg.crude)loadX().then(()=>{if(curScr()==='play')render();else if(curScr()==='end')endView()})}
 if((scr==='play'||scr==='end')&&g&&typeof g==='object'){
-const ov=g.ov&&typeof g.ov==='object'&&['red','up','menu'].includes(g.ov.k)?{k:g.ov.k,to:num(g.ov.to,1,5)}:null;
+const ov=g.ov&&typeof g.ov==='object'&&['red','up','menu','replay','pick','rule'].includes(g.ov.k)?{k:g.ov.k,to:num(g.ov.to,1,5)}:null;
 Object.assign(S,{turn:num(g.turn,0,1),level:num(g.level,1,5),inLevel:num(g.inLevel,0,999),passes:[0,1].map(i=>num((g.passes||[])[i],0,9)),
 mode:['signal','yellow','doing','special'].includes(g.mode)?g.mode:'signal',left:num(g.left,0,3600),maxLevel:num(g.maxLevel,1,5),
-played:new Array(num(g.played,0,999)),ready:[0,1].map(i=>!!(g.ready||[])[i]),ov,
+played:(Array.isArray(g.pl)?g.pl:[]).slice(-200).map(k=>ALL.find(c=>c.code===k)).filter(Boolean),
+rules:(Array.isArray(g.rules)?g.rules:[]).slice(-5).map(t=>String(t).slice(0,80)),noteK:['swap','pick','carry'].includes(g.nk)?g.nk:null,rp:!!g.rp,pickL:num(g.pkl,0,5),
+pk:g.pk&&typeof g.pk==='object'?Object.fromEntries([1,2,3,4,5].map(l=>[l,num(g.pk[l],0,999)])):null,used:undefined,ready:[0,1].map(i=>!!(g.ready||[])[i]),ov,
 total:num(g.total,0,999),deckN:num(g.deckN,0,999),deck:undefined});
 S.lvls=[...new Set((Array.isArray(g.lvls)?g.lvls:[]).map(x=>num(x,1,5)))].sort();if(!S.lvls.length)S.lvls=[S.level];
 S.card=ALL.find(c=>c.code===g.card)||null;
@@ -870,7 +907,7 @@ function rOvClose(){if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}R
 function rOv(){const key=JSON.stringify([S.ov,S.ready]);if(key===R.ovKey)return;
 if(!S.ov){rOvClose();return}
 R.ovKey=key;R.gameOv=true;
-if(S.ov.k==='red')redStop();else if(S.ov.k==='up')levelUp(S.ov.to,true);else levelMenu()}
+const k=S.ov.k;if(k==='red')redStop();else if(k==='up')levelUp(S.ov.to,true);else if(k==='replay')replayMenu();else if(k==='pick')pickMenu();else if(k==='rule')ruleMenu();else levelMenu()}
 /* guest taps go to the host instead of acting locally */
 document.addEventListener('click',e=>{if(R.role!=='guest')return;const scr=curScr();
 if(scr==='bx'&&R.caseView){let b;
