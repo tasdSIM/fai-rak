@@ -43,7 +43,8 @@ services:
     image: cloudflare/cloudflared:2026.10.1
     container_name: fai-rak-tunnel
     restart: unless-stopped
-    command: tunnel --no-autoupdate run
+    # http2 over TCP 443: the VM's network drops outbound UDP, so the default QUIC never connects.
+    command: tunnel --no-autoupdate --protocol http2 run
     env_file: tunnel.env
     depends_on: [fai-rak]
     logging:
