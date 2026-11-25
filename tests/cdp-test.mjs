@@ -38,8 +38,12 @@ await click('[data-b=done]'); await click('[data-b=list]'); await shot('nights-a
 await click('#bxBack');
 // 3 cases
 await click('[data-h=cases]'); await shot('cases-list');
-await click('[data-b=c0]'); for (let j = 0; j < 6; j++) await click('[data-b=clue]'); await shot('case-clues');
-await click('[data-b=p01]'); await click('[data-b=p12]'); await shot('case-guess');
+// co-op flow on one device (cdp-case2 covers all 20 cases and two devices): brief, each player's
+// sealed envelope, shared clues, the joint 3-part answer, both agree, reveal
+await click('[data-b=c0]'); await click('[data-b=go]'); await shot('case-brief');
+await click('[data-b=sv0]'); await click('[data-b=sv0]'); for (let j = 0; j < 3; j++) await click('[data-b=clue]'); await shot('case-clues');
+await click('[data-b=ask]'); await click('[data-b=w3]'); await click('[data-b=h0]'); await click('[data-b=y1]');
+await click('[data-b=ok0]'); await click('[data-b=ok1]'); await shot('case-answer');
 await click('[data-b=reveal]'); await shot('case-reveal');
 await click('[data-b=list]'); await click('#bxBack');
 // 4 dates

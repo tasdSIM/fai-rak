@@ -26,22 +26,22 @@ const A = await browser('A', 9371), B = await browser('B', 9372);
 const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:4}))`); };
 await prep(A, true); await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 console.log('chip hidden at start:', await A.ev(`document.getElementById('xchip').hidden`));
-await A.ev(`(()=>{for(let i=0;i<4;i++)document.getElementById('s-t').click()})()`); console.log('4 taps -> dialog?', await A.ev(`document.getElementById('ov').classList.contains('on')`));
-await A.click('#s-t'); await sleep(300); console.log('5th tap -> dialog:', await A.ev(`document.getElementById('ov-t')?.textContent`)); await A.shot('dialog');
+await A.ev(`(()=>{const t=(()=>{const e=document.getElementById('s-t');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));e.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))});for(let i=0;i<4;i++)t()})()`); console.log('4 taps -> dialog?', await A.ev(`document.getElementById('ov').classList.contains('on')`));
+await A.ev(`(()=>{const e=document.getElementById('s-t');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));e.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))})()`); await sleep(300); console.log('5th tap -> dialog:', await A.ev(`document.getElementById('ov-t')?.textContent`)); await A.shot('dialog');
 await A.click('[data-x=on]'); console.log('no consent err:', await A.ev(`document.getElementById('xerr').textContent`));
 await A.click('#xok0'); await A.click('#xok1'); await A.click('[data-x=on]'); await sleep(800);
 console.log('after on: chip shown', await A.ev(`!document.getElementById('xchip').hidden`), 'stored', await A.ev(`localStorage.getItem('frm-crude')`)); await A.shot('setup-chip');
 // find a strong-word card on level 4
-const findX = X => X.ev(`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));const xt=await (await fetch('cards-x.json')).json();
+const findX = X => X.ev(`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));let xt=await (await fetch('cards-x.json')).json();xt=xt.th||xt;const q=x=>document.querySelector(x),ovb=()=>{const o=q('#ovbody button');if(o){o.click();return 1}};
  for(let i=0;i<60;i++){const code=document.querySelector('#card .chead span:nth-child(2)')?.textContent.split(' ')[0];const txt=document.querySelector('#card .ctext')?.textContent;
   if(xt[code])return JSON.stringify({code,shown:txt,match:txt===xt[code]});
-  const a=[...document.querySelectorAll('#ctl button')].map(b=>b.dataset.a);if(a.includes('green')){document.querySelector('#ctl [data-a=green]').click();await s(2);document.querySelector('#ctl [data-a=next]').click()}else if(a.includes('sp'))document.querySelector('#ctl [data-a=sp]').click();else return 'stuck '+a;await s(5)}return 'none found'})()`);
+  const a=[...document.querySelectorAll('#ctl button')].map(b=>b.dataset.a);if(a.includes('green')){q('#ctl [data-a=green]').click();await s(2);const n=q('#ctl [data-a=next]');if(n)n.click();else ovb()}else if(a.includes('sp'))q('#ctl [data-a=sp]').click();else if(a.includes('next'))q('#ctl [data-a=next]').click();else if(!ovb())return 'stuck '+a;await s(5)}return 'none found'})()`);
 await A.click('#start'); await sleep(500); const fx = await findX(A); console.log('single device strong card:', fx); await A.shot('play-strong');
 // turn off from the chip -> same card shows normal text
 await A.click('#toSetup'); await sleep(200); await A.click('#xchip'); await sleep(200); await A.click('[data-x=off]'); await sleep(200);
 console.log('after off: chip hidden', await A.ev(`document.getElementById('xchip').hidden`));
 // two devices: host turns it on, guest must show the strong text too
-await A.ev(`(()=>{for(let i=0;i<5;i++)document.getElementById('s-t').click()})()`); await sleep(200); await A.click('#xok0'); await A.click('#xok1'); await A.click('[data-x=on]'); await sleep(500);
+await A.ev(`(()=>{const t=(()=>{const e=document.getElementById('s-t');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));e.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))});for(let i=0;i<5;i++)t()})()`); await sleep(200); await A.click('#xok0'); await A.click('#xok1'); await A.click('[data-x=on]'); await sleep(500);
 await A.click('#toRoom'); await sleep(300); await A.click('[data-r=create]'); await sleep(1500);
 const code = await A.ev(`document.querySelector('.rcode')?.textContent.replace(/[^0-9]/g,'')`);
 await prep(B, false); await B.cmd('Page.navigate', { url: 'about:blank' }); await sleep(200); await B.cmd('Page.navigate', { url: URL + '#join=' + code }); await sleep(2500);

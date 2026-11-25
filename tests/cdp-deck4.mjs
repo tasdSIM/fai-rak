@@ -16,19 +16,21 @@ await cmd('Runtime.enable'); await cmd('Page.enable');
 await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
 await cmd('Page.navigate', { url: URL }); await sleep(1200);
 await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
-// play the whole deck; returns {codes, levels, ups, end}
-const run = () => ev(`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));const codes=[],ups=[];let guard=0;
+// play the whole deck; returns {codes, levels, ups, end}. Cards like L4-15 open a menu after green:
+// its skip button (data-o=skip) is taken, like stay on the level-up question. SP-21 brings the last
+// card back on purpose; that repeat is counted apart, so REPEATED means a real repeat.
+const run = () => ev(`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));const codes=[],ups=[];let guard=0,lastSp='',replays=0;
 while(guard++<400){const ov=document.getElementById('ov').classList.contains('on');
- if(ov){ups.push(document.getElementById('ov-t').textContent);const st=document.querySelector('#ovbody [data-o=stay]');if(st){st.click();await s(5);continue}break}
+ if(ov){ups.push(document.getElementById('ov-t').textContent);const st=document.querySelector('#ovbody [data-o=stay]')||document.querySelector('#ovbody [data-o=skip]');if(st){st.click();await s(5);continue}break}
  const a=[...document.querySelectorAll('#ctl button')].map(b=>b.dataset.a);
- if(a.includes('reshuffle'))return {codes,ups,end:document.querySelector('#card .ctext').textContent,chip:document.getElementById('lvname').textContent};
+ if(a.includes('reshuffle'))return {codes,ups,replays,end:document.querySelector('#card .ctext').textContent,chip:document.getElementById('lvname').textContent};
  const code=document.querySelector('#card .chead span:nth-child(2)').textContent.split(' ')[0];
- if(a.includes('green')){codes.push(code);document.querySelector('#ctl [data-a=green]').click();await s(2);document.querySelector('#ctl [data-a=next]').click()}
- else if(a.includes('sp'))document.querySelector('#ctl [data-a=sp]').click();
- else return {codes,ups,stuck:a.join(',')};
- await s(2)}return {codes,ups,guard}})()`);
+ if(a.includes('green')){if(lastSp==='SP-21'&&codes.includes(code))replays++;else codes.push(code);lastSp='';document.querySelector('#ctl [data-a=green]').click();await s(2);const n=document.querySelector('#ctl [data-a=next]');if(n)n.click()}
+ else if(a.includes('sp')){lastSp=code;document.querySelector('#ctl [data-a=sp]').click()}
+ else return {codes,ups,replays,stuck:a.join(',')};
+ await s(2)}return {codes,ups,replays,guard}})()`);
 const report = (name, r) => { const lv = r.codes.map(c => c.split('-')[0]); const uniq = new Set(r.codes).size;
-  console.log(name, '| drawn', r.codes.length, 'unique', uniq, '| levels', [...new Set(lv)].join(','), '| overlays', JSON.stringify(r.ups), '| end:', r.end, '| chip:', r.chip, r.stuck ? 'STUCK ' + r.stuck : ''); };
+  console.log(name, '| drawn', r.codes.length, 'unique', uniq, '| SP-21 replays', r.replays, '| levels', [...new Set(lv)].join(','), '| overlays', JSON.stringify(r.ups), '| end:', r.end, '| chip:', r.chip, r.stuck ? 'STUCK ' + r.stuck : '', uniq < r.codes.length ? 'REPEATED ' + r.codes.filter((c, i) => r.codes.indexOf(c) !== i).join(',') : ''); };
 const counts = await ev(`JSON.stringify([...document.querySelectorAll('#levels .note')].map(e=>e.textContent))`); console.log('notes', counts);
 // 1) one level only
 await click('[data-dm=one]'); await click('#levels [data-l="4"]'); await shot('setup-one');
