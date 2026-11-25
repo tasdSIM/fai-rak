@@ -27,6 +27,7 @@ node tests/cdp-room.mjs <shots-folder> http://127.0.0.1:8765/index.html
 | `cdp-lang2.mjs` | EN / ไทย button in the card game: chosen language big, the other small |
 | `cdp-how.mjs` | how-to-play page before the game: skip, don't show again, open from setup |
 | `cdp-lang3.mjs` | EN / ไทย on the age gate (Thai or Western birth year), setup and after-game |
+| `cdp-room-en.mjs` | two-phone room in English on one phone and Thai on the other |
 
 The other scripts set `frm-howskip` so Start goes straight to the game.
 

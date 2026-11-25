@@ -51,17 +51,28 @@ echo "== Copying $REV"
 # Same folder every time (nginx bind-mounts it), so empty it and unpack in place.
 vm "mkdir -p $APP_DIR/site && find $APP_DIR/site -mindepth 1 -delete && tar xf - -C $APP_DIR/site --strip-components=1 && chmod -R a+rX $APP_DIR/site" < "$TARBALL"
 vm "cat > $APP_DIR/docker-compose.vm.yml" < deploy/vm/docker-compose.vm.yml
-vm "cat > $APP_DIR/nginx.conf" < deploy/vm/nginx.conf
-git show HEAD:relay/relay.js | vm "cat > $APP_DIR/relay.js && chmod a+r $APP_DIR/relay.js"
+# The relay is restarted and nginx reloaded only when their file changed: a relay restart drops
+# every two-phone room in play, and an nginx reload can make the tunnel answer 502 for a moment.
+same() { local here; here=$(sha256sum | cut -c1-64); [ "$(vm "sha256sum $APP_DIR/$1 2>/dev/null | cut -c1-64" < /dev/null)" = "$here" ]; }
+NGINX_NEW=1; same nginx.conf < deploy/vm/nginx.conf && NGINX_NEW=0
+RELAY_NEW=1; git show HEAD:relay/relay.js | same relay.js && RELAY_NEW=0
+[ $NGINX_NEW = 1 ] && vm "cat > $APP_DIR/nginx.conf" < deploy/vm/nginx.conf
+[ $RELAY_NEW = 1 ] && git show HEAD:relay/relay.js | vm "cat > $APP_DIR/relay.js && chmod a+r $APP_DIR/relay.js"
 vm "echo $REV > $APP_DIR/REVISION"
 
 echo "== Starting"
-vm "cd $APP_DIR && $COMPOSE up -d --remove-orphans 2>&1 | tail -4 && sudo docker restart fai-rak-relay >/dev/null && sudo docker exec fai-rak-web nginx -s reload >/dev/null 2>&1 || true"
+vm "cd $APP_DIR && $COMPOSE up -d --remove-orphans 2>&1 | tail -4" || true
+if [ $RELAY_NEW = 1 ]; then vm "sudo docker restart fai-rak-relay >/dev/null" && echo "   relay.js changed: relay restarted (rooms in play reconnect)"; else echo "   relay.js unchanged: relay left running"; fi
+if [ $NGINX_NEW = 1 ]; then vm "sudo docker exec fai-rak-web nginx -s reload >/dev/null 2>&1" || true; echo "   nginx.conf changed: nginx reloaded"; else echo "   nginx.conf unchanged"; fi
 
 echo "== Checking"
 vm "for i in \$(seq 1 20); do curl -fs -o /dev/null http://127.0.0.1:8093/manifest.webmanifest && echo '   VM 200' && exit 0; sleep 1; done; echo '   VM FAILED'; sudo docker logs --tail 30 fai-rak-web; exit 1"
 vm "for i in \$(seq 1 15); do sudo docker logs fai-rak-tunnel 2>&1 | grep -q 'Registered tunnel connection' && echo '   Own tunnel connected' && exit 0; sleep 2; done; echo '   Own tunnel NOT connected:'; sudo docker logs --tail 15 fai-rak-tunnel; exit 1" || true
-code=$(curl -s -o /dev/null -w '%{http_code}' "$PUBLIC_URL/manifest.webmanifest" || true)
+# A just-restarted container or reloaded nginx can give one 502 through the tunnel: retry briefly.
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  code=$(curl -s -o /dev/null -w '%{http_code}' "$PUBLIC_URL/manifest.webmanifest" || true)
+  [ "$code" = 200 ] && break; sleep 2
+done
 echo "   Public $code"
 [ "$code" = 200 ] || echo "   (Not 200: on the tunnel fai-rak add the public hostname ${PUBLIC_URL#https://} -> http://fai-rak:80. If it was just added, it may also be your own DNS cache.)"
 echo "== Done: $REV is on the VM"

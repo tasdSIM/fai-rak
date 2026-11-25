@@ -226,7 +226,7 @@ body.en1 .th.i{display:inline;margin:0 0 0 6px}
 </head>
 <body>
 <main class="app">
-<div class="rban" id="rban" hidden><span class="d" aria-hidden="true"></span><span id="rbanT" style="flex:1"></span><button type="button" class="chip" id="rbanB">ห้อง</button></div>
+<div class="rban" id="rban" hidden><span class="d" aria-hidden="true"></span><span id="rbanT" style="flex:1"></span><button type="button" class="chip" id="rbanB">ห้อง<span class="en i">Room</span></button></div>
 
 <section class="scr" id="gate" aria-labelledby="g-t">
 <div class="top" style="justify-content:flex-end"><button type="button" class="iconbtn langbtn" id="langG">EN</button></div>
@@ -342,8 +342,8 @@ body.en1 .th.i{display:inline;margin:0 0 0 6px}
 </section>
 
 <section class="scr" id="room" aria-labelledby="r-t">
-<div class="top"><button class="iconbtn" id="roomBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill">2 เครื่อง</span><span style="width:44px"></span></div>
-<div><h2 id="r-t">เล่น 2 เครื่อง</h2><p class="soft">ต่างคนต่างถือมือถือ เห็นการ์ดใบเดียวกันพร้อมกัน ใครกดปุ่มก็ได้ ทั้งสองเครื่องต้องต่อเน็ต</p></div>
+<div class="top"><button class="iconbtn" id="roomBack" aria-label="ย้อนกลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="pill">2 เครื่อง · 2 phones</span><button type="button" class="iconbtn langbtn" id="langR">EN</button></div>
+<div><h2 id="r-t">เล่น 2 เครื่อง<span class="en">Play on 2 phones</span></h2><p class="soft">ต่างคนต่างถือมือถือ เห็นการ์ดใบเดียวกันพร้อมกัน ใครกดปุ่มก็ได้ ทั้งสองเครื่องต้องต่อเน็ต<span class="en">Each of you holds a phone and sees the same card at once. Either of you can press the buttons. Both phones need the internet</span></p></div>
 <div id="roomc" class="bxc"></div>
 </section>
 
@@ -777,9 +777,9 @@ const hubT=id=>B.hub.find(h=>h.id===id);
 const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
 const retitle=(tag,title)=>{$('bxtag').textContent=tag;$('bxt').textContent=title};
 function langUI(){document.body.classList.toggle('en1',LANG==='en');bilOrder(document);$('toEnd').textContent=LANG==='en'?'End':'จบเกม';
-for(const id of ['langA','langB','langP','langH','langG','langS']){const b=$(id);if(b){b.textContent=LANG==='en'?'ไทย':'EN';b.setAttribute('aria-label',LANG==='en'?'เปลี่ยนเป็นภาษาไทย':'Switch to English')}}}
+for(const id of ['langA','langB','langP','langH','langG','langS','langR']){const b=$(id);if(b){b.textContent=LANG==='en'?'ไทย':'EN';b.setAttribute('aria-label',LANG==='en'?'เปลี่ยนเป็นภาษาไทย':'Switch to English')}}}
 function setLang(l){LANG=l==='en'?'en':'th';store.set('blang',LANG);langUI();
-if(curScr()==='play')render();else if(curScr()==='setup')renderLevels();
+if(curScr()==='play')render();else if(curScr()==='setup')renderLevels();rban();if(curScr()==='room')roomView();
 loadB().then(()=>{if(curScr()==='bonus')openBonus();else if(curScr()==='bx'&&bxRe)bxRe()}).catch(()=>{})}
 /* Thai + English labels are written as  Thai text<span class="en">English</span>. To let the
    chosen language lead, the Thai just before each .en is wrapped in <span class="th"> (once, as
@@ -807,7 +807,7 @@ langUI();show('bonus')}).catch(()=>{$('serr').innerHTML='โหลดเกม�
 $('toBonus').addEventListener('click',openBonus);
 $('bonusBack').addEventListener('click',openSetup);
 $('bxBack').addEventListener('click',()=>{bxStop();(bxBackFn||openBonus)()});
-for(const id of ['langA','langB','langP','langH','langG','langS'])$(id).addEventListener('click',()=>setLang(LANG==='en'?'th':'en'));
+for(const id of ['langA','langB','langP','langH','langG','langS','langR'])$(id).addEventListener('click',()=>setLang(LANG==='en'?'th':'en'));
 langUI();
 $('hub').addEventListener('click',e=>{const t=e.target.closest('[data-h]');if(t)({massage:mSetup,nights:nList,cases:cList,dates:dList})[t.dataset.h]()});
 $('bxc').addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(b&&!b.disabled&&bxH)bxH(b.dataset.b)});
@@ -985,30 +985,31 @@ pk:S.ov&&S.ov.k==='pick'?Object.fromEntries([1,2,3,4,5].map(l=>[l,pileLeft(l)]))
 function rsync(){if(R.role!=='host'||!R.peer||R.q)return;R.q=1;setTimeout(()=>{R.q=0;rsend({k:'snap',s:snap()})},0)}
 function rOpen(first){
 if(R.ws){const o=R.ws;R.ws=null;o.onclose=null;try{o.close()}catch(e){}}
-let ws;try{ws=new WebSocket(wsUrl())}catch(e){R.st='idle';R.err='เชื่อมต่อไม่ได้ ลองอีกครั้ง';rui();return}
+let ws;try{ws=new WebSocket(wsUrl())}catch(e){R.st='idle';R.err='เชื่อมต่อไม่ได้ ลองอีกครั้ง'+E("Couldn't connect. Try again");rui();return}
 R.ws=ws;
 ws.onopen=()=>{R.retry=0;ws.send(JSON.stringify(first))};
 ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}rMsg(m)};
 ws.onclose=()=>{if(R.ws!==ws)return;R.ws=null;
 if(R.code&&R.tok){R.st='re';rui();clearTimeout(R.rt);R.rt=setTimeout(()=>{if(R.code&&!R.ws)rOpen({t:'resume',code:R.code,tok:R.tok})},Math.min(15000,800*2**R.retry++))}
-else{if(R.st==='conn')R.err='เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ เช็กเน็ตแล้วลองอีกครั้ง';R.st='idle';rui()}}}
+else{if(R.st==='conn')R.err='เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ เช็กเน็ตแล้วลองอีกครั้ง'+E("Couldn't reach the server. Check the internet and try again");R.st='idle';rui()}}}
 function rCreate(){R.err='';R.st='conn';rui();rOpen({t:'create'})}
-function rJoin(code){code=String(code||'').replace(/\D/g,'');if(code.length!==6){R.err='รหัสห้องต้องเป็นตัวเลข 6 หลัก';rui();return}R.err='';R.st='conn';rui();rOpen({t:'join',code})}
+function rJoin(code){code=String(code||'').replace(/\D/g,'');if(code.length!==6){R.err='รหัสห้องต้องเป็นตัวเลข 6 หลัก'+E('The room code is 6 digits');rui();return}R.err='';R.st='conn';rui();rOpen({t:'join',code})}
 function rClear(err){const ws=R.ws,wasGuest=R.role==='guest';clearTimeout(R.rt);
 Object.assign(R,{ws:null,role:null,code:null,tok:null,peer:false,st:'idle',err:err||'',last:null,hostScr:null,hostKey:null,ovKey:null});ssSave();
 if(ws){ws.onclose=null;try{ws.close()}catch(e){}}
 if(R.gameOv){$('ov').classList.remove('on');R.gameOv=false}
 if(wasGuest&&curScr()!=='room'){S={};roomOpen();return}rui()}
 function rLeave(){if(R.ws&&R.ws.readyState===1)R.ws.send('{"t":"leave"}');rClear('')}
-const RERR={nf:'ไม่พบห้องนี้ เช็กรหัสอีกครั้ง',full:'ห้องนี้มีครบ 2 เครื่องแล้ว',gone:'ห้องหมดอายุแล้ว สร้างห้องใหม่ได้เลย',rate:'ลองบ่อยเกินไป รอสักครู่แล้วลองใหม่',busy:'เซิร์ฟเวอร์ไม่ว่าง ลองใหม่อีกครั้ง'};
+/* room errors: R.err is HTML built only from these fixed strings, never from network text */
+const RERR={nf:'ไม่พบห้องนี้ เช็กรหัสอีกครั้ง'+E('No such room. Check the code'),full:'ห้องนี้มีครบ 2 เครื่องแล้ว'+E('This room already has 2 phones'),gone:'ห้องหมดอายุแล้ว สร้างห้องใหม่ได้เลย'+E('The room has expired. Create a new one'),rate:'ลองบ่อยเกินไป รอสักครู่แล้วลองใหม่'+E('Too many tries. Wait a moment and try again'),busy:'เซิร์ฟเวอร์ไม่ว่าง ลองใหม่อีกครั้ง'+E('The server is busy. Try again')};
 function rMsg(m){
 if(m.t==='room'){Object.assign(R,{code:m.code,tok:m.tok,role:m.role,peer:!!m.peer,st:'ok',err:''});ssSave();
 if(R.role==='guest'){if(playing)musPause();musStarted=true}
 if(R.role==='host')rsync();rui()}
 else if(m.t==='peer'){R.peer=!!m.on;
-if(m.left&&R.role==='guest'){rClear('เครื่องหลักปิดห้องแล้ว');return}
+if(m.left&&R.role==='guest'){rClear('เครื่องหลักปิดห้องแล้ว'+E('The main phone closed the room'));return}
 if(R.peer&&R.role==='host')rsync();rui()}
-else if(m.t==='err')rClear(RERR[m.e]||'เกิดข้อผิดพลาด ลองอีกครั้ง');
+else if(m.t==='err')rClear(RERR[m.e]||'เกิดข้อผิดพลาด ลองอีกครั้ง'+E('Something went wrong. Try again'));
 else if(m.t==='msg'&&m.d&&typeof m.d==='object'){const d=m.d;
 if(R.role==='host'&&d.k==='act')rAct(d);
 else if(R.role==='guest'){if(d.k==='snap'&&d.s)rApply(d.s);
@@ -1074,29 +1075,30 @@ rsend({k:'act',...m})},true);
 /* banner and room screen */
 function rban(){const on=!!R.code&&curScr()!=='gate'&&curScr()!=='room';$('rban').hidden=!on;if(!on)return;
 const ok=R.st==='ok'&&R.peer;$('rban').classList.toggle('wait',!ok);
-$('rbanT').textContent=R.st==='re'?'กำลังต่อใหม่… ห้อง '+R.code:R.role==='host'?(R.peer?'ห้อง '+R.code+' · อีกเครื่องเชื่อมต่อแล้ว':'ห้อง '+R.code+' · รออีกเครื่องเข้าห้อง'):(R.peer?'เชื่อมกับห้อง '+R.code:'ห้อง '+R.code+' · เครื่องหลักหลุดการเชื่อมต่อ')}
+$('rbanT').textContent=isEn()?(R.st==='re'?'Reconnecting… room '+R.code:R.role==='host'?(R.peer?'Room '+R.code+' · other phone connected':'Room '+R.code+' · waiting for the other phone'):(R.peer?'Connected to room '+R.code:'Room '+R.code+' · main phone disconnected'))
+:R.st==='re'?'กำลังต่อใหม่… ห้อง '+R.code:R.role==='host'?(R.peer?'ห้อง '+R.code+' · อีกเครื่องเชื่อมต่อแล้ว':'ห้อง '+R.code+' · รออีกเครื่องเข้าห้อง'):(R.peer?'เชื่อมกับห้อง '+R.code:'ห้อง '+R.code+' · เครื่องหลักหลุดการเชื่อมต่อ')}
 function rui(){rban();if(curScr()==='room')roomView()}
 function roomOpen(){const c=curScr();if(c!=='room')R.ret=c;show('room');roomView()}
 const gameOn=()=>R.role==='guest'?(R.hostScr==='play'||R.hostScr==='end'||(R.hostScr==='bx'&&!!(R.last&&R.last.cs))):(R.ret==='bx'&&!!CS)||!!(S&&S.deck&&(R.ret==='play'||R.ret==='end'));
 function roomView(){let h='';const tag=R.code?R.code.slice(0,3)+' '+R.code.slice(3):'';
 $('roomBack').hidden=R.role==='guest'&&!gameOn();
 if(!R.code){const busy=R.st==='conn';
-h=`${R.err?`<p class="err" role="alert">${esc(R.err)}</p>`:''}
-<div class="box"><h3>สร้างห้องใหม่</h3><p class="soft" style="font-size:14px">เครื่องนี้เป็นเครื่องหลัก ใช้ตั้งค่าเกมและสุ่มการ์ด แล้วให้อีกคนสแกน QR หรือพิมพ์รหัสห้อง</p><button class="btn" data-r="create" ${busy?'disabled':''}>${busy?'กำลังเชื่อมต่อ…':'สร้างห้อง'}</button></div>
-<div class="box"><h3>เข้าห้องของอีกคน</h3><div class="field"><label for="rcode">รหัสห้อง 6 หลัก</label><input type="text" id="rcode" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="เช่น 482913"></div><button class="btn ghost" data-r="join" ${busy?'disabled':''}>เข้าห้อง</button></div>
-<p class="mute">ระบบส่งแค่รหัสการ์ดกับปุ่มที่กดระหว่างสองเครื่อง ไม่เก็บข้อมูลใดไว้ และห้องจะหายไปเองเมื่อเลิกเล่น</p>`}
+h=`${R.err?`<p class="err" role="alert">${R.err}</p>`:''}
+<div class="box"><h3>สร้างห้องใหม่${E('Create a room')}</h3><p class="soft" style="font-size:14px">เครื่องนี้เป็นเครื่องหลัก ใช้ตั้งค่าเกมและสุ่มการ์ด แล้วให้อีกคนสแกน QR หรือพิมพ์รหัสห้อง${E('This phone is the main one: it sets up the game and draws the cards. The other person scans the QR or types the room code')}</p><button class="btn" data-r="create" ${busy?'disabled':''}>${busy?'กำลังเชื่อมต่อ…'+E('Connecting…'):'สร้างห้อง'+E('Create room')}</button></div>
+<div class="box"><h3>เข้าห้องของอีกคน${E("Join your partner's room")}</h3><div class="field"><label for="rcode">รหัสห้อง 6 หลัก${Ei('6-digit room code')}</label><input type="text" id="rcode" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="เช่น · e.g. 482913"></div><button class="btn ghost" data-r="join" ${busy?'disabled':''}>เข้าห้อง${E('Join')}</button></div>
+<p class="mute">ระบบส่งแค่รหัสการ์ดกับปุ่มที่กดระหว่างสองเครื่อง ไม่เก็บข้อมูลใดไว้ และห้องจะหายไปเองเมื่อเลิกเล่น${E('Only card codes and button presses pass between the two phones. Nothing is kept, and the room disappears when you stop playing')}</p>`}
 else if(R.role==='host'){
-h=`<div class="box" style="align-items:center;text-align:center"><span class="lbl">รหัสห้อง</span><span class="rcode">${tag}</span><div class="qr" id="rqr"></div><p class="mute">ให้อีกคนสแกน QR ด้วยกล้องมือถือ หรือเปิดเกมแล้วกด เล่น 2 เครื่อง แล้วใส่รหัสนี้</p><button class="btn ghost" data-r="share">ส่งลิงก์เชิญ</button></div>
-<p class="rstat ${R.peer&&R.st==='ok'?'ok':''}">${R.st==='re'?'กำลังต่อใหม่…':R.peer?'อีกเครื่องเชื่อมต่อแล้ว':'รออีกเครื่องเข้าห้อง…'}</p>
-${gameOn()?'<button class="btn" data-r="back">กลับไปที่เกม</button>':R.peer?'<button class="btn" data-r="setup">ไปตั้งค่าเกม แล้วกดเริ่มเล่น</button>':''}
-<button class="btn ghost" data-r="leave">ปิดห้อง</button>`}
+h=`<div class="box" style="align-items:center;text-align:center"><span class="lbl">รหัสห้อง${Ei('Room code')}</span><span class="rcode">${tag}</span><div class="qr" id="rqr"></div><p class="mute">ให้อีกคนสแกน QR ด้วยกล้องมือถือ หรือเปิดเกมแล้วกด เล่น 2 เครื่อง แล้วใส่รหัสนี้${E('Have your partner scan the QR with the phone camera, or open the game, tap Play on 2 phones and enter this code')}</p><button class="btn ghost" data-r="share">ส่งลิงก์เชิญ${E('Send an invite link')}</button></div>
+<p class="rstat ${R.peer&&R.st==='ok'?'ok':''}">${R.st==='re'?'กำลังต่อใหม่…'+E('Reconnecting…'):R.peer?'อีกเครื่องเชื่อมต่อแล้ว'+E('The other phone is connected'):'รออีกเครื่องเข้าห้อง…'+E('Waiting for the other phone…')}</p>
+${gameOn()?'<button class="btn" data-r="back">กลับไปที่เกม'+E('Back to the game')+'</button>':R.peer?'<button class="btn" data-r="setup">ไปตั้งค่าเกม แล้วกดเริ่มเล่น'+E('Go to setup, then tap Start')+'</button>':''}
+<button class="btn ghost" data-r="leave">ปิดห้อง${E('Close the room')}</button>`}
 else{
-h=`<div class="box" style="align-items:center;text-align:center"><span class="lbl">ห้อง</span><span class="rcode">${tag}</span>
-<p class="rstat ${R.peer&&R.st==='ok'?'ok':''}">${R.st==='re'?'กำลังต่อใหม่…':R.peer?'เชื่อมต่อแล้ว':'เครื่องหลักหลุดการเชื่อมต่อ รอสักครู่'}</p>
-<p class="soft">${gameOn()?'เกมกำลังเล่นอยู่':'รอเครื่องหลักตั้งค่าและกดเริ่มเล่น การ์ดจะขึ้นที่เครื่องนี้เอง'}</p></div>
-${gameOn()?'<button class="btn" data-r="back">กลับไปที่เกม</button>':''}
-<p class="mute">เพลงเปิดจากเครื่องหลักเครื่องเดียว จะได้ไม่ดังซ้อนกัน</p>
-<button class="btn ghost" data-r="leave">ออกจากห้อง</button>`}
+h=`<div class="box" style="align-items:center;text-align:center"><span class="lbl">ห้อง${Ei('Room')}</span><span class="rcode">${tag}</span>
+<p class="rstat ${R.peer&&R.st==='ok'?'ok':''}">${R.st==='re'?'กำลังต่อใหม่…'+E('Reconnecting…'):R.peer?'เชื่อมต่อแล้ว'+E('Connected'):'เครื่องหลักหลุดการเชื่อมต่อ รอสักครู่'+E('The main phone dropped. Wait a moment')}</p>
+<p class="soft">${gameOn()?'เกมกำลังเล่นอยู่'+E('The game is on'):'รอเครื่องหลักตั้งค่าและกดเริ่มเล่น การ์ดจะขึ้นที่เครื่องนี้เอง'+E('Waiting for the main phone to set up and tap Start. The cards will show here by themselves')}</p></div>
+${gameOn()?'<button class="btn" data-r="back">กลับไปที่เกม'+E('Back to the game')+'</button>':''}
+<p class="mute">เพลงเปิดจากเครื่องหลักเครื่องเดียว จะได้ไม่ดังซ้อนกัน${E('Music plays from the main phone only, so it never doubles up')}</p>
+<button class="btn ghost" data-r="leave">ออกจากห้อง${E('Leave the room')}</button>`}
 $('roomc').innerHTML=h;
 if(R.role==='host')drawQR()}
 let qrP=null;
@@ -1110,12 +1112,12 @@ openSetup()}
 $('roomc').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b||b.disabled)return;const a=b.dataset.r;
 if(a==='create')rCreate();
 else if(a==='join')rJoin($('rcode').value);
-else if(a==='leave'){if(confirm(R.role==='host'?'ปิดห้องนี้? อีกเครื่องจะหลุดออกจากเกม':'ออกจากห้องนี้?')){rLeave();roomView()}}
+else if(a==='leave'){if(confirm(isEn()?(R.role==='host'?'Close this room? The other phone will drop out of the game':'Leave this room?'):R.role==='host'?'ปิดห้องนี้? อีกเครื่องจะหลุดออกจากเกม':'ออกจากห้องนี้?')){rLeave();roomView()}}
 else if(a==='setup')openSetup();
 else if(a==='back')roomBack();
-else if(a==='share'){const url=inviteUrl(),text='มาเล่นไฟรักไม่มอดด้วยกัน ห้อง '+R.code;
+else if(a==='share'){const url=inviteUrl(),text=(isEn()?'Come play Fai Rak Mai Mod with me, room ':'มาเล่นไฟรักไม่มอดด้วยกัน ห้อง ')+R.code;
 if(navigator.share)navigator.share({title:'ไฟรักไม่มอด',text,url}).catch(()=>{});
-else(navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>{b.textContent='คัดลอกลิงก์แล้ว'},()=>{b.textContent=url})}});
+else(navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>{b.innerHTML='คัดลอกลิงก์แล้ว'+E('Link copied')},()=>{b.textContent=url})}});
 $('roomc').addEventListener('keydown',e=>{if(e.target.id==='rcode'&&e.key==='Enter'){e.preventDefault();rJoin(e.target.value)}});
 $('roomBack').addEventListener('click',roomBack);
 $('toRoom').addEventListener('click',roomOpen);
