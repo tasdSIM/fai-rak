@@ -21,7 +21,7 @@ const click = sel => ev(`(()=>{const e=document.querySelector(${JSON.stringify(s
 await cmd('Runtime.enable'); await cmd('Page.enable');
 await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
 await cmd('Page.navigate', { url: URL }); await sleep(1500);
-await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));location.reload()`); await sleep(2500);
+await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));location.reload()`); await sleep(2500);
 // first tap anywhere starts music
 await click('#n0'); await sleep(7000);
 console.log('after first tap:', await ev(`JSON.stringify({ready:typeof YT!=='undefined', state: (()=>{try{return document.querySelector('#ytp')&&window.YT&&YT.get?1:0}catch(e){return -1}})(), title: document.getElementById('mTitle').textContent, sub: document.getElementById('mSub').textContent, eq: document.getElementById('mEq').className})`));

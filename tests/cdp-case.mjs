@@ -25,12 +25,12 @@ async function browser(name, port) {
 const st = b => b.ev(`JSON.stringify({scr:document.querySelector('.scr.on')?.id,card:document.querySelector('#card .ctext')?.textContent?.slice(0,40),who:document.getElementById('who').textContent,ctl:[...document.querySelectorAll('#ctl button')].map(b=>b.dataset.a).join(','),ov:document.getElementById('ov').classList.contains('on')?document.getElementById('ov-t')?.textContent:null,clock:document.getElementById('clock')?.textContent||null,ban:document.getElementById('rban').hidden?null:document.getElementById('rbanT').textContent})`);
 const A = await browser('A', 9341), B = await browser('B', 9342);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1200);
-await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
+await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
 await A.click('#toRoom'); await sleep(300); await A.shot('room-start');
 await A.click('[data-r=create]'); await sleep(1500);
 const cs = b => b.ev(`JSON.stringify({scr:document.querySelector('.scr.on')?.id,t:document.getElementById('bxt')?.textContent,secret:[...document.querySelectorAll('#bxc .secret h3')].map(h=>h.textContent),env:document.querySelectorAll('#bxc .env').length,pub:document.querySelectorAll('#bxc [id^=pub]').length,btns:[...document.querySelectorAll('#bxc [data-b]')].filter(x=>!x.disabled).map(x=>x.dataset.b).join(','),stamp:document.querySelector('#done .stamp')?.textContent||null,rstat:document.querySelector('.rstat')?.textContent||null})`);
 const A = await browser('A', 9361), B = await browser('B', 9362);
-const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}))`); };
+const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}))`); };
 await prep(A, true); await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 // --- single device: every case renders, and a full run of case 1 ---
 await A.click('#toBonus'); await sleep(800); await A.click('[data-h=cases]'); await sleep(300);

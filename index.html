@@ -168,6 +168,17 @@ input[type=range]{width:100%;accent-color:#B3122E}
 .rstat{text-align:center;color:#FFD8A8;font-weight:600}.rstat.ok{color:#8CE99A}
 .en{display:block;font-size:.8em;line-height:1.35;opacity:.78;font-weight:400;margin-top:2px;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
 .en.i{display:inline;margin:0 0 0 6px}
+/* English first (EN button): English takes the main size and the Thai goes small under it */
+body.en1 .en{display:inline;font-size:1em;line-height:inherit;opacity:1;font-weight:inherit;margin:0;font-family:inherit}
+body.en1 .th{display:block;font-size:.8em;line-height:1.35;opacity:.78;font-weight:400;margin-top:2px;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+body.en1 .th.i{display:inline;margin:0 0 0 6px}
+/* how to play */
+.how{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.55;color:var(--soft)}
+.how li::marker{color:var(--goldi);font-weight:700}
+.how b{display:block;color:var(--ink);font-size:16px;margin-bottom:2px}
+.how .lights{display:flex;flex-direction:column;gap:6px;margin:4px 0 6px}
+.how .lights>span{display:block;padding-left:20px;position:relative}
+.how .lights i{position:absolute;left:0;top:.45em;width:12px;height:12px;border-radius:50%}
 .cen{margin:-6px 0 0;font-size:15px;line-height:1.45;color:#6B5A4A;font-style:italic;text-wrap:balance}
 .cnote{margin:0;border-radius:10px;background:#2A1218;border:1px solid #7A1A2A;color:#FFC9C9;padding:8px 12px;font-size:14px;text-align:center}
 .rules{display:flex;flex-direction:column;gap:4px;border-radius:12px;border:1px dashed #5A4228;padding:10px 14px;font-size:14px;color:var(--soft)}.rules b{color:var(--goldi);font-size:13px}
@@ -259,16 +270,38 @@ input[type=range]{width:100%;accent-color:#B3122E}
 <p class="err" id="serr" role="alert"></p>
 <button type="button" class="bonusbtn" id="toBonus"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M3 7h18v4H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/></svg></span><span style="flex:1;text-align:left"><b>เกมเสริม 4 อย่าง</b><span class="mute" style="display:block">นวดหลังเกม · 7 คืนเติมไฟ · สืบซ่อนรัก 20 คดี · เดตในบ้าน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button type="button" class="bonusbtn" id="toRoom"><span class="bb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="8" height="15" rx="2"/><rect x="13.5" y="5" width="8" height="15" rx="2"/><path d="M5.5 16h2M16.5 17h2"/></svg></span><span style="flex:1;text-align:left"><b>เล่น 2 เครื่อง</b><span class="mute" style="display:block">ต่างคนต่างถือมือถือ เห็นการ์ดใบเดียวกันพร้อมกัน</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+<button type="button" class="btn ghost" id="toHow" style="min-height:48px;font-size:15px">วิธีเล่น<span class="en">How to play</span></button>
 <button type="button" class="btn ghost" id="toMusic" style="min-height:48px;font-size:15px">เพลงประกอบ: เปลี่ยนเพลง หรือเพิ่มเพลย์ลิสต์เอง</button>
 <div class="foot"><button class="btn" id="start">เริ่มเล่น</button><button type="button" class="btn ghost inst" data-install hidden><img src="icon-192.png" alt="">เพิ่มไอคอนเกมไว้ที่หน้าจอโฮม</button></div>
 </div>
+</section>
+
+<section class="scr" id="howto" aria-labelledby="h-t">
+<div class="top"><button class="iconbtn" id="howBack" aria-label="กลับไปตั้งค่า"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><div style="display:flex;gap:8px"><button type="button" class="iconbtn langbtn" id="langH">EN</button><button type="button" class="iconbtn" id="howSkip">ข้าม<span class="en i">Skip</span></button></div></div>
+<div><h2 id="h-t">วิธีเล่น<span class="en">How to play</span></h2><p class="soft">อ่านครั้งเดียวก็พอ ใช้เวลาไม่ถึงนาที<span class="en">One read is enough, under a minute</span></p></div>
+<ol class="how">
+<li><b>ผลัดกันอ่าน<span class="en">Take turns</span></b><span>แต่ละตาแอปจะบอกว่าใครอ่าน คนอ่านอ่านการ์ดออกเสียงให้อีกคนฟัง<span class="en">Each turn the app says who reads. Read the card aloud to your partner</span></span></li>
+<li><b>คนฟังชูไฟ<span class="en">The listener shows a light</span></b>
+<span class="lights"><span><i style="background:#2F9E44"></i>ไฟเขียว ทำตามการ์ด<span class="en">Green: do the card</span></span>
+<span><i style="background:#F59F00"></i>ไฟเหลือง ทำแบบเบาลง หรือใช้บัตรผ่านข้ามใบนี้<span class="en">Yellow: go gentler, or use a pass to skip it</span></span>
+<span><i style="background:#E03131"></i>ไฟแดง หยุดทันที แล้วดูแลกันก่อน<span class="en">Red: stop at once and look after each other</span></span></span>
+<span>ชูไฟเหลืองหรือแดงได้เสมอ ไม่ต้องอธิบายเหตุผล<span class="en">Yellow or red is always fine, no reason needed</span></span></li>
+<li><b>บัตรผ่านคนละ 2 ใบ<span class="en">2 passes each</span></b><span>คนฟังใช้ข้ามการ์ดที่ไม่อยากทำ แล้วได้เป็นคนอ่านใบต่อไป<span class="en">The listener can skip a card they'd rather not do, then reads the next one</span></span></li>
+<li><b>การ์ดที่มีเวลา<span class="en">Timed cards</span></b><span>ปรับเวลา + / − ได้ก่อนชูไฟ กดไฟเขียวแล้วนาฬิกาเริ่มเดิน ทำเสร็จกดใบต่อไป<span class="en">Adjust the time with + / − first; green starts the clock. Tap Next card when done</span></span></li>
+<li><b>ขึ้นลงระดับ<span class="en">Levels</span></b><span>โหมดไล่ระดับ ครบ 9 ใบแอปจะถามว่าจะขึ้นระดับไหม ต้องกดพร้อมทั้งสองคน ลดระดับได้ทุกเมื่อที่ปุ่มระดับด้านบน<span class="en">In level-by-level mode the app asks after 9 cards; both must press ready to go up. Go down anytime with the level button at the top</span></span></li>
+<li><b>การ์ดพิเศษ<span class="en">Special cards</span></b><span>แทรกขึ้นมาเป็นระยะ เช่น สลับบท พักหายใจ เพิ่มเวลา ทำตามที่การ์ดบอก<span class="en">They pop up now and then, like swapping roles, a breather or extra time. Follow what they say</span></span></li>
+<li><b>ระดับ 5 มีคำหยุด<span class="en">Level 5 has a stop word</span></b><span>พูดคำหยุดเมื่อไหร่ ทุกอย่างหยุดทันที<span class="en">Say it and everything stops at once</span></span></li>
+<li><b>ปุ่มอื่น ๆ<span class="en">Other buttons</span></b><span>หัวใจบนการ์ด เก็บใบที่ชอบ · EN / ไทย สลับภาษา · จบเกม ไปหน้าหลังเกม<span class="en">Heart on a card saves it · EN / ไทย switches language · End goes to after-game</span></span></li>
+</ol>
+<div class="foot"><label class="check"><input type="checkbox" id="howNo"><span>ไม่ต้องแสดงหน้านี้ก่อนเริ่มเกมอีก<span class="en">Don't show this before the game again</span></span></label>
+<button class="btn" id="howGo">เข้าใจแล้ว เริ่มเล่น</button></div>
 </section>
 
 <section class="scr" id="play" aria-label="หน้าเล่นการ์ด">
 <div class="top">
 <button class="iconbtn" id="toSetup" aria-label="กลับไปตั้งค่า"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
 <button class="lvchip" id="lvchip"><span class="dot" id="lvdot" style="width:10px;height:10px;border-radius:50%"></span><span id="lvname"></span></button>
-<button class="iconbtn" id="toEnd">จบเกม</button>
+<div style="display:flex;gap:8px"><button type="button" class="iconbtn langbtn" id="langP">EN</button><button class="iconbtn" id="toEnd">จบเกม</button></div>
 </div>
 <div class="bar" aria-hidden="true"><i id="prog" style="width:0"></i></div>
 <div class="col pl">
@@ -369,7 +402,8 @@ const svg=(n,c,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-wi
 const HEART='<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>';
 const EXCL=['กระซิบ','จูบ','สัมผัส','มอง','ปิดตา','ผูก','น้ำแข็ง','เสื้อผ้า','สถานที่','กระจก','เทียน','เพลง'];
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
-const tlabel=s=>s>=60&&s%60===0?(s/60)+' นาที':s+' วินาที';
+const isEn=()=>document.body.classList.contains('en1');
+const tlabel=s=>s>=60&&s%60===0?(s/60)+(isEn()?' min':' นาที'):s+(isEn()?' sec':' วินาที');
 
 let ALL=[],S={},timer=null,lastCard=null,CS=null;
 /* two-device room state (see "two devices" below) */
@@ -389,6 +423,8 @@ const cText=c=>cfg.crude&&typeof XT[c.code]==='string'?XT[c.code]:c.text;
 const cEn=c=>(cfg.crude&&typeof XEN[c.code]==='string'?XEN[c.code]:EN[c.code])||'';
 const LVE={1:'Spark',2:'Warm',3:'Hot',4:'Blazing',5:'Extreme',0:'Special'},TYE={'คุย':'Talk','ทำ':'Do','เลือก':'Choose','พิเศษ':'Special'};
 const E=t=>'<span class="en">'+t+'</span>',Ei=t=>'<span class="en i">'+t+'</span>';
+/* Card face text: the chosen language (LANG, the EN / ไทย button) big, the other small under it */
+const pair=(th,en)=>!en?`<p class="ctext">${th}</p>`:isEn()?`<p class="ctext">${en}</p><p class="cen">${th}</p>`:`<p class="ctext">${th}</p><p class="cen">${en}</p>`;
 if(cfg.crude)loadX().catch(()=>{});
 const selLv=()=>cfg.mode==='mix'?cfg.lvls.slice().sort():cfg.mode==='all'?[1,2,3,4,5]:[cfg.level];
 const rangeTxt=a=>{a=a.slice().sort();return a.length>1&&a[a.length-1]-a[0]===a.length-1?a[0]+'–'+a[a.length-1]:a.join(', ')};
@@ -438,7 +474,17 @@ cfg.names=[n0,n1];store.set('names',cfg.names);cfg.sp=$('sp').checked;
 if(selLv().includes(5)){const sw=$('safe').value.trim();
 if(!sw||!$('ok0').checked||!$('ok1').checked){$('serr').textContent='ระดับ 5 ต้องตั้งคำหยุด และติ๊กยินยอมทั้งสองคน';return}
 cfg.x5=true;cfg.safe=sw}
-startGame()});
+if(store.get('howskip',0))startGame();else openHow(true)});
+
+/* how to play: shown before the game until "don't show again" is ticked; the setup button opens it anytime */
+let howGo=false;
+function openHow(go){howGo=go;$('howNo').checked=!!store.get('howskip',0);$('howSkip').hidden=!go;
+$('howGo').innerHTML=go?'เข้าใจแล้ว เริ่มเล่น'+E("Got it, let's play"):'กลับไปตั้งค่า'+E('Back to setup');show('howto')}
+const howDone=play=>{store.set('howskip',$('howNo').checked?1:0);if(play)startGame();else openSetup()};
+$('toHow').addEventListener('click',()=>openHow(false));
+$('howGo').addEventListener('click',()=>howDone(howGo));
+$('howSkip').addEventListener('click',()=>howDone(true));
+$('howBack').addEventListener('click',()=>howDone(false));
 
 /* game */
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -536,23 +582,24 @@ const reader=()=>cfg.names[S.turn],listener=()=>cfg.names[1-S.turn];
 function render(){
 const c=S.card,mixed=isMix(),lvs=Array.isArray(S.lvls)&&S.lvls.length?S.lvls:[S.level],top=mixed?lvs[lvs.length-1]:S.level;
 const deckN=Array.isArray(S.deck)?S.deck.length:(S.deckN||0);
-$('lvdot').style.background=LV[top].dot;$('lvname').textContent=mixed?'ผสมระดับ '+rangeTxt(lvs)+' Mixed · เหลือ '+deckN+' ใบ left':'ระดับ '+S.level+' '+LV[S.level].n+' · '+LVE[S.level];
+$('lvdot').style.background=LV[top].dot;$('lvname').textContent=isEn()?(mixed?'Mixed levels '+rangeTxt(lvs)+' · '+deckN+' left':'Level '+S.level+' '+LVE[S.level]+' · '+LV[S.level].n)
+:mixed?'ผสมระดับ '+rangeTxt(lvs)+' Mixed · เหลือ '+deckN+' ใบ left':'ระดับ '+S.level+' '+LV[S.level].n+' · '+LVE[S.level];
 $('prog').style.width=(cfg.mode==='prog'?Math.min(100,S.inLevel/9*100):S.total?(S.total-deckN)/S.total*100:0)+'%';
 $('who').innerHTML=esc('ตาของ'+reader())+Ei(esc(reader())+"'s turn");$('whoto').innerHTML=esc('อ่านออกเสียงให้'+listener()+'ฟัง')+E('Read it aloud to '+esc(listener()));
 $('passes').innerHTML=esc('บัตรผ่าน '+cfg.names[0]+' '+S.passes[0]+' ใบ · '+cfg.names[1]+' '+S.passes[1]+' ใบ')+E(esc('Passes: '+cfg.names[0]+' '+S.passes[0]+' · '+cfg.names[1]+' '+S.passes[1]));
 {const n=c?noteText():null;$('cnote').hidden=!n;$('cnote').innerHTML=n?esc(n[0])+E(esc(n[1])):'';
 const rl=Array.isArray(S.rules)?S.rules:[];$('rules').hidden=!rl.length;$('rules').innerHTML=rl.length?'<b>กติกาคืนนี้ · House rules</b>'+rl.map((t,i)=>`<span>${i+1}. ${esc(t)}</span>`).join(''):''}
 if(!c){const what=mixed?'กองผสมระดับ '+rangeTxt(lvs):'ระดับ '+S.level;
-$('card').innerHTML=`<div class="cbody"><p class="ctext">การ์ดในกองหมดแล้ว</p><p class="cen">The pile is empty</p><p style="color:#6B5A4A">เล่นครบทุกใบของ${what} แล้ว สับกองใหม่เพื่อเอาการ์ดที่เล่นแล้วกลับมา${mixed?'':' หรือแตะปุ่มระดับด้านบนเพื่อเปลี่ยนระดับ'} หรือไปหลังเกม${cfg.ex.length?' (หมวดที่ซ่อนไว้จะไม่ถูกสุ่ม)':''}${E('Every card here has been played. Reshuffle to bring them back'+(mixed?'':', change level with the button at the top')+', or go to the after-game screen')}</p></div>`;
+$('card').innerHTML=`<div class="cbody">${pair('การ์ดในกองหมดแล้ว','The pile is empty')}<p style="color:#6B5A4A">เล่นครบทุกใบของ${what} แล้ว สับกองใหม่เพื่อเอาการ์ดที่เล่นแล้วกลับมา${mixed?'':' หรือแตะปุ่มระดับด้านบนเพื่อเปลี่ยนระดับ'} หรือไปหลังเกม${cfg.ex.length?' (หมวดที่ซ่อนไว้จะไม่ถูกสุ่ม)':''}${E('Every card here has been played. Reshuffle to bring them back'+(mixed?'':', change level with the button at the top')+', or go to the after-game screen')}</p></div>`;
 $('ctl').innerHTML='<div class="two"><button class="btn ghost" data-a="reshuffle">สับกองใหม่'+E('Reshuffle')+'</button><button class="btn" data-a="finish">ไปหลังเกม'+E('After game')+'</button></div>';rsync();return}
 const L=LV[c.l],fav=store.get('favs',[]).includes(c.code);
 const ink=c.l===3||c.l===2?'#8A1024':'#6B4A12';
 if(c.code!==lastCard){lastCard=c.code;$('card').style.animation='none';void $('card').offsetWidth;$('card').style.animation=''}
 $('card').innerHTML=`<div class="band" style="background:${L.band}"></div><div class="cbody">
-<div class="chead"><span class="ctype">${esc(c.type)} · ${TYE[c.type]||''}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
+<div class="chead"><span class="ctype">${isEn()&&TYE[c.type]?TYE[c.type]+' · '+esc(c.type):esc(c.type)+' · '+(TYE[c.type]||'')}</span><span>${esc(c.code)}${c.l===0?' · พิเศษ':''}</span>
 <button class="fav" id="fav" aria-pressed="${fav}" aria-label="เก็บการ์ดนี้ไว้ในที่ชอบ"><svg width="22" height="22" viewBox="0 0 24 24" fill="${fav?'#B3122E':'none'}" stroke="${fav?'#B3122E':'#A8967A'}" stroke-width="1.8" aria-hidden="true">${HEART}</svg></button></div>
 <div class="cicon">${svg(c.icon,ink,1.3)}</div>
-<p class="ctext">${esc(cText(c))}</p>${cEn(c)?`<p class="cen">${esc(cEn(c))}</p>`:''}
+${pair(esc(cText(c)),cEn(c)?esc(cEn(c)):'')}
 ${S.left?`<div class="ctime">${S.mode==='signal'?'<button class="adj" id="minus" aria-label="ลดเวลา 15 วินาที">−</button>':''}<span>${tlabel(S.left)}</span>${S.mode==='signal'?'<button class="adj" id="plus" aria-label="เพิ่มเวลา 15 วินาที">+</button>':''}</div>`:''}
 ${c.code==='X-01'?`<p class="safe">คำหยุดคืนนี้ · Stop word: <b>${esc(cfg.safe)}</b></p>`:''}
 </div>`;
@@ -714,8 +761,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('msheet').classLi
 document.addEventListener('click',e=>{if(musStarted||!mus.on||$('gate').classList.contains('on')||e.target.closest('#mbar,#msheet'))return;musPlay()});
 
 /* bonus games */
-/* Language for the bonus games: chosen per device with the EN / ไทย button (never synced, so on
-   two devices each can read its own language). bonus-en.json has the same shape as bonus.json. */
+/* Language, chosen per device with the EN / ไทย button (never synced, so on two devices each can
+   read its own language). Bonus games swap wholly to it (bonus-en.json has the same shape as
+   bonus.json); in the card game both languages stay, the chosen one big and the other small. */
 let B=null,BT=null,BE=null,bxT=null,bxH=null,bxBackFn=null,bxRe=null,wl=null,LANG=store.get('blang','th')==='en'?'en':'th';
 const L=(th,en)=>LANG==='en'?en:th;
 const nm=i=>cfg.names[i]||$('n'+i).value.trim()||(L('ผู้เล่น ','Player ')+(i+1));
@@ -724,9 +772,26 @@ const loadB=()=>(BT?Promise.resolve():getJ('bonus.json').then(d=>{BT=d})).then((
 const hubT=id=>B.hub.find(h=>h.id===id);
 const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
 const retitle=(tag,title)=>{$('bxtag').textContent=tag;$('bxt').textContent=title};
-function langUI(){for(const id of ['langA','langB']){const b=$(id);if(b){b.textContent=LANG==='en'?'ไทย':'EN';b.setAttribute('aria-label',LANG==='en'?'เปลี่ยนเป็นภาษาไทย':'Switch to English')}}}
+function langUI(){document.body.classList.toggle('en1',LANG==='en');bilOrder(document);$('toEnd').textContent=LANG==='en'?'End':'จบเกม';
+for(const id of ['langA','langB','langP','langH']){const b=$(id);if(b){b.textContent=LANG==='en'?'ไทย':'EN';b.setAttribute('aria-label',LANG==='en'?'เปลี่ยนเป็นภาษาไทย':'Switch to English')}}}
 function setLang(l){LANG=l==='en'?'en':'th';store.set('blang',LANG);langUI();
+if(curScr()==='play')render();
 loadB().then(()=>{if(curScr()==='bonus')openBonus();else if(curScr()==='bx'&&bxRe)bxRe()}).catch(()=>{})}
+/* Thai + English labels are written as  Thai text<span class="en">English</span>. To let the
+   chosen language lead, the Thai just before each .en is wrapped in <span class="th"> (once, as
+   the page renders) and the pair is put in reading order: English first when LANG is en. */
+const INL=new Set(['B','STRONG','I','EM','SMALL','U']);
+function bil(root){for(const en of root.querySelectorAll('.en:not([data-bl])')){en.dataset.bl=1;
+const run=[],thai=n=>n.nodeType===3||(n.nodeType===1&&(INL.has(n.tagName)||(n.tagName==='SPAN'&&!n.className)));
+for(let n=en.previousSibling;n&&thai(n);n=n.previousSibling)run.unshift(n);
+if(!run.some(x=>x.textContent.trim()))continue;
+const th=document.createElement('span');th.className='th'+(en.classList.contains('i')?' i':'');
+en.parentNode.insertBefore(th,en);for(const x of run)th.appendChild(x)}
+bilOrder(root)}
+function bilOrder(root){const en1=LANG==='en';for(const th of root.querySelectorAll('.th')){
+const a=th.nextElementSibling,b=th.previousElementSibling;
+if(!en1&&b&&b.classList.contains('en'))th.after(b);else if(en1&&a&&a.classList.contains('en'))th.before(a)}}
+new MutationObserver(()=>bil(document.body)).observe(document.body,{childList:true,subtree:true});bil(document.body);
 function wake(on){try{if(on&&navigator.wakeLock&&!wl)navigator.wakeLock.request('screen').then(l=>{wl=l}).catch(()=>{});else if(!on&&wl){wl.release();wl=null}}catch(e){}}
 function bxStop(){if(bxT){clearInterval(bxT);bxT=null}wake(false)}
 function bxSet(html){$('bxc').innerHTML=html}
@@ -738,7 +803,7 @@ langUI();show('bonus')}).catch(()=>{$('serr').textContent='โหลดเกม
 $('toBonus').addEventListener('click',openBonus);
 $('bonusBack').addEventListener('click',openSetup);
 $('bxBack').addEventListener('click',()=>{bxStop();(bxBackFn||openBonus)()});
-for(const id of ['langA','langB'])$(id).addEventListener('click',()=>setLang(LANG==='en'?'th':'en'));
+for(const id of ['langA','langB','langP','langH'])$(id).addEventListener('click',()=>setLang(LANG==='en'?'th':'en'));
 langUI();
 $('hub').addEventListener('click',e=>{const t=e.target.closest('[data-h]');if(t)({massage:mSetup,nights:nList,cases:cList,dates:dList})[t.dataset.h]()});
 $('bxc').addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(b&&!b.disabled&&bxH)bxH(b.dataset.b)});

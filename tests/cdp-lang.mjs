@@ -23,7 +23,7 @@ async function browser(name, port) {
   return { edge, ws, ev, shot, click, cmd };
 }
 const A = await browser('A', 9521), Bx = await browser('B', 9522);
-const prep = async (X, names, lang) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');${names ? `localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));` : ''}localStorage.setItem('frm-music',JSON.stringify({on:false}));${lang ? `localStorage.setItem('frm-blang','"${lang}"');` : ''}`); };
+const prep = async (X, names, lang) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');${names ? `localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));` : ''}localStorage.setItem('frm-music',JSON.stringify({on:false}));${lang ? `localStorage.setItem('frm-blang','"${lang}"');` : ''}`); };
 const v = X => X.ev(`JSON.stringify({scr:document.querySelector('.scr.on')?.id,tag:document.getElementById('bxtag').textContent,title:document.getElementById('bxt').textContent,lang:(document.getElementById('langB')||{}).textContent,first:(document.querySelector('#bxc')?.innerText||'').slice(0,70).replace(/\\n/g,' / ')})`);
 await prep(A, true); await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 await A.click('#toBonus'); await sleep(800);

@@ -1,6 +1,6 @@
 const A = await browser('A', 9451);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1000);
-await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'mix',lvls:[1,2,3,4]}))`);
+await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'mix',lvls:[1,2,3,4]}))`);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 let res='';for(let gg=0;gg<4;gg++){ res = await A.ev(`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));let back2back=0,specials=0,notesOnSpecial=0,games=0,seen={};
 for(let g=0;g<1;g++){document.getElementById('start').click();await s(20);games++;let prev=null;

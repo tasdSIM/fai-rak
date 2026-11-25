@@ -24,7 +24,7 @@ async function browser(name, port) {
 }
 const cs = b => b.ev(`JSON.stringify({scr:document.querySelector('.scr.on')?.id,t:document.getElementById('bxt')?.textContent,secret:[...document.querySelectorAll('#bxc .secret h3')].map(h=>h.textContent),env:document.querySelectorAll('#bxc .env').length,pub:document.querySelectorAll('#bxc [id^=pub]').length,btns:[...document.querySelectorAll('#bxc [data-b]')].filter(x=>!x.disabled).map(x=>x.dataset.b).join(','),stamp:document.querySelector('#done .stamp')?.textContent||null,rstat:document.querySelector('.rstat')?.textContent||null})`);
 const A = await browser('A', 9541), B = await browser('B', 9542);
-const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}))`); };
+const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}))`); };
 await prep(A, true); await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 // --- single device: every case renders, and a full run of case 1 ---
 await A.click('#toBonus'); await sleep(800); await A.click('[data-h=cases]'); await sleep(300);

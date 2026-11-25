@@ -24,6 +24,10 @@ node tests/cdp-room.mjs <shots-folder> http://127.0.0.1:8765/index.html
 | `cdp-act.mjs` | cards that need the app to act |
 | `cdp-sp.mjs`, `cdp-sp2.mjs` | special cards |
 | `cdp-en.mjs`, `cdp-lang.mjs` | English on cards, bonus-game language switch |
+| `cdp-lang2.mjs` | EN / ไทย button in the card game: chosen language big, the other small |
+| `cdp-how.mjs` | how-to-play page before the game: skip, don't show again, open from setup |
+
+The other scripts set `frm-howskip` so Start goes straight to the game.
 
 `cdp-head.mjs` and the `*-body.mjs` files are the pieces the full scripts were built from.
 Tests that force a card use `window.__T`, which the page only exposes on 127.0.0.1.

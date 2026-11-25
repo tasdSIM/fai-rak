@@ -24,7 +24,7 @@ async function browser(name, port) {
 }
 const A = await browser('A', 9501);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1000);
-await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:3}))`);
+await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:3}))`);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1800);
 await A.shot('setup');
 await A.click('#start'); await sleep(400);

@@ -2,7 +2,7 @@ const A = await browser('A', 9441);
 const spRow = async () => { for(let i=0;i<40;i++){ await play(); } };
 const st = () => A.ev(`JSON.stringify({card:__T.S.card&&__T.S.card.code,lv:__T.S.card&&__T.S.card.l,turn:__T.S.turn,passes:__T.S.passes.join('/'),left:__T.S.left,note:document.getElementById('cnote').hidden?null:document.getElementById('cnote').textContent,deck:__T.S.deck.length,ctl:[...document.querySelectorAll('#ctl button')].map(b=>b.dataset.a).join(',')})`);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1000);
-await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:2}))`);
+await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:2}))`);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 await A.click('#start'); await sleep(300);
 const play = async () => { await A.ev(`(()=>{const g=document.querySelector('#ctl [data-a=green]');if(g){g.click();document.querySelector('#ctl [data-a=next]')?.click()}else document.querySelector('#ctl [data-a=sp]')?.click()})()`); await sleep(60); };

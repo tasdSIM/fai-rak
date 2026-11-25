@@ -25,7 +25,7 @@ async function browser(name, port) {
 const A = await browser('A', 9381);
 await A.cmd('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 await A.cmd('Page.navigate', { url: URL }); await sleep(1000);
-await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}))`);
+await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}))`);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 const r = await A.ev(`(()=>{const b=document.getElementById('s-t').getBoundingClientRect();return {x:b.left+40,y:b.top+b.height/2}})()`);
 const tap = async (ms = 60) => { await A.cmd('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: r.x, y: r.y }] }); await sleep(ms); await A.cmd('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); };

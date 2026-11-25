@@ -25,13 +25,13 @@ async function browser(name, port) {
 const st = b => b.ev(`JSON.stringify({scr:document.querySelector('.scr.on')?.id,card:document.querySelector('#card .ctext')?.textContent?.slice(0,40),who:document.getElementById('who').textContent,ctl:[...document.querySelectorAll('#ctl button')].map(b=>b.dataset.a).join(','),ov:document.getElementById('ov').classList.contains('on')?document.getElementById('ov-t')?.textContent:null,clock:document.getElementById('clock')?.textContent||null,ban:document.getElementById('rban').hidden?null:document.getElementById('rbanT').textContent})`);
 const A = await browser('A', 9421), B = await browser('B', 9422);
 await A.cmd('Page.navigate', { url: URL }); await sleep(1200);
-await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
+await A.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
 await A.click('#toRoom'); await sleep(300); await A.shot('room-start');
 await A.click('[data-r=create]'); await sleep(1500);
 const code = await A.ev(`document.querySelector('.rcode')?.textContent.replace(/[^0-9]/g,'')`);
 console.log('room code', code); await A.shot('room-created');
 await B.cmd('Page.navigate', { url: URL }); await sleep(1000);
-await B.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-music',JSON.stringify({on:false}))`);
+await B.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-music',JSON.stringify({on:false}))`);
 await B.cmd('Page.navigate', { url: 'about:blank' }); await sleep(300); await B.cmd('Page.navigate', { url: URL + '#join=' + code }); await sleep(2500);
 await B.shot('joined'); await A.shot('peer-joined');
 console.log('A after join', await A.ev(`document.querySelector('.rstat')?.textContent`));

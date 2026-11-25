@@ -20,7 +20,7 @@ const sizes = [['desk',1440,900,false],['ipadL',1180,820,true],['ipadP',820,1180
 for (const [nm,w,h,mob] of sizes) {
   await cmd('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: mob, screenOrientation: { type: w>h?'landscapePrimary':'portraitPrimary', angle: w>h?90:0 } });
   await cmd('Page.navigate', { url: URL }); await sleep(1200);
-  await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false,vol:60,shuf:false,idx:0,list:[{id:'x',t:'Sweet Night R&B 💕 Romantic Bedroom Vibes | Smooth Deep Bass Playlist 04 very long title here'}]}));location.reload()`); await sleep(1500);
+  await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false,vol:60,shuf:false,idx:0,list:[{id:'x',t:'Sweet Night R&B 💕 Romantic Bedroom Vibes | Smooth Deep Bass Playlist 04 very long title here'}]}));location.reload()`); await sleep(1500);
   await ev(`document.getElementById('mTitle').textContent='Sweet Night R&B 💕 Romantic Bedroom Vibes | Smooth Deep Bass Playlist 04';document.getElementById('mbar').hidden=false`);
   await shot(nm+'-1setup');
   const ov = await ev(`(()=>{const b=document.getElementById('mTitle').getBoundingClientRect(),p=document.getElementById('mPlay2').getBoundingClientRect();return {titleRight:Math.round(b.right),playLeft:Math.round(p.left),hscroll:document.documentElement.scrollWidth>innerWidth}})()`);

@@ -23,7 +23,7 @@ async function browser(name, port) {
   return { edge, ws, ev, shot, click, cmd };
 }
 const A = await browser('A', 9371), B = await browser('B', 9372);
-const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:4}))`); };
+const prep = async (X, names) => { await X.cmd('Page.navigate', { url: URL }); await sleep(1000); await X.ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');${names?`localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));`:''}localStorage.setItem('frm-music',JSON.stringify({on:false}));localStorage.setItem('frm-deck',JSON.stringify({mode:'one',level:4}))`); };
 await prep(A, true); await A.cmd('Page.navigate', { url: URL }); await sleep(1500);
 console.log('chip hidden at start:', await A.ev(`document.getElementById('xchip').hidden`));
 await A.ev(`(()=>{for(let i=0;i<4;i++)document.getElementById('s-t').click()})()`); console.log('4 taps -> dialog?', await A.ev(`document.getElementById('ov').classList.contains('on')`));

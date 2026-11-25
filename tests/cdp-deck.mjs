@@ -15,7 +15,7 @@ const click = sel => ev(`(()=>{const e=document.querySelector(${JSON.stringify(s
 await cmd('Runtime.enable'); await cmd('Page.enable');
 await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
 await cmd('Page.navigate', { url: URL }); await sleep(1200);
-await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
+await ev(`localStorage.clear();localStorage.setItem('frm-age','1');localStorage.setItem('frm-howskip','1');localStorage.setItem('frm-names',JSON.stringify(['เอ','บี']));localStorage.setItem('frm-music',JSON.stringify({on:false}));location.reload()`); await sleep(1500);
 // play the whole deck; returns {codes, levels, ups, end}
 const run = () => ev(`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));const codes=[],ups=[];let guard=0;
 while(guard++<400){const ov=document.getElementById('ov').classList.contains('on');
